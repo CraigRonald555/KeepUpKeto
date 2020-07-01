@@ -1,0 +1,152 @@
+<div class="container">
+  <div class="row">
+    <div class="col-lg-12">
+        <div class="btn-group" role="group" *ngIf="showDaily===true">
+        <button type="button" class="btn btn-primary" (click)="showDaily=true">Daily</button>
+        <button type="button" class="btn btn-primary btn-link" (click)="showDaily=false">Weekly</button>
+        </div>
+
+        <div class="btn-group" role="group" *ngIf="showDaily===false">
+          <button type="button" class="btn btn-primary btn-link" (click)="showDaily=true">Daily</button>
+          <button type="button" class="btn btn-primary" (click)="showDaily=false">Weekly</button>
+        </div>
+
+        <div class="btn btn-rose pull-right" (click)='generateTimetable()'>Generate</div>
+
+        <!-- <div class="dropdown show pull-right">
+            <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Dropdown link
+            </a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+              <a class="dropdown-item" href="#">Table 1</a>
+              <a class="dropdown-item" href="#">Table 2</a>
+              <a class="dropdown-item" href="#">Table 3</a>
+            </div>
+          </div> -->
+
+
+        <table class="table" *ngIf="showDaily==true">
+            <thead>
+                <tr>
+                  <th><strong>Type</strong></th>
+                  <th><strong>Time</strong></th>
+                  <th class="text-center"><strong>IMG</strong></th>
+                  <th><strong>Name</strong></th>
+                  <th><strong>Carbs</strong></th>
+                  <th class="text-right"><strong>Actions</strong></th>
+                </tr>
+            </thead>
+            <tbody *ngFor="let currentRecipe of todayRecipes.recipes; let i = index">
+                <tr>
+                    <td>{{currentRecipe.recipeType}}</td>
+                    <td>{{currentRecipe.time}}</td>
+                    <td class="text-center"><img src="{{currentRecipe.image}}" class="rounded-circle img-fluid" style="width:130px; height:130px;"/></td>
+                    <td>{{currentRecipe.name}}</td>
+                    <td>{{currentRecipe.carbs}}</td>
+                    <td class="td-actions text-right">
+                        <button type="button" rel="tooltip" class="btn btn-info">
+                            <i class="material-icons">person</i>
+                        </button>
+                        <button type="button" rel="tooltip" class="btn btn-success">
+                            <i class="material-icons">edit</i>
+                        </button>
+                        <button type="button" rel="tooltip" class="btn btn-danger" (click)="this.timetableService.removeRecipeByObject(this.todayRecipes, i);">
+                            <i class="material-icons">close</i>
+                        </button>
+                        {{this.todayRecipes.noOfRecipes}}
+                    </td>
+                </tr>
+            </tbody>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="text-right">Calories remaining: {{todayRecipes.caloriesRemaining}}</td>
+        </table>
+
+      <div class="weekly-table" *ngIf="showDaily==false">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="text-center"><strong>Day</strong></th>
+                    <th><strong>Type</strong></th>
+                    <th><strong>Time</strong></th>
+                    <th><strong>Name</strong></th>
+                    <th><strong>Calories</strong></th>
+                    <th><strong>Carbs</strong></th>
+                    <th><strong>Protein</strong></th>
+                    <th><strong>Fat</strong></th>
+                    <th class="text-right"><strong>Actions</strong></th>
+                </tr>
+            </thead>
+            <!-- <div class="table-class" *ngFor="let currentDay of allRecipes"> -->
+            <tbody *ngFor="let currentDay of allRecipes; let i = index;">
+                <tr style="background-color: #f7f7f7"> <!--background: linear-gradient(to bottom, #f7f7f7, #ECEBEB)-->
+                    <td class="text-center" style="color:black"><strong>{{currentDay.day}}</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="td-actions text-right">
+                        <div class="btn-group">
+                          <button type="button" rel="tooltip" class="btn btn-primary" (click)="currentDay.show=false" *ngIf="currentDay.show">
+                              <i class="material-icons">arrow_drop_up</i>
+                          </button>
+                          <button type="button" rel="tooltip" class="btn btn-primary" (click)="currentDay.show=true" *ngIf="!currentDay.show">
+                              <i class="material-icons">arrow_drop_down</i>
+                          </button>
+                          <button type="button" class="btn btn-success btn-round" (click)="this.timetableService.dayToAddRecipeTo = i" data-toggle="modal" data-target="#exampleModal">
+                              <i class="material-icons">add</i>
+                          </button>
+                        </div>
+                    </td>
+                </tr>
+                <ng-container *ngIf="currentDay.show === true">
+
+                  <tr *ngFor="let current of currentDay['recipes']; let j = index;">
+                      <td class="td-actions text-center">
+                        <button type="button" rel="tooltip" class="btn btn-success btn-round">
+                        <i class="material-icons"><a href="{{current.url}}" target="_blank">edit</a></i>
+                        </button>
+                      </td>
+                      <td>{{current.recipeType}}</td>
+                      <td>{{current.time}}</td>
+                      <td>{{current.name}}</td>
+                      <td>{{current.calories}}</td>
+                      <td>{{current.carbs}}g</td>
+                      <td>{{current.protein}}g</td>
+                      <td>{{current.fat}}g</td>
+                      <td class="td-actions text-right">
+                          <button type="button" rel="tooltip" class="btn btn-danger btn-round" (click)="this.timetableService.removeRecipeByIndex(i,j);">
+                              <i class="material-icons">close</i>
+                          </button>
+                      </td>
+                  </tr>
+
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>{{currentDay.totalCarbs}}</td>
+                    <td>{{currentDay.totalProtein}}</td>
+                    <td>{{currentDay.totalFat}}</td>
+                    <td class="text-right">Calories remaining: {{currentDay.caloriesRemaining}}</td>
+                  </tr>
+
+
+                </ng-container>
+              </tbody>
+        </table>
+      </div>
+
+      <!-- (click)="allRecipes[i].recipes.push({}) -->
+
+    </div>
+  </div>
+</div>

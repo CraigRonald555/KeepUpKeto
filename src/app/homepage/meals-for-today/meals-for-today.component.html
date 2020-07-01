@@ -1,0 +1,14 @@
+<div class="row">
+  <div class="col-lg-12">
+    <div class="title">
+      <strong>Your meals for today</strong>
+    </div>
+  </div>
+  </div>
+
+
+<div fxLayout="row wrap" fxLayoutGap="8px">
+
+  <app-meal-card *ngFor="let element of mealCards" [element]="element" fxFlex="32.5%"></app-meal-card>
+
+</div>

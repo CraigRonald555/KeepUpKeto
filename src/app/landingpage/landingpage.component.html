@@ -1,0 +1,197 @@
+<div id="background">
+  <!-- <img src="assets/img/bg-landing.jpg" class="stretch" alt="" /> -->
+
+<!-- <nav class="navbar fixed-top navbar-expand-lg navbar-transparent" color-on-scroll="100" id="sectionsNav" style="background-color:crimson">
+  <div class="container">
+      <div class="navbar-translate">
+          <a class="navbar-brand" routerLink="/landing"><strong>KetoManager</strong></a>
+      </div>
+  </div>
+</nav> -->
+  <div class="container-fluid" style='margin-top: 33%'>
+    <div class="row">
+      <div class="col-md-6 border-right border-bottom">
+        <div class='text-center' style='color: #d43440; font-family: arial;font-size: 18px'>Why Us?</div>
+        <p style='margin-left: 120px; margin-top: 30px; font-family: arial; font-size: 18px'>
+          <img src='assets/img/tick.png' height='30' width='30' /> Quick and easy to create your meal plan</p>
+        <p style='margin-left: 120px; font-family: arial; font-size: 18px'>
+          <img src='assets/img/tick.png' height='30' width='30' /> Thousands of recipes to select from</p>
+        <p style='margin-left: 120px; font-family: arial; font-size: 18px'>
+          <img src='assets/img/tick.png' height='30' width='30' /> Fully customise your meal plan from to suit you</p>
+        <p style='margin-left: 120px; font-family: arial; font-size: 18px'>
+          <img src='assets/img/tick.png' height='30' width='30' /> Burn fat faster than any other healthy diet</p>
+        <p style='margin-left: 120px; font-family: arial; font-size: 18px'>
+          <img src='assets/img/tick.png' height='30' width='30' /> Continuous support</p>
+        <div class='p text-center'>
+          <button type="button" class="btn btn-default" style='margin: 30px' routerLink="/more">More info</button>
+        </div>
+      </div>
+
+      <div class="col-md-6 text-center border-bottom" style='margin-top: 11%'>
+        <app-signup></app-signup>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="signUpModel" tabindex="-1" role="dialog" aria-labelledby="signUpModel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel" *ngIf='stepCounter===0'>Help us find recipes for you by selecting your preferred ingredients</h5>
+        <h5 class="modal-title" id="exampleModalLabel" *ngIf='stepCounter===1'>To help us calculate your required nutrients please enter in your details</h5>
+        <button type="button" class="close" data-dismiss="modal" (click)='stepCounter=0' aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <!-- INGREDIENTS FORM -->
+        <ng-container *ngIf='stepCounter === 0'>
+
+          <button class="btn btn-default btn-round text-left" *ngIf='!porkSelected' style="display:block; min-width:100%" (click)="addIngredient('pork')"><img src="assets/img/ingredients/pork.png" style="width: 40px; height: 28px; margin-right: 20px" /> Pork <div class="pull-right"><i class='material-icons'>highlight_off</i></div></button>
+          <button class="btn btn-success btn-round text-left" *ngIf='porkSelected' style="display:block; min-width:100%" (click)="removeIngredient('pork')"><img src="assets/img/ingredients/pork.png" style="width: 40px; height: 28px; margin-right: 20px" /> Pork <div class="pull-right"><i class='material-icons'>check</i></div></button>
+
+          <button class="btn btn-default btn-round text-left" *ngIf='!chickenSelected' style="display:block; min-width:100%" (click)="addIngredient('chicken')"><img src="assets/img/ingredients/chicken.png" style="width: 40px; height: 28px; margin-right: 20px" /> Chicken <div class="pull-right"><i class='material-icons'>highlight_off</i></div></button>
+          <button class="btn btn-success btn-round text-left" *ngIf='chickenSelected' style="display:block; min-width:100%" (click)="removeIngredient('chicken')"><img src="assets/img/ingredients/chicken.png" style="width: 40px; height: 28px; margin-right: 20px" /> Chicken <div class="pull-right"><i class='material-icons'>check</i></div></button>
+
+          <button class="btn btn-default btn-round text-left" *ngIf='!vealSelected' style="display:block; min-width:100%" (click)="addIngredient('veal')"><img src="assets/img/ingredients/veal.png" style="width: 40px; height: 28px; margin-right: 20px" /> Veal <div class="pull-right"><i class='material-icons'>highlight_off</i></div></button>
+          <button class="btn btn-success btn-round text-left" *ngIf='vealSelected' style="display:block; min-width:100%" (click)="removeIngredient('veal')"><img src="assets/img/ingredients/veal.png" style="width: 40px; height: 28px; margin-right: 20px" /> Veal <div class="pull-right"><i class='material-icons'>check</i></div></button>
+
+          <button class="btn btn-default btn-round text-left" *ngIf='!eggsSelected' style="display:block; min-width:100%" (click)="addIngredient('eggs')"><img src="assets/img/ingredients/eggs.png" style="width: 40px; height: 28px; margin-right: 20px" /> Eggs <div class="pull-right"><i class='material-icons'>highlight_off</i></div></button>
+          <button class="btn btn-success btn-round text-left" *ngIf='eggsSelected' style="display:block; min-width:100%" (click)="removeIngredient('eggs')"><img src="assets/img/ingredients/eggs.png" style="width: 40px; height: 28px; margin-right: 20px" /> Eggs <div class="pull-right"><i class='material-icons'>check</i></div></button>
+
+          <button class="btn btn-default btn-round text-left" *ngIf='!berriesSelected' style="display:block; min-width:100%" (click)="addIngredient('berries')"><img src="assets/img/ingredients/berries.png" style="width: 40px; height: 28px; margin-right: 20px" /> Berries <div class="pull-right"><i class='material-icons'>highlight_off</i></div></button>
+          <button class="btn btn-success btn-round text-left" *ngIf='berriesSelected' style="display:block; min-width:100%" (click)="removeIngredient('berries')"><img src="assets/img/ingredients/berries.png" style="width: 40px; height: 28px; margin-right: 20px" /> Berries <div class="pull-right"><i class='material-icons'>check</i></div></button>
+
+          <button class="btn btn-default btn-round text-left" *ngIf='!nutsSelected' style="display:block; min-width:100%" (click)="addIngredient('nuts')"><img src="assets/img/ingredients/nuts.png" style="width: 40px; height: 28px; margin-right: 20px" /> Nuts <div class="pull-right"><i class='material-icons'>highlight_off</i></div></button>
+          <button class="btn btn-success btn-round text-left" *ngIf='nutsSelected' style="display:block; min-width:100%" (click)="removeIngredient('nuts')"><img src="assets/img/ingredients/nuts.png" style="width: 40px; height: 28px; margin-right: 20px" /> Nuts <div class="pull-right"><i class='material-icons'>check</i></div></button>
+
+          <button type="button" class="btn btn-primary" (click)="stepCounter = stepCounter + 1">Next</button>
+
+        </ng-container>
+
+        <!-- METRICS FORM -->
+        <div id='Metrics' [hidden]="stepCounter!==1">
+          <form #metricsForm='ngForm' ngNativeValidate>
+            <div id="user-data">
+
+              <!-- Height -->
+
+              <div class="form-group">
+                <label for="height">Height</label>
+                <div class="input-group" [hidden]='!centimeters'>
+                  <input type="text" name="centimeters" id="centimeters" placeholder='Centimeters' class="form-control" ngModel #modelCentimeters='ngModel' minlength='2' required [disabled]='!centimeters'>
+                  <div class="input-group-append">
+                    <button class='btn' [ngClass]="{'btn-default' : !centimeters, 'btn-primary' : centimeters}" (click)='centimeters=true'>Cm</button>
+                    <button class='btn' [ngClass]="{'btn-default' : centimeters, 'btn-primary' : !centimeters}" (click)='centimeters=false'>Ft</button>
+                  </div>
+                  <span class="help-block" *ngIf='(!modelCentimeters.valid || modelCentimeters.value.length === 0) && modelCentimeters.touched'>
+                    Please make sure you enter in your height in centimeters
+                  </span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="input-group" [hidden]='centimeters'>
+                  <input type="number" name="feet" placeholder="Feet" class="form-control" ngModel #modelFeet='ngModel' required [disabled]='centimeters'>
+                  <input type="number" name="inches" placeholder="Inches" class="form-control" ngModel #modelInches='ngModel' required [disabled]='centimeters'>
+                  <div class="input-group-append">
+                    <button class='btn' [ngClass]="{'btn-default' : !centimeters, 'btn-primary' : centimeters}" (click)='centimeters=true'>Cm</button>
+                    <button class='btn' [ngClass]="{'btn-default' : centimeters, 'btn-primary' : !centimeters}" (click)='centimeters=false'>Ft</button>
+                  </div>
+                  <span class="help-block" *ngIf='(!modelFeet.valid || modelFeet.value.length === 0) && modelFeet.touched'>
+                    Please make sure you enter in your height in feet and inches
+                  </span>
+                </div>
+              </div>
+
+              <!-- Weight -->
+
+              <div class="form-group">
+                <label for="weight">Weight</label>
+                <div class="input-group" [hidden]='!lbs'>
+                  <input type="text" name="pounds" id="pounds" placeholder='Pounds' class="form-control" ngModel #modelPounds='ngModel' minlength='2' required [disabled]='!lbs'>
+                  <!-- [disabled]='!lbs' -->
+                  <div class="input-group-append">
+                    <button class='btn' [ngClass]="{'btn-default' : !lbs, 'btn-primary' : lbs}" (click)='lbs=true'>Lbs</button>
+                    <button class='btn' [ngClass]="{'btn-default' : lbs, 'btn-primary' : !lbs}" (click)='lbs=false'>KG</button>
+                  </div>
+                  <span class="help-block" *ngIf='(!modelPounds.valid || modelPounds.value.length === 0) && modelPounds.touched'>
+                    Please make sure you enter in your weight in pounds
+                  </span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="input-group" [hidden]='lbs'>
+                  <input type="number" name="kilograms" id="kilograms" placeholder="Kilograms" class="form-control" ngModel #modelKilograms='ngModel' minlength='2' required [disabled]='lbs'>
+                  <!-- [disabled]='lbs' -->
+                  <div class="input-group-append">
+                    <button class='btn' [ngClass]="{'btn-default' : !lbs, 'btn-primary' : lbs}" (click)='lbs=true'>Lbs</button>
+                    <button class='btn' [ngClass]="{'btn-default' : lbs, 'btn-primary' : !lbs}" (click)='lbs=false'>KG</button>
+                  </div>
+                  <span class="help-block" *ngIf='(!modelKilograms.valid || modelKilograms.value.length === 0) && modelKilograms.touched'>
+                    Please make sure you enter in your weight in kilograms
+                  </span>
+                </div>
+              </div>
+
+              <!-- Age -->
+
+              <div class="form-group">
+                <label for="Age">Date of Birth</label>
+                <input type="date" name="age" id="age" class="form-control" ngModel min="01-01-1900" max="01/01/2010" #age='ngModel' required>
+                <span class="help-block" *ngIf='!age.valid && age.touched'>
+                  Please make sure you enter a valid date of birth
+                </span>
+              </div>
+
+              <button type="submit" class="btn btn-primary" [disabled]='!metricsForm.valid' (click)="stepCounter = stepCounter + 1">Next</button>
+
+            </div>
+
+          </form>
+
+        </div>
+
+        <!-- LOGIN FORM -->
+        <div id='payment' [hidden]="stepCounter!==2">
+
+          <form #loginForm='ngForm'>
+            <div id="user-data">
+              <div class="form-group">
+                <label for="name" required>Name</label>
+                <input type="text" name="name" id="name" class="form-control" ngModel minlength=1 #name='ngModel'>
+                <span class="help-block" *ngIf='(!name.valid || name.value.length === 0) && name.touched'>Please enter a valid name</span>
+              </div>
+              <div class="form-group">
+                <label for="email" required email>Email</label>
+                <input type="email" name="email" id="email" class="form-control" ngModel email #email='ngModel'>
+                <span class="help-block" *ngIf='(!email.valid || email.value.length === 0) && email.touched'>Please enter a valid email</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="pwd">Password</label>
+              <input type="password" name="password" id="password" class="form-control" ngModel required minlength=6 #password='ngModel'>
+              <span class="help-block" *ngIf='(!password.valid || password.value.length === 0) && password.touched'>Please enter at least six characters</span>
+            </div>
+
+            <div #paypal></div>
+            <span class="help-block" *ngIf='buttonError && !loginForm.valid'>Please make sure the values above are valid before checking out</span>
+          </form>
+        </div>
+
+        <br>
+        <div class="progress progress-striped active">
+          <div class="progress-bar progress-bar-info" role='progressbar' [attr.aria-valuenow]="progress" aria-valuemin="0" aria-valuemax="100" style="width:0%"><span class="sr-only">0/3 steps</span></div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" (click)="stepCounter = stepCounter - 1">Previous</button>
+        <button type="button" class="btn btn-primary" (click)="stepCounter = stepCounter + 1">Next</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,43 @@
+/* #background {
+  background: url('~src/assets/img/bg-landing.png');
+  background-size: cover;
+  width: 100%;
+  height: 70%;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  z-index: 0;
+} */
+
+.stretch {
+  width:100%;
+  height:100%;
+}
+
+#background {
+  background-image: url('~src/assets/img/bg-landing.png');
+  background-repeat: no-repeat;
+  background-color: white;
+  background-size: 100%;
+  position: absolute;
+  /* left: -12px; */
+  /* top: -2px; */
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.block {
+  display: block;
+  width: 100%;
+  border: none;
+  background-color: #4CAF50;
+  padding: 14px 28px;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.help-block {
+  color: red;
+}
