@@ -36,7 +36,6 @@ export class LandingpageComponent implements AfterViewInit {
   @ViewChild('paypal') paypalElement: ElementRef;
   planID = "P-1BH46091SU0529455L2YMZFY";
   subcripId: any;
-  basicAuth = 'Basic QVJBWVg4eTdxTHVIeTFxY1FKY2xERnh1LW5ZN18wNElwN3J0UE1OdHNWTUZ6TTFoSkFBNGQyNDBBcXlOMjQ0UlJ6MnNQV2hZNHItWkF3REE6RUVJSlJOLWNSTnNWaEdpdFFWUHdQX09JcWIyZVo1LVRuMlFob2R5NGdPblc3ajdzcVdtNmppS2dxWkhQV2h4OGdMMzZzaW0zVGhoLWlDMFI=';
 
   constructor(private auth: AuthService) {}
 
