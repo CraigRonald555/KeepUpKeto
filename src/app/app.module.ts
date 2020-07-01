@@ -29,14 +29,11 @@ import { SignupComponent } from './signup/signup.component';
 const appRoutes = [
 
   {path: '', redirectTo: 'home', pathMatch: 'full'},
-  // { path: '', component: MainComponent, children: [
-  //   { path: 'home', component: HomepageComponent},
-  //   { path: 'timetable', component: TimetablepageComponent},
-  //   { path: 'more', component: MoreInfoComponent}
-  // ] },
-  { path: 'home', component: HomepageComponent},
-  { path: 'timetable', component: TimetablepageComponent},
-  { path: 'more', component: MoreInfoComponent},
+  { path: '', component: MainComponent, children: [
+    { path: 'home', component: HomepageComponent},
+    { path: 'timetable', component: TimetablepageComponent},
+    { path: 'more', component: MoreInfoComponent}
+  ] },
   { path: 'landing', component: LandingpageComponent}
 
 ];
