@@ -5,7 +5,6 @@
                   <thead>
                       <tr>
                         <th><strong>Type</strong></th>
-                        <th><strong>Time</strong></th>
                         <th><strong>Name</strong></th>
                         <th><strong>Carbs</strong></th>
                       </tr>
@@ -14,7 +13,6 @@
                       <tr *ngFor="let currentRecipe of todayRecipes.recipes">
                         <td>{{ currentRecipe.recipeType }}</td>
                         <td>{{ currentRecipe.name }}</td>
-                        <td>{{ currentRecipe.time }}</td>
                         <td>{{ currentRecipe.carbs }}</td>
                       </tr>
                   </tbody>

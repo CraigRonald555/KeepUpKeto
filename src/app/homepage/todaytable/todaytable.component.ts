@@ -16,7 +16,6 @@ export class TodaytableComponent implements OnInit {
     noOfRecipes: number,
     recipes: {
       recipeType: string,
-      time: string,
       name: string,
       image: string,
       carbs: number

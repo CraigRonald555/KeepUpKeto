@@ -27,7 +27,6 @@ export class TimetablepageComponent implements OnInit {
     notKetoFriendlyReason: string, // Day is not keto friendly reason
     recipes: {
       recipeType: string,
-      time: string,
       name: string,
       image: string,
       calories: number,
@@ -46,7 +45,6 @@ export class TimetablepageComponent implements OnInit {
     noOfRecipes: number,
     recipes: {
       recipeType: string,
-      time: string,
       name: string,
       image: string,
       calories: number,

@@ -29,7 +29,6 @@
             <thead>
                 <tr>
                   <th><strong>Type</strong></th>
-                  <th><strong>Time</strong></th>
                   <th class="text-center"><strong>IMG</strong></th>
                   <th><strong>Name</strong></th>
                   <th><strong>Carbs</strong></th>
@@ -39,7 +38,6 @@
             <tbody *ngFor="let currentRecipe of todayRecipes.recipes; let i = index">
                 <tr>
                     <td>{{currentRecipe.recipeType}}</td>
-                    <td>{{currentRecipe.time}}</td>
                     <td class="text-center"><img src="{{currentRecipe.image}}" class="rounded-circle img-fluid" style="width:130px; height:130px;"/></td>
                     <td>{{currentRecipe.name}}</td>
                     <td>{{currentRecipe.carbs}}</td>
@@ -61,7 +59,6 @@
             <td></td>
             <td></td>
             <td></td>
-            <td></td>
             <td class="text-right">Calories remaining: {{todayRecipes.caloriesRemaining}}</td>
         </table>
 
@@ -71,7 +68,6 @@
                 <tr>
                     <th class="text-center"><strong>Day</strong></th>
                     <th><strong>Type</strong></th>
-                    <th><strong>Time</strong></th>
                     <th><strong>Name</strong></th>
                     <th><strong>Calories</strong></th>
                     <th><strong>Carbs</strong></th>
@@ -84,7 +80,6 @@
             <tbody *ngFor="let currentDay of allRecipes; let i = index;">
                 <tr style="background-color: #f7f7f7"> <!--background: linear-gradient(to bottom, #f7f7f7, #ECEBEB)-->
                     <td class="text-center" style="color:black"><strong>{{currentDay.day}}</strong></td>
-                    <td></td>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -114,7 +109,6 @@
                         </button>
                       </td>
                       <td>{{current.recipeType}}</td>
-                      <td>{{current.time}}</td>
                       <td>{{current.name}}</td>
                       <td>{{current.calories}}</td>
                       <td>{{current.carbs}}g</td>
@@ -132,14 +126,11 @@
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td></td>
                     <td>{{currentDay.totalCarbs}}</td>
                     <td>{{currentDay.totalProtein}}</td>
                     <td>{{currentDay.totalFat}}</td>
                     <td class="text-right">Calories remaining: {{currentDay.caloriesRemaining}}</td>
                   </tr>
-
-
                 </ng-container>
               </tbody>
         </table>

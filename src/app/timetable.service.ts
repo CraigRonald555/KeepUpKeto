@@ -23,7 +23,6 @@ export class TimetableService {
     notKetoFriendlyReason: string, // Day is not keto friendly reason
     recipes: {
       recipeType: string,
-      time: string,
       name: string,
       image: string,
       url: string,
@@ -96,11 +95,13 @@ export class TimetableService {
       noOfRecipes: number,
       recipes: {
         recipeType: string,
-        time: string,
         name: string,
         image: string,
         calories: number,
-        carbs: number
+        carbs: number,
+        fat: number,
+        protein: number,
+        url: string
       }[]
     };
 
@@ -138,7 +139,6 @@ export class TimetableService {
   }
 
   addRecipeToDay(index: number, recipe: {recipeType: string,
-      time: string,
       name: string,
       image: string,
       url: string,
@@ -166,7 +166,6 @@ export class TimetableService {
 
   addRecipesToDay(index: number, recipes: {
       recipeType: string,
-      time: string,
       name: string,
       image: string,
       calories: number,
@@ -211,7 +210,6 @@ export class TimetableService {
       noOfRecipes: number,
       recipes: {
         recipeType: string,
-        time: string,
         name: string,
         image: string,
         calories: number,
@@ -605,7 +603,6 @@ export class TimetableService {
 
         let recipeForDay: {
           recipeType: string,
-          time: string,
           name: string,
           image: string,
           url: string,
@@ -616,7 +613,6 @@ export class TimetableService {
           isKetoFriendly: boolean,
           notKetoFriendlyReason: string
       } = {recipeType: recipeDetails.recipeType,
-          time: '15:00',
           name: returnRecipe.label,
           url: returnRecipe.url,
           carbs: returnRecipe['totalNutrients'].CHOCDF.quantity / servings,
