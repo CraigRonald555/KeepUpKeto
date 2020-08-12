@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { TimetableService } from 'src/app/timetable.service';
 import { stringify } from 'querystring';
 
@@ -22,13 +22,18 @@ export class TodaytableComponent implements OnInit {
     }[]
   };
 
-  currentDay: string = this.timetableService.getDayName();
+  currentDay: string;
 
-  constructor(private timetableService: TimetableService) { }
+  constructor(private timetableService: TimetableService, private changeDetector: ChangeDetectorRef) {
+
+  }
 
   ngOnInit() {
 
     this.todayRecipes = this.timetableService.getTodayRecipes();
+    this.currentDay = this.timetableService.getDayName();
+    this.changeDetector.detectChanges();
+    console.log(this.currentDay);
 
   }
 

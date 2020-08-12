@@ -41,3 +41,11 @@
 .help-block {
   color: red;
 }
+
+.space-right{
+  padding-right: 10px
+}
+
+.clickableText {
+  cursor: pointer;
+}

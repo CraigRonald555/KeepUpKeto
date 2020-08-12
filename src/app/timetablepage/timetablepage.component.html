@@ -29,7 +29,6 @@
             <thead>
                 <tr>
                   <th><strong>Type</strong></th>
-                  <th class="text-center"><strong>IMG</strong></th>
                   <th><strong>Name</strong></th>
                   <th><strong>Carbs</strong></th>
                   <th class="text-right"><strong>Actions</strong></th>
@@ -38,7 +37,6 @@
             <tbody *ngFor="let currentRecipe of todayRecipes.recipes; let i = index">
                 <tr>
                     <td>{{currentRecipe.recipeType}}</td>
-                    <td class="text-center"><img src="{{currentRecipe.image}}" class="rounded-circle img-fluid" style="width:130px; height:130px;"/></td>
                     <td>{{currentRecipe.name}}</td>
                     <td>{{currentRecipe.carbs}}</td>
                     <td class="td-actions text-right">
@@ -58,7 +56,6 @@
             <td></td>
             <td></td>
             <td></td>
-            <td></td>
             <td class="text-right">Calories remaining: {{todayRecipes.caloriesRemaining}}</td>
         </table>
 
@@ -70,9 +67,9 @@
                     <th><strong>Type</strong></th>
                     <th><strong>Name</strong></th>
                     <th><strong>Calories</strong></th>
-                    <th><strong>Carbs</strong></th>
-                    <th><strong>Protein</strong></th>
-                    <th><strong>Fat</strong></th>
+                    <th class='showBasedOnSS'><strong>Carbs</strong></th>
+                    <th class='showBasedOnSS'><strong>Protein</strong></th>
+                    <th class='showBasedOnSS'><strong>Fat</strong></th>
                     <th class="text-right"><strong>Actions</strong></th>
                 </tr>
             </thead>
@@ -82,9 +79,9 @@
                     <td class="text-center" style="color:black"><strong>{{currentDay.day}}</strong></td>
                     <td></td>
                     <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td class='showBasedOnSS'></td>
+                    <td class='showBasedOnSS'></td>
+                    <td class='showBasedOnSS'></td>
                     <td></td>
                     <td class="td-actions text-right">
                         <div class="btn-group">
@@ -111,9 +108,9 @@
                       <td>{{current.recipeType}}</td>
                       <td>{{current.name}}</td>
                       <td>{{current.calories}}</td>
-                      <td>{{current.carbs}}g</td>
-                      <td>{{current.protein}}g</td>
-                      <td>{{current.fat}}g</td>
+                      <td class='showBasedOnSS'>{{current.carbs}}g</td>
+                      <td class='showBasedOnSS'>{{current.protein}}g</td>
+                      <td class='showBasedOnSS'>{{current.fat}}g</td>
                       <td class="td-actions text-right">
                           <button type="button" rel="tooltip" class="btn btn-danger btn-round" (click)="this.timetableService.removeRecipeByIndex(i,j);">
                               <i class="material-icons">close</i>
@@ -126,9 +123,9 @@
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td>{{currentDay.totalCarbs}}</td>
-                    <td>{{currentDay.totalProtein}}</td>
-                    <td>{{currentDay.totalFat}}</td>
+                    <td class='showBasedOnSS'>{{currentDay.totalCarbs}}</td>
+                    <td class='showBasedOnSS'>{{currentDay.totalProtein}}</td>
+                    <td class='showBasedOnSS'>{{currentDay.totalFat}}</td>
                     <td class="text-right">Calories remaining: {{currentDay.caloriesRemaining}}</td>
                   </tr>
                 </ng-container>

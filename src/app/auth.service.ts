@@ -1,55 +1,162 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { stringify } from 'querystring';
+import { User } from 'firebase';
+import { AngularFireDatabase } from '@angular/fire/database';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  loggedIn = false;
 
-  constructor(private afAuth: AngularFireAuth, private router: Router, private http: HttpClient) {
+  signedIn = new EventEmitter<User>();
 
+  constructor(private afAuth: AngularFireAuth, private router: Router, private fbDB: AngularFireDatabase) {
+
+    this.afAuth.onAuthStateChanged(user => {
+
+      if (user) {
+
+        this.signedIn.emit(user);
+
+      } else {
+
+        console.log('Currently logged out');
+        this.router.navigate(['/landing']);
+
+      }
+
+
+    })
 
   }
 
-  SignUp(email, password) {
+  async signUp(email, password) {
 
-    const credentials = { email, password};
+    let finalResponse;
 
-    this.http.post('http://localhost:3000/api/user', credentials)
-      .subscribe(response => {
+    await this.afAuth.createUserWithEmailAndPassword(email, password)
+    .then(response => {
 
-        console.log(response);
+      finalResponse = response.user.uid;
 
-      },
-      error => {
+    })
+    .catch(error => {
 
-        console.log('Email already used');
+      finalResponse = error;
+      console.log(error);
 
-      });
+    });
 
-    // return this.afAuth.createUserWithEmailAndPassword(email, password)
-    //   .then((result) => {
-    //     window.alert('You have been successfully registered!');
-    //     console.log(result.user);
-    //   }).catch((error) => {
-    //     window.alert(error.message);
-    //   });
+    this.router.navigate(['/home']);
+    return finalResponse;
+
   }
 
   // Sign in with email/password
-  SignIn(email, password) {
+  async signIn(email, password) {
 
-    // return this.afAuth.signInWithEmailAndPassword(email, password)
-    //   .then((result) => {
-    //      this.router.navigate(['/homepage']);
-    //      this.loggedIn = true;
-    //   }).catch((error) => {
-    //     window.alert(error.message);
-    //   });
+    let finalResponse;
+
+    await this.afAuth.signInWithEmailAndPassword(email, password)
+      .then(response => {
+
+         this.router.navigate(['/home']);
+         console.log(response);
+         finalResponse = 'successful';
+
+      })
+      .catch(error => {
+
+        console.log(error);
+        finalResponse = error.code;
+
+      });
+
+    return finalResponse;
+
+  }
+
+  // Sign out
+  signOut() {
+
+    this.afAuth.signOut()
+    .then(response => {
+
+      console.log(response);
+
+    })
+    .catch(error => {
+
+      console.log(error);
+
+    });
+
+  }
+
+  async resetPassword(email: string) {
+
+    let finalResponse;
+
+    await this.afAuth.sendPasswordResetEmail(email)
+    .then(response => {
+
+      finalResponse = 'successful';
+
+    })
+    .catch(error => {
+
+      finalResponse = error.code;
+
+    });
+
+    return finalResponse;
+
+  }
+
+  async addMetrics(uid, name, ingredients, goals, sex, height, weight, dob, age) {
+
+    await this.fbDB.database.ref('userData/' + uid).set({
+      name: name,
+      goals: goals,
+      ingredients: ingredients,
+      sex: sex,
+      heightCM : height,
+      weightKG: weight,
+      dateOfBirth: dob,
+      age: age
+
+    }).catch(error => {
+
+      console.log(error);
+
+    });
+
+
+
+  }
+
+  async readDataFromFireBase(uid, table) {
+
+    let returnValue;
+
+    await this.fbDB.database.ref(`${table}/` + uid).once('value')
+      .then(snapshot => {
+
+        returnValue = snapshot.val();
+
+      })
+      .catch(error => {
+
+        console.log(error);
+        returnValue = error;
+
+
+     });
+
+    return returnValue;
+
   }
 
 }

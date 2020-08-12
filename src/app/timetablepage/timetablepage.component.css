@@ -1,0 +1,6 @@
+@media all and (max-width: 775px) {
+
+  /* SS means Screen Size */
+  .showBasedOnSS{display:none;}
+
+}

@@ -1,9 +1,18 @@
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
+import { AuthService } from './auth.service';
+import { AngularFireAuth } from '@angular/fire/auth';
+import { User } from 'firebase';
 
+@Injectable({
+  providedIn: 'root'
+})
 export class AccountService {
 
+  userId: string;
+
   accountDetails: {
-    username: string,
+    name: string,
+    goals: string,
     sex: string,
     age: number,
     height: number, // cm
@@ -20,10 +29,23 @@ export class AccountService {
 
   accountDetailsUpdated = new EventEmitter<string>();
 
-  constructor(/*call the HTTP import*/) {
+  constructor(private auth: AuthService) {
+
+    this.auth.signedIn.subscribe(user => {
+
+      //Assign accountDetails to the User's details
+      this.userId = user.uid;
+      console.log(user.uid);
+
+      this.updateAccountDetails();
+
+      // make a call to the table holding the userData data using the user id
+
+    });
 
     this.accountDetails = {
-      username: undefined,
+      name: undefined,
+      goals: undefined,
       sex: undefined,
       age: undefined,
       height: undefined, // cm
@@ -37,25 +59,38 @@ export class AccountService {
       dailyCalories: undefined
     };
 
-    this.getAccountDetails();
+  }
+
+  getUserID() {
+
+    return this.userId;
+
+  }
+
+  async updateAccountDetails() {
+
+    console.log(await this.auth.readDataFromFireBase(this.userId, 'userData'));
+    const userDataResponse = await this.auth.readDataFromFireBase(this.userId, 'userData');
+
+    this.accountDetails.name = userDataResponse.name;
+    this.accountDetails.goals = userDataResponse.goals;
+    this.accountDetails.sex = userDataResponse.sex;
+    this.accountDetails.age = userDataResponse.age;
+    this.accountDetails.height = userDataResponse.heightCM;
+    this.accountDetails.weight = userDataResponse.weightKG;
+    this.accountDetails.ingredientPreferences = userDataResponse.ingredients;
+    this.accountDetails.macros = {fat: 130, protein: 80, carbs: 20};
+    this.calculateDailyCalories();
+
+    console.log(this.accountDetails.dailyCalories);
+
+    this.accountDetailsUpdated.emit('Updated');
 
   }
 
   getAccountDetails() {
 
-    // Use this to make API calls to firebase which will fill in the accountDetails object
-
-    // Test case:
-    this.accountDetails.username = 'Test';
-    this.accountDetails.sex = 'Male';
-    this.accountDetails.age = 23;
-    this.accountDetails.height = 178;
-    this.accountDetails.weight = 95.25;
-    this.accountDetails.ingredientPreferences = ['beef', 'chicken', 'walnuts', 'avocodo'];
-    this.accountDetails.macros = {fat: 130, protein: 80, carbs: 20};
-    this.calculateDailyCalories();
-
-    console.log(this.accountDetails.dailyCalories);
+    return this.accountDetails;
 
   }
 
@@ -75,7 +110,71 @@ export class AccountService {
 
     }
 
-    this.accountDetailsUpdated.emit('Daily Calories updated');
+  }
+
+  setNutrients() {
+
+    const carbsPercentage = 0.2;
+    const proteinPercentage = 0.3;
+    const fatPercentage = 0.5;
+
+    let calories;
+
+    if (this.accountDetails.goals === 'loseOne') {
+
+      if (this.accountDetails.sex === 'Male') {
+
+        calories = (10 * this.accountDetails.weight + 6.25 * this.accountDetails.height - 5 * this.accountDetails.age + 5);
+
+      } else if (this.accountDetails.sex === 'Female') {
+
+        calories = (10 * this.accountDetails.weight + 6.25 * this.accountDetails.height - 5 * this.accountDetails.age - 161);
+
+      }
+
+      this.accountDetails.dailyCalories = Math.round((calories)  * 10) / 10;
+      this.accountDetails.dailyCalories = this.accountDetails.dailyCalories - 500;
+      //calories = calories - 500;
+      //this.goalCalories = Math.round((calories)  * 10) / 10;
+
+    } else if (this.accountDetails.goals === 'maintain') {
+
+      if (this.accountDetails.sex === 'Male') {
+
+        calories = (10 * this.accountDetails.weight + 6.25 * this.accountDetails.height - 5 * this.accountDetails.age + 5);
+
+      } else if (this.accountDetails.sex === 'Female') {
+
+        calories = (10 * this.accountDetails.weight + 6.25 * this.accountDetails.height - 5 * this.accountDetails.age - 161);
+
+      }
+
+      this.accountDetails.dailyCalories = Math.round((calories)  * 10) / 10;
+
+    } else {
+
+      if (sex === 'Male') {
+
+        calories = (10 * weightKG + 6.25 * heightCM - 5 * age + 5);
+
+      } else if (sex === 'Female') {
+
+        calories = (10 * weightKG + 6.25 * heightCM - 5 * age - 161);
+
+      }
+
+      this.dailyCalories = Math.round((calories)  * 10) / 10;
+      calories = calories + 500;
+      this.goalCalories = Math.round((calories) * 10) / 10;
+
+    }
+
+    this.goalCarbs = carbs = Math.round(((calories * carbsPercentage) / 4) * 10) / 10;
+    this.goalProtein = protein = Math.round(((calories * proteinPercentage) / 4) * 10) / 10;
+    this.goalFat = fat = Math.round(((calories * fatPercentage) / 9) * 10) / 10;
+
+    console.log(calories);
+    this.timetableService.setGenerateValues(calories, carbs, fat, protein, ingredients);
 
   }
 

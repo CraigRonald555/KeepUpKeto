@@ -21,13 +21,31 @@ export class LandingpageComponent implements AfterViewInit {
   berriesSelected = false;
   nutsSelected = false;
 
-  stepCounter = 0;
+  weightKG;
+  heightCM;
+  goalsText;
+  sexText;
+  dateOfBirth;
+  age;
+  name;
+
+  signUpStep = 0;
   progress = 0;
+
+  loginStep = 0;
+
+  resetPasswordError = false;
+  resetPasswordSuccess = false;
+
+  loginAttemptFailed = false;
 
   centimeters = true;
   lbs = true;
+  male: boolean = undefined;
+  goals: number = undefined; // -1 = lose 1kg, 0 = maintain, 1 = gain 1kg
 
-  @ViewChild('loginForm') loginForm;
+  @ViewChild('signUpForm') signUpForm;
+  @ViewChild('metricsForm') userMetricsForm;
   today = new Date();
   loginStatus: string;
   buttonError = false;
@@ -47,11 +65,11 @@ export class LandingpageComponent implements AfterViewInit {
 
         actions.disable();
 
-        this.loginForm.statusChanges.subscribe(status => {
+        this.signUpForm.statusChanges.subscribe(status => {
 
           this.loginStatus = status;
 
-          if (status === 'VALID' && (this.loginForm.value.name.length > 0 && this.loginForm.value.email.length > 0 && this.loginForm.value.password.length > 0)) {
+          if (status === 'VALID' && (this.signUpForm.value.name.length > 0 && this.signUpForm.value.email.length > 0 && this.signUpForm.value.password.length > 0)) {
 
             console.log('Form enabled');
             actions.enable();
@@ -87,7 +105,7 @@ export class LandingpageComponent implements AfterViewInit {
 
       onApprove: (data, actions) => {
         console.log(data + ' transaction approved');
-        this.submitLoginDetails();
+        this.submitSignUpDetails();
         console.log(data.subscriptionID);
         //this.getSubcriptionDetails(data.subscriptionID);
         // use auth login method and redirect to /home
@@ -111,46 +129,103 @@ export class LandingpageComponent implements AfterViewInit {
 
   }
 
-  submitUserMetrics(metricsForm: NgForm) {
+  assignUserMetrics() {
 
-    const centimeters = metricsForm.value.centimeters;
-    const feet = metricsForm.value.feet;
-    const inches = metricsForm.value.inches;
+    if (this.lbs) {
+      this.weightKG = this.userMetricsForm.value.pounds / 2.2;
+    } else {
+      this.weightKG = this.userMetricsForm.value.kilograms;
+    }
 
-    // console.log('Centimeters' + metricsForm.value.centimeters);
+    // Convert feet and inches to cm
+    if (!this.centimeters) {
 
-    // if (centimeters.length === undefined && (feet.length === undefined || inches.length === undefined)) {
+      const feet = this.userMetricsForm.value.feet;
+      const inches = this.userMetricsForm.value.inches;
 
-    //   console.log('Height hasn\'t been entered');
+      this. heightCM = (feet * 30.48) + (inches * 2.54);
 
-    // }
+    } else {
+      this. heightCM = this.userMetricsForm.value.centimeters;
+    }
 
-    // if(metricsForm.value.)
+    switch (true) {
 
-    console.log(metricsForm.value);
-    this.stepCounter = this.stepCounter + 1;
+      case this.goals === 0:      this.goalsText = 'maintain'; break;
+      case this.goals === -1:     this.goalsText = 'loseOne'; break;
+      case this.goals === +1:     this.goalsText = 'gainOne'; break;
+
+    }
+
+    switch (true) {
+
+      case this.male === true:        this.sexText = 'Male'; break;
+      case this.male === false:       this.sexText = 'Female'; break;
+
+    }
+
+    this.dateOfBirth = this.userMetricsForm.value.dateOfBirth;
+    this.age = this.convertDOBtoAge(this.dateOfBirth);
+
+    console.log('Goals: ' + this.goalsText);
+    console.log('Goals: ' + this.sexText);
 
   }
 
-  submitLoginDetails() {
+  async submitSignUpDetails() {
 
-    this.auth.SignUp(this.loginForm.value.email, this.loginForm.value.password);
+    this.name = this.signUpForm.value.name;
+
+    const uid = await (this.auth.signUp(this.signUpForm.value.email, this.signUpForm.value.password));
+    await this.auth.addMetrics(uid, this.name, this.ingredients, this.goalsText, this.sexText, this.heightCM, this.weightKG, this.dateOfBirth, this.age);
+
+
+    /* Write the values from the metricsForm and ingredients to the database
+     *
+     * We already have a default table which stores the user's primary details (user id, email, last login, sign up date)
+     *
+     */
 
   }
 
-  // getSubcriptionDetails(subcriptionId) {
-  //   const xhttp = new XMLHttpRequest();
-  //   xhttp.onreadystatechange = function() {
-  //     if (this.readyState === 4 && this.status === 200) {
-  //       console.log(JSON.parse(this.responseText));
-  //       alert(JSON.stringify(this.responseText));
-  //     }
-  //   };
-  //   xhttp.open('GET', 'https://api.sandbox.paypal.com/v1/billing/subscriptions/' + subcriptionId, true);
-  //   xhttp.setRequestHeader('Authorization', this.basicAuth);
+  async submitSignInDetails(loginForm: NgForm) {
 
-  //   xhttp.send();
-  // }
+    this.resetPasswordSuccess = false; // After submitting a login, reset the passwordSuccess message to not being showing
+
+    const response = await this.auth.signIn(loginForm.value.emailLogin, loginForm.value.passwordLogin);
+
+    switch (true) {
+
+      case response === 'auth/wrong-password':    this.loginAttemptFailed = true;
+                                                  break;
+
+      case response === 'auth/user-not-found':    this.loginAttemptFailed = true;
+                                                  break;
+
+      case response === 'successful':   break;
+
+    }
+
+  }
+
+  async submitResetPassword(forgotPassword: NgForm) {
+
+    const response = await this.auth.resetPassword(forgotPassword.value.forgotEmail);
+    console.log(response);
+
+    switch (true) {
+
+      case response === 'auth/user-not-found':  this.resetPasswordError = true;
+                                                break;
+
+
+      case response === 'successful':   this.loginStep = 0;
+                                        this.resetPasswordSuccess = true;
+                                        break;
+
+    }
+
+  }
 
   addIngredient(ingredient) {
 
@@ -218,6 +293,19 @@ export class LandingpageComponent implements AfterViewInit {
     }
 
     console.log(this.ingredients);
+
+  }
+
+  convertDOBtoAge(dob) {
+
+    const today = new Date();
+    const birthDate = new Date(dob);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    return age;
 
   }
 

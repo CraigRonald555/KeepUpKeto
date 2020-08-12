@@ -1,4 +1,4 @@
-import { OnInit, EventEmitter, Injectable } from '@angular/core';
+import { OnInit, EventEmitter, Injectable, ChangeDetectorRef } from '@angular/core';
 import { AccountService } from './account.service';
 import {HttpClient} from '@angular/common/http';
 import {map} from 'rxjs/operators';
@@ -42,13 +42,13 @@ export class TimetableService {
   dayToAddRecipeTo = -1; // This value gets updated in the timetablepage.component (currently)
 
   // Get user's daily calorie and macro requirements from accountDetails service
-  dailyCalories = this.accountService.accountDetails.dailyCalories;
-  dailyCarbs = this.accountService.accountDetails.macros.carbs;
-  dailyProtein = this.accountService.accountDetails.macros.protein;
-  dailyFat = this.accountService.accountDetails.macros.fat;
+  dailyCalories;
+  dailyCarbs;
+  dailyProtein;
+  dailyFat;
 
-  userIngredients = this.accountService.accountDetails.ingredientPreferences;
-  baseIngredients = ['chicken', 'beef', 'ribs', 'fish', 'pork', 'fish', 'lamb', 'veal', 'eggs', 'avocado', 'nuts'];
+  userIngredients;
+  baseIngredients = ['chicken', 'beef', 'ribs', 'fish', 'pork', 'fish', 'lamb', 'veal', 'eggs', 'avocado', 'nuts', 'berries'];
 
   constructor(private accountService: AccountService, private http: HttpClient) {
 
@@ -58,6 +58,11 @@ export class TimetableService {
       this.dailyCarbs = this.accountService.accountDetails.macros.carbs;
       this.dailyProtein = this.accountService.accountDetails.macros.protein;
       this.dailyFat = this.accountService.accountDetails.macros.fat;
+      this.userIngredients = this.accountService.accountDetails.ingredientPreferences;
+
+      this.updateWeeklyTotals();
+
+      console.log('Updated account details in timetable service');
 
     });
 
@@ -85,6 +90,8 @@ export class TimetableService {
 
 
   getTodayRecipes() {
+
+    console.log('Request received at timetable.service getTodayRecipes()')
 
     const currentDayName: string = this.getDayName();
 
@@ -324,8 +331,8 @@ export class TimetableService {
        * compiled directly from the recipePlan
        */
 
-        /*Store the user's ingredient preferences in the ingredients array and baseIngredients in a temp array */
-       let userIngredients = this.accountService.accountDetails.ingredientPreferences;
+        /*Store the user's ingredient preferences in the tempUsersIngredients array and baseIngredients in a temp array */
+       let tempUserIngredients = this.userIngredients.slice(0);
        let tempBaseIngredients = ['chicken', 'beef', 'pork', 'fish', 'lamb', 'veal', 'eggs', 'avocado', 'nuts', 'cheese', 'coconut', 'yogurt', 'steak'];
        let ingredient = '';
 
@@ -343,17 +350,17 @@ export class TimetableService {
 
               console.log('While loop starting...');
 
-              if (userIngredients.length > 0) {
+              if (tempUserIngredients.length > 0) {
 
 
                 console.log('Reached 1');
 
-                const randomIngredientIndex = Math.round((Math.random()) * (userIngredients.length-1));
-                ingredient = userIngredients[randomIngredientIndex];
-                userIngredients.splice(randomIngredientIndex, 1);
+                const randomIngredientIndex = Math.round((Math.random()) * (tempUserIngredients.length-1));
+                ingredient = tempUserIngredients[randomIngredientIndex];
+                tempUserIngredients.splice(randomIngredientIndex, 1);
 
               }
-              else if (userIngredients.length === 0) {
+              else if (tempUserIngredients.length === 0) {
 
                 console.log('Reached 2');
 
@@ -561,8 +568,8 @@ export class TimetableService {
     const from = 0;
     let to = from + 5;
 
-    const minCarbs = (recipeDetails.carbs - 3.5 <= 0) ? 0 : recipeDetails.carbs - 3.5;
-    const maxCarbs = (recipeDetails.carbs < 0) ? 3.5 : recipeDetails.carbs + 3.5;
+    const minCarbs = (recipeDetails.carbs - 5 <= 0) ? 0 : recipeDetails.carbs - 5;
+    const maxCarbs = (recipeDetails.carbs < 0) ? 5 : recipeDetails.carbs + 5;
     const minProtein = (recipeDetails.protein - 3.5 <= 0) ? 0 : recipeDetails.protein - 3.5;
     const maxProtein = (recipeDetails.protein < 0) ? 3.5 : recipeDetails.protein + 3.5;
     const minFat = (recipeDetails.fat - 3.5 <= 0) ? 0 : recipeDetails.fat - 3.5;

@@ -51,6 +51,8 @@ app.post("/api/user", (req, res, next) => {
   firebase.auth().createUserWithEmailAndPassword(email,password)
     .then(response => {
 
+      console.log(response);
+
       res.status(201).json({
         message: 'User created successfully',
       });

@@ -12,12 +12,15 @@
           <ul class="navbar-nav ml-auto">
               <li class="dropdown nav-item">
                   <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
-                      <i class="material-icons">apps</i> My Plans
+                      <i class="material-icons">apps</i> My Profile
                   </a>
                   <div class="dropdown-menu dropdown-with-icons">
                       <a routerLink='/timetable' class="dropdown-item">
                           <i class="material-icons">layers</i> My Timetables
                       </a>
+                      <a routerLink='/landing' (click)='this.authService.signOut()' class="dropdown-item">
+                        <i class="material-icons">layers</i> Sign Out
+                    </a>
                       <!-- <a routerLink='/users/1/2' class="dropdown-item">
                         <i class="material-icons">layers</i> My Timetables Test
                     </a> -->
@@ -146,26 +149,6 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         <button type="button" class="btn btn-primary" (click)="addNewRecipeTest()">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="signUpModel" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="signUpModel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Generate timetable</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        Test <br><br><br><br><br><br><br><br><br>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
       </div>
     </div>
   </div>

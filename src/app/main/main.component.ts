@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { TimetableService } from '../timetable.service';
 import { AccountService } from '../account.service';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-main',
@@ -11,7 +12,7 @@ export class MainComponent implements OnInit {
 
   title = 'KetoManager';
 
-  constructor(private timetableService: TimetableService, private accountService: AccountService) { }
+  constructor(private timetableService: TimetableService, private accountService: AccountService, public authService: AuthService) { }
 
   addNewRecipeTest() {
 
@@ -35,11 +36,11 @@ export class MainComponent implements OnInit {
 
   }
 
-  login() {
+  // login() {
 
-    this.accountService.getAccountDetails();
+  //   this.accountService.getAccountDetails();
 
-  }
+  // }
 
   ngOnInit() {
   }

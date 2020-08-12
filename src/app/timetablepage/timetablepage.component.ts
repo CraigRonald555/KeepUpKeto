@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { TimetableService } from '../timetable.service';
 
 @Component({
@@ -55,11 +55,12 @@ export class TimetablepageComponent implements OnInit {
 
   tempRecipes;
 
-  constructor(public timetableService: TimetableService) {
+  constructor(public timetableService: TimetableService, private changeDetector: ChangeDetectorRef) {
 
     timetableService.arrayUpdated.subscribe(status => {
 
       this.allRecipes = timetableService.getAllRecipes();
+      this.changeDetector.detectChanges();
 
     });
 
@@ -69,6 +70,7 @@ export class TimetablepageComponent implements OnInit {
 
     this.allRecipes = this.timetableService.getAllRecipes();
     this.todayRecipes = this.timetableService.getTodayRecipes();
+    this.changeDetector.detectChanges();
 
   }
 
