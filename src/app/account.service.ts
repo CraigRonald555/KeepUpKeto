@@ -114,9 +114,9 @@ export class AccountService {
 
   calculateMacros() {
 
-    const carbsPercentage = 0.2;
+    const carbsPercentage = 0.1;
     const proteinPercentage = 0.3;
-    const fatPercentage = 0.5;
+    const fatPercentage = 0.6;
 
     let calories;
 
