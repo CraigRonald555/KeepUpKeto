@@ -79,8 +79,8 @@ export class AccountService {
     this.accountDetails.height = userDataResponse.heightCM;
     this.accountDetails.weight = userDataResponse.weightKG;
     this.accountDetails.ingredientPreferences = userDataResponse.ingredients;
-    this.accountDetails.macros = {fat: 130, protein: 80, carbs: 20};
-    this.calculateDailyCalories();
+
+    this.calculateMacros();
 
     console.log(this.accountDetails.dailyCalories);
 
@@ -112,7 +112,7 @@ export class AccountService {
 
   }
 
-  setNutrients() {
+  calculateMacros() {
 
     const carbsPercentage = 0.2;
     const proteinPercentage = 0.3;
@@ -153,28 +153,28 @@ export class AccountService {
 
     } else {
 
-      if (sex === 'Male') {
+      if (this.accountDetails.sex === 'Male') {
 
-        calories = (10 * weightKG + 6.25 * heightCM - 5 * age + 5);
+        calories = (10 * this.accountDetails.weight + 6.25 * this.accountDetails.height - 5 * this.accountDetails.age + 5);
 
-      } else if (sex === 'Female') {
+      } else if (this.accountDetails.sex === 'Female') {
 
-        calories = (10 * weightKG + 6.25 * heightCM - 5 * age - 161);
+        calories = (10 * this.accountDetails.weight + 6.25 * this.accountDetails.height - 5 * this.accountDetails.age - 161);
 
       }
 
-      this.dailyCalories = Math.round((calories)  * 10) / 10;
-      calories = calories + 500;
-      this.goalCalories = Math.round((calories) * 10) / 10;
+      this.accountDetails.dailyCalories = Math.round((calories)  * 10) / 10;
+      this.accountDetails.dailyCalories = this.accountDetails.dailyCalories - 500;
+      //calories = calories + 500;
+      //this.goalCalories = Math.round((calories) * 10) / 10;
 
     }
 
-    this.goalCarbs = carbs = Math.round(((calories * carbsPercentage) / 4) * 10) / 10;
-    this.goalProtein = protein = Math.round(((calories * proteinPercentage) / 4) * 10) / 10;
-    this.goalFat = fat = Math.round(((calories * fatPercentage) / 9) * 10) / 10;
+    this.accountDetails.macros.carbs =  Math.round(((this.accountDetails.dailyCalories * carbsPercentage) / 4) * 10) / 10;
+    this.accountDetails.macros.protein = Math.round(((this.accountDetails.dailyCalories * proteinPercentage) / 4) * 10) / 10;
+    this.accountDetails.macros.fat = Math.round(((this.accountDetails.dailyCalories * fatPercentage) / 9) * 10) / 10;
 
-    console.log(calories);
-    this.timetableService.setGenerateValues(calories, carbs, fat, protein, ingredients);
+    //this.timetableService.setGenerateValues(calories, carbs, fat, protein, ingredients);
 
   }
 
