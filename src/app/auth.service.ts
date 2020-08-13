@@ -23,7 +23,12 @@ export class AuthService {
       } else {
 
         console.log('Currently logged out');
-        this.router.navigate(['/landing']);
+
+        /* Calling the navigate inside a subscribe block causes an ngZone error which
+         * leads to variables not being assigned in the landing component. It'll probably be a better
+         * idea to handle unauthorised users by using auth guards
+         */
+        // this.router.navigate(['/landing']);
 
       }
 

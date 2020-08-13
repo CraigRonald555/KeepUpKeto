@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, Injectable  } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, Injectable, ChangeDetectorRef  } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { AuthService } from '../auth.service';
 
@@ -31,7 +31,6 @@ export class LandingpageComponent implements AfterViewInit {
 
   signUpStep = 0;
   progress = 0;
-
   loginStep = 0;
 
   resetPasswordError = false;
@@ -55,9 +54,18 @@ export class LandingpageComponent implements AfterViewInit {
   planID = "P-1BH46091SU0529455L2YMZFY";
   subcripId: any;
 
-  constructor(private auth: AuthService) {}
+  constructor(private auth: AuthService, private changeDetector: ChangeDetectorRef) {
+  }
 
   ngAfterViewInit() {
+
+    this.signUpStep = 0;
+    this.progress = 0;
+    this.loginStep = 0;
+
+    console.log(`signUpStep: ${this.signUpStep}, loginStep: ${this.loginStep}`);
+
+    this.changeDetector.detectChanges();
 
     paypal.Buttons({
 
