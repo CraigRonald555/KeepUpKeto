@@ -88,6 +88,12 @@ export class TimetableService {
 
   }
 
+  writeRecipeToFireBase() {
+
+
+
+  }
+
 
   getTodayRecipes() {
 
@@ -299,7 +305,17 @@ export class TimetableService {
 
   }
 
-  generate() {
+  writeAllRecipesToStorage() {
+
+    this.allRecipes.forEach(dayWithRecipes => {
+
+      window.localStorage.setItem(dayWithRecipes.day, JSON.stringify(dayWithRecipes));
+
+    });
+
+  }
+
+  async generate() {
 
     // a string which will be used to store the request url to the edamam API
     let request = '';
@@ -319,8 +335,9 @@ export class TimetableService {
       carbs: number
     }[] = [];
 
-    // Loop through each day in the allRecipes array to and pass the day to the getRecipePlanStructure method
-    this.allRecipes.forEach((dayWithRecipes, index) => {
+    for (let i = 0; i < this.allRecipes.length; i++) {
+
+      const dayWithRecipes = this.allRecipes[i];
 
       /* The reciplePlan array is assigned the result of the getRecipePlanStructure method.
        * All the attributes of each element (apart from the recipe) will be given a value from the method.
@@ -331,72 +348,257 @@ export class TimetableService {
        * compiled directly from the recipePlan
        */
 
-        /*Store the user's ingredient preferences in the tempUsersIngredients array and baseIngredients in a temp array */
-       let tempUserIngredients = this.userIngredients.slice(0);
-       let tempBaseIngredients = ['chicken', 'beef', 'pork', 'fish', 'lamb', 'veal', 'eggs', 'avocado', 'nuts', 'cheese', 'coconut', 'yogurt', 'steak'];
-       let ingredient = '';
+      /*Store the user's ingredient preferences in the tempUsersIngredients array and baseIngredients in a temp array */
+      const tempUserIngredients = this.userIngredients.slice(0);
+      let tempBaseIngredients = ['chicken', 'beef', 'pork', 'fish', 'lamb', 'veal', 'eggs', 'avocado', 'nuts', 'cheese', 'coconut', 'yogurt', 'steak'];
+      let ingredient = '';
 
-       // Remove the exclamation mark and change Monday's isKetoFriendly value back to true in the allRecipes array back to
-       if (dayWithRecipes.isKetoFriendly) {
+      // Remove the exclamation mark and change Monday's isKetoFriendly value back to true in the allRecipes array back to
+      if (dayWithRecipes.isKetoFriendly) {
 
-          recipePlan = this.getReciplePlanStructure(dayWithRecipes);
+        console.log(`Finding recipes for ${dayWithRecipes.day}`);
 
-          recipePlan.forEach(async recipeDetails => {
+        recipePlan = this.getReciplePlanStructure(dayWithRecipes);
 
-            let recipeReturned;
+        for (let j = 0; j < recipePlan.length; j++) {
 
-            //While a recipeReturned is undefined or false and there's still baseIngredients to find
-            while (!recipeReturned && tempBaseIngredients.length > 0) {
+          const recipeDetails = recipePlan[j];
+          let recipeReturned;
 
-              console.log('While loop starting...');
+          // While a recipeReturned is undefined or false and there's still baseIngredients to find
+          while (!recipeReturned && tempBaseIngredients.length > 0) {
 
-              if (tempUserIngredients.length > 0) {
+            console.log('Looking for a new ingredient...');
+
+            if (tempUserIngredients.length > 0) {
 
 
-                console.log('Reached 1');
+              console.log('A user preferenced ingredient found...');
 
-                const randomIngredientIndex = Math.round((Math.random()) * (tempUserIngredients.length-1));
-                ingredient = tempUserIngredients[randomIngredientIndex];
-                tempUserIngredients.splice(randomIngredientIndex, 1);
+              const randomIngredientIndex = Math.round((Math.random()) * (tempUserIngredients.length-1));
+              ingredient = tempUserIngredients[randomIngredientIndex];
+              tempUserIngredients.splice(randomIngredientIndex, 1);
+
+            }
+            else if (tempUserIngredients.length === 0) {
+
+              console.log('No more user perferenced ingredients left...');
+
+              if (tempBaseIngredients.length > 0) {
+
+                console.log('A base ingredient found...');
+
+                const randomIngredientIndex = Math.round((Math.random()) * (tempBaseIngredients.length-1));
+                ingredient = tempBaseIngredients[randomIngredientIndex];
+                tempBaseIngredients.splice(randomIngredientIndex, 1);
 
               }
-              else if (tempUserIngredients.length === 0) {
 
-                console.log('Reached 2');
+            }
 
-                if (tempBaseIngredients.length > 0) {
+            recipeReturned = await this.searchForRecipes(i, recipeDetails, ingredient);
 
-                  console.log('Reached 3');
+            console.log('Returned:' + recipeReturned);
 
-                  const randomIngredientIndex = Math.round((Math.random()) * (tempBaseIngredients.length-1));
-                  ingredient = tempBaseIngredients[randomIngredientIndex];
-                  tempBaseIngredients.splice(randomIngredientIndex, 1);
+            // await this.searchForRecipes(index, recipeDetails, ingredient).then(returned => {
 
-                }
+            //   console.log('Returned:' + returned);
+            //   recipeReturned = returned;
 
-              }
-
-              await this.searchForRecipes(index, recipeDetails, ingredient).then(returned => {
-
-                console.log('Returned:' + returned);
-                recipeReturned = returned;
-
-              });
+            // });
 
 
-          }
-            console.log('Exited while loop');
-            console.log(recipePlan);
+        }
+          console.log('Exited while loop');
+          //console.log(recipePlan);
 
-          });
+        }
 
-       } else {
+      } else {
 
-        // console.log(`${dayWithRecipes.day} is marked as notKetoFriendly`); -UNCOMMENT THIS AFTER TESTING
+      // console.log(`${dayWithRecipes.day} is marked as notKetoFriendly`); -UNCOMMENT THIS AFTER TESTING
 
-       }
+      }
+
+    }
+
+    // Loop through each day in the allRecipes array to and pass the day to the getRecipePlanStructure method
+    // this.allRecipes.forEach(async (dayWithRecipes, index) => {
+
+    //   /* The reciplePlan array is assigned the result of the getRecipePlanStructure method.
+    //    * All the attributes of each element (apart from the recipe) will be given a value from the method.
+    //    *
+    //    * Each element in the recipePlan will be ready to be used to make calls to the API in order to find a suitable recipe.
+    //    *
+    //    * The recipePlan now returns gram values as opposed to percentages like previously so the request should be able to be
+    //    * compiled directly from the recipePlan
+    //    */
+
+    //     /*Store the user's ingredient preferences in the tempUsersIngredients array and baseIngredients in a temp array */
+    //    const tempUserIngredients = this.userIngredients.slice(0);
+    //    let tempBaseIngredients = ['chicken', 'beef', 'pork', 'fish', 'lamb', 'veal', 'eggs', 'avocado', 'nuts', 'cheese', 'coconut', 'yogurt', 'steak'];
+    //    let ingredient = '';
+
+    //    // Remove the exclamation mark and change Monday's isKetoFriendly value back to true in the allRecipes array back to
+    //    if (dayWithRecipes.isKetoFriendly) {
+
+    //       console.log(`Finding recipes for ${dayWithRecipes.day}`);
+
+    //       recipePlan = this.getReciplePlanStructure(dayWithRecipes);
+
+    //       await recipePlan.forEach(async recipeDetails => {
+
+    //         let recipeReturned;
+
+    //         // While a recipeReturned is undefined or false and there's still baseIngredients to find
+    //         while (!recipeReturned && tempBaseIngredients.length > 0) {
+
+    //           console.log('Looking for a new ingredient...');
+
+    //           if (tempUserIngredients.length > 0) {
+
+
+    //             console.log('A user preferenced ingredient found...');
+
+    //             const randomIngredientIndex = Math.round((Math.random()) * (tempUserIngredients.length-1));
+    //             ingredient = tempUserIngredients[randomIngredientIndex];
+    //             tempUserIngredients.splice(randomIngredientIndex, 1);
+
+    //           }
+    //           else if (tempUserIngredients.length === 0) {
+
+    //             console.log('No more user perferenced ingredients left...');
+
+    //             if (tempBaseIngredients.length > 0) {
+
+    //               console.log('A base ingredient found...');
+
+    //               const randomIngredientIndex = Math.round((Math.random()) * (tempBaseIngredients.length-1));
+    //               ingredient = tempBaseIngredients[randomIngredientIndex];
+    //               tempBaseIngredients.splice(randomIngredientIndex, 1);
+
+    //             }
+
+    //           }
+
+    //           recipeReturned = await this.searchForRecipes(index, recipeDetails, ingredient);
+
+    //           console.log('Returned:' + recipeReturned);
+
+    //           // await this.searchForRecipes(index, recipeDetails, ingredient).then(returned => {
+
+    //           //   console.log('Returned:' + returned);
+    //           //   recipeReturned = returned;
+
+    //           // });
+
+
+    //       }
+    //         console.log('Exited while loop');
+    //         //console.log(recipePlan);
+
+    //       });
+
+    //    } else {
+
+    //     // console.log(`${dayWithRecipes.day} is marked as notKetoFriendly`); -UNCOMMENT THIS AFTER TESTING
+
+    //    }
+
+    // });
+
+    this.writeAllRecipesToStorage();
+
+    for(let i = 0; i < window.localStorage.length; i++) {
+      console.log('window storage: ' + window.localStorage.key(i));
+      console.log(window.localStorage.getItem(window.localStorage.key(i)));
+    }
+
+  }
+
+  async searchForRecipes(index, recipeDetails, ingredient) {
+
+    let returnRecipe;
+    let randomRecipeNo;
+    let recipeFound;
+
+    const from = 0;
+    let to = from + 5;
+
+    const minCarbs = (recipeDetails.carbs - 5 <= 0) ? 0 : recipeDetails.carbs - 5;
+    const maxCarbs = (recipeDetails.carbs < 0) ? 5 : recipeDetails.carbs + 5;
+    const minProtein = (recipeDetails.protein - 3.5 <= 0) ? 0 : recipeDetails.protein - 3.5;
+    const maxProtein = (recipeDetails.protein < 0) ? 3.5 : recipeDetails.protein + 3.5;
+    const minFat = (recipeDetails.fat - 3.5 <= 0) ? 0 : recipeDetails.fat - 3.5;
+    const maxFat = (recipeDetails.fat < 0) ? 3.5 : recipeDetails.fat + 3.5;
+    const minCalories = (recipeDetails.calories - 35 <= 0) ? 0 : recipeDetails.calories - 35;
+    const maxCalories = (recipeDetails.calories < 0) ? 35 : recipeDetails.calories + 35;
+
+    // TEMPORARILY JUST USE BASIC PARAMETERS UNTIL MEMBERSHIP UPGRADED
+    const requestURL = `https://api.edamam.com/search?q=${ingredient}&app_id=4dad360d&app_key=5d6c41eeeb543f362a3b108c597193bd&from=${from}&to=${to}&calories=${minCalories}-${maxCalories}&nutrients%5BFAT%5D=${minFat}-${maxFat}&nutrients%5BCHOCDF%5D=${minCarbs}-${maxCarbs}&nutrients%5BPROCNT%5D=${minProtein}-${maxProtein}`;
+    console.log(requestURL);
+
+    await this.http.get(requestURL).toPromise().then(async result => {
+
+
+      console.log(result);
+      const recipes = await result['hits'];
+
+      //console.log(recipes);
+
+      // Randomly select between the from and to values
+      randomRecipeNo = Math.round((Math.random() + from) * (to-1));
+      console.log(randomRecipeNo);
+
+      if (await result['count'] > 0) {
+
+        // If there's less recipes than the actually random selected
+        if (result['count'] <= to) {
+          console.log('Count less than 5');
+          to = result['count'] - 1;
+          randomRecipeNo = Math.round((Math.random() + from) * (to));
+          console.log(`${randomRecipeNo} after change`);
+        }
+
+        returnRecipe = recipes[randomRecipeNo]['recipe'];
+
+        //Use this to get the servings
+        const servings = returnRecipe['yield'];
+
+        let recipeForDay: {
+          recipeType: string,
+          name: string,
+          image: string,
+          url: string,
+          calories: number,
+          carbs: number,
+          protein: number,
+          fat: number,
+          isKetoFriendly: boolean,
+          notKetoFriendlyReason: string
+      } = {recipeType: recipeDetails.recipeType,
+          name: returnRecipe.label,
+          url: returnRecipe.url,
+          carbs: returnRecipe['totalNutrients'].CHOCDF.quantity / servings,
+          protein: returnRecipe['totalNutrients'].PROCNT.quantity  / servings,
+          fat: returnRecipe['totalNutrients'].FAT.quantity / servings,
+          calories: returnRecipe.calories / servings,
+          isKetoFriendly: true,
+          notKetoFriendlyReason: '',
+          image: ''};
+
+        this.addRecipeToDay(index, recipeForDay);
+        recipeFound = true;
+
+      } else {
+
+        recipeFound = false;
+
+      }
 
     });
+
+    return recipeFound;
 
   }
 
@@ -556,92 +758,6 @@ export class TimetableService {
         }
 
        });
-
-  }
-
-  async searchForRecipes(index, recipeDetails, ingredient) {
-
-    let returnRecipe;
-    let randomRecipeNo;
-    let recipeFound;
-
-    const from = 0;
-    let to = from + 5;
-
-    const minCarbs = (recipeDetails.carbs - 5 <= 0) ? 0 : recipeDetails.carbs - 5;
-    const maxCarbs = (recipeDetails.carbs < 0) ? 5 : recipeDetails.carbs + 5;
-    const minProtein = (recipeDetails.protein - 3.5 <= 0) ? 0 : recipeDetails.protein - 3.5;
-    const maxProtein = (recipeDetails.protein < 0) ? 3.5 : recipeDetails.protein + 3.5;
-    const minFat = (recipeDetails.fat - 3.5 <= 0) ? 0 : recipeDetails.fat - 3.5;
-    const maxFat = (recipeDetails.fat < 0) ? 3.5 : recipeDetails.fat + 3.5;
-    const minCalories = (recipeDetails.calories - 35 <= 0) ? 0 : recipeDetails.calories - 35;
-    const maxCalories = (recipeDetails.calories < 0) ? 35 : recipeDetails.calories + 35;
-
-    // TEMPORARILY JUST USE BASIC PARAMETERS UNTIL MEMBERSHIP UPGRADED
-    const requestURL = `https://api.edamam.com/search?q=${ingredient}&app_id=4dad360d&app_key=5d6c41eeeb543f362a3b108c597193bd&from=${from}&to=${to}&calories=${minCalories}-${maxCalories}&nutrients%5BFAT%5D=${minFat}-${maxFat}&nutrients%5BCHOCDF%5D=${minCarbs}-${maxCarbs}&nutrients%5BPROCNT%5D=${minProtein}-${maxProtein}`;
-    console.log(requestURL);
-
-    await this.http.get(requestURL).toPromise().then(result => {
-
-
-      console.log(result);
-      const recipes = result['hits'];
-
-      //console.log(recipes);
-
-      // Randomly select between the from and to values
-      randomRecipeNo = Math.round((Math.random() + from) * (to-1));
-      console.log(randomRecipeNo);
-
-      if (result['count'] > 0) {
-
-        // If there's less recipes than the actually random selected
-        if (result['count'] <= to) {
-          console.log('Count less than 5');
-          to = result['count'] - 1;
-          randomRecipeNo = Math.round((Math.random() + from) * (to));
-          console.log(`${randomRecipeNo} after change`);
-        }
-
-        returnRecipe = recipes[randomRecipeNo]['recipe'];
-
-        //Use this to get the servings
-        const servings = returnRecipe['yield'];
-
-        let recipeForDay: {
-          recipeType: string,
-          name: string,
-          image: string,
-          url: string,
-          calories: number,
-          carbs: number,
-          protein: number,
-          fat: number,
-          isKetoFriendly: boolean,
-          notKetoFriendlyReason: string
-      } = {recipeType: recipeDetails.recipeType,
-          name: returnRecipe.label,
-          url: returnRecipe.url,
-          carbs: returnRecipe['totalNutrients'].CHOCDF.quantity / servings,
-          protein: returnRecipe['totalNutrients'].PROCNT.quantity  / servings,
-          fat: returnRecipe['totalNutrients'].FAT.quantity / servings,
-          calories: returnRecipe.calories / servings,
-          isKetoFriendly: true,
-          notKetoFriendlyReason: '',
-          image: ''};
-
-        this.addRecipeToDay(index, recipeForDay);
-        recipeFound = true;
-
-      } else {
-
-        recipeFound = false;
-
-      }
-
-    });
-
-    return recipeFound;
 
   }
 

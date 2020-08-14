@@ -142,11 +142,11 @@ export class AuthService {
 
   }
 
-  async readDataFromFireBase(uid, table) {
+  async readDataFromFireBase(id, table) {
 
     let returnValue;
 
-    await this.fbDB.database.ref(`${table}/` + uid).once('value')
+    await this.fbDB.database.ref(`${table}/` + id).once('value')
       .then(snapshot => {
 
         returnValue = snapshot.val();
@@ -161,6 +161,54 @@ export class AuthService {
      });
 
     return returnValue;
+
+  }
+
+  async writeRecipeToUserTimetable(uid, data) {
+
+    //add recipe to firebase
+
+    await this.fbDB.database.ref('timetable/' + uid).set({
+      name: data.name
+
+    }).catch(error => {
+
+      console.log(error);
+
+    });
+
+  }
+
+  async writeEdamamRecipeToDatabase(uri, title, image) {
+
+    /* uri e.g. "http://www.edamam.com/ontologies/edamam.owl#recipe_3bc88115588b85b4a4b6c717a510f9a5"
+     * The line below creates a substring from the character after _ to the end i.e. the recipeID at the end
+     */
+    const recipeID = uri.substring(uri.chatAt('_') + 1, uri.length);
+
+    // Check if recipeID exists in Firebase recipes
+    await this.fbDB.database.ref('recipes/' + recipeID).once('value').then(async snapshot => {
+
+      // If it doesn't exist then write the recipe into recipes
+      if (!snapshot.exists()) {
+
+        await this.fbDB.database.ref('recipes/' + recipeID).set({
+          isEdamam: true,
+          title: title,
+          image: image
+
+        }).catch(error => {
+
+          console.log(error);
+
+        });
+
+      }
+
+    });
+
+    // Pushes recipe into recipes and returns the newRecipeKey
+    // const newRecipeKey = this.fbDB.database.ref().child('recipes').push().key;
 
   }
 
