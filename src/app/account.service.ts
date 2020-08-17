@@ -69,8 +69,8 @@ export class AccountService {
 
   async updateAccountDetails() {
 
-    console.log(await this.auth.readDataFromFireBase(this.userId, 'userData'));
-    const userDataResponse = await this.auth.readDataFromFireBase(this.userId, 'userData');
+    console.log(await this.auth.readDataFromFirebase(`userData/${this.userId}`));
+    const userDataResponse = await this.auth.readDataFromFirebase(`userData/${this.userId}`);
 
     this.accountDetails.name = userDataResponse.name;
     this.accountDetails.goals = userDataResponse.goals;

@@ -24,6 +24,7 @@
             </div>
           </div> -->
 
+        <ng-container *ngIf='todayRecipes !== undefined'>
 
         <table class="table" *ngIf="showDaily==true">
             <thead>
@@ -132,7 +133,7 @@
               </tbody>
         </table>
       </div>
-
+    </ng-container>
       <!-- (click)="allRecipes[i].recipes.push({}) -->
 
     </div>

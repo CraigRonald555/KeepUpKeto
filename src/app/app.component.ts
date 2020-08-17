@@ -3,6 +3,7 @@ import { TimetableService } from './timetable.service';
 import { stringify } from '@angular/compiler/src/util';
 import { AccountService } from './account.service';
 import { AuthService } from './auth.service';
+import { StorageService } from './storage.service';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +13,11 @@ import { AuthService } from './auth.service';
 export class AppComponent {
   title = 'KetoManager';
 
-  constructor(private timetableService: TimetableService, private accountService: AccountService, private authService: AuthService, private changeDetector: ChangeDetectorRef) {
+  constructor(private timetableService: TimetableService,
+              private accountService: AccountService,
+              private authService: AuthService,
+              private storageService: StorageService,
+              private changeDetector: ChangeDetectorRef) {
 
   }
 

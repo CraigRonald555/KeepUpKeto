@@ -186,7 +186,7 @@ export class LandingpageComponent implements AfterViewInit {
 
     const uid = await (this.auth.signUp(this.signUpForm.value.email, this.signUpForm.value.password));
     await this.auth.addMetrics(uid, this.name, this.ingredients, this.goalsText, this.sexText, this.heightCM, this.weightKG, this.dateOfBirth, this.age);
-
+    await this.auth.addDefaultTimetable(uid);
 
     /* Write the values from the metricsForm and ingredients to the database
      *
