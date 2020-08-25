@@ -1,9 +1,7 @@
-import { OnInit, EventEmitter, Injectable, ChangeDetectorRef} from '@angular/core';
+import { OnInit, EventEmitter, Injectable} from '@angular/core';
 import { AccountService } from './account.service';
 import {HttpClient} from '@angular/common/http';
-import {map} from 'rxjs/operators';
 import { AuthService } from './auth.service';
-import { DaysModel } from './days-model';
 
 @Injectable()
 export class TimetableService {
@@ -24,6 +22,7 @@ export class TimetableService {
     isKetoFriendly: boolean, // Day is not keto friendly
     notKetoFriendlyReason: string, // Day is not keto friendly reason
     recipes: {
+      recipeID: string,
       recipeType: string,
       name: string,
       image: string,
@@ -55,9 +54,14 @@ export class TimetableService {
 
   constructor(private accountService: AccountService, private auth: AuthService, private http: HttpClient) {
 
-    // window.localStorage.clear();
+    window.localStorage.clear();
 
-    this.accountService.accountDetailsUpdated.subscribe(status => {
+    // Make sure allRecipes is initiated
+    if (typeof this.allRecipes === 'undefined') {
+      this.allRecipes = [];
+    }
+
+    this.accountService.accountDetailsUpdated.subscribe(async status => {
 
       this.dailyCalories = this.accountService.accountDetails.dailyCalories;
       this.dailyCarbs = this.accountService.accountDetails.macros.carbs;
@@ -65,29 +69,12 @@ export class TimetableService {
       this.dailyFat = this.accountService.accountDetails.macros.fat;
       this.userIngredients = this.accountService.accountDetails.ingredientPreferences;
 
+      await this.checkStorage();
       this.updateWeeklyTotals();
 
       console.log('Updated account details in timetable service');
 
     });
-
-    if (typeof this.allRecipes === 'undefined') {
-      this.allRecipes = [];
-    }
-
-    /* checkLocalStorage() call is needed here to go through each day and check there whether the day
-       needs to be created or not
-     */
-
-    this.checkStorage();
-
-    // this.allRecipes.push({day: 'Monday', show: true, totalCarbs: 0, carbsRemaining: this.dailyCarbs, totalProtein: 0, proteinRemaining: this.dailyProtein, totalFat: 0, fatRemaining: this.dailyFat, totalCalories: 0, caloriesRemaining: this.dailyCalories, noOfRecipes: 0, isKetoFriendly: true, notKetoFriendlyReason: undefined, recipes: []});
-    // this.allRecipes.push({day: 'Tuesday', show: true, totalCarbs: 0, carbsRemaining: this.dailyCarbs, totalProtein: 0, proteinRemaining: this.dailyProtein, totalFat: 0, fatRemaining: this.dailyFat, totalCalories: 0, caloriesRemaining: this.dailyCalories, noOfRecipes: 0, isKetoFriendly: true, notKetoFriendlyReason: undefined, recipes: []});
-    // this.allRecipes.push({day: 'Wednesday', show: true, totalCarbs: 0, carbsRemaining: this.dailyCarbs, totalProtein: 0, proteinRemaining: this.dailyProtein, totalFat: 0, fatRemaining: this.dailyFat, totalCalories: 0, caloriesRemaining: this.dailyCalories, noOfRecipes: 0, isKetoFriendly: true, notKetoFriendlyReason: undefined, recipes: []});
-    // this.allRecipes.push({day: 'Thursday', show: true, totalCarbs: 0, carbsRemaining: this.dailyCarbs, totalProtein: 0, proteinRemaining: this.dailyProtein, totalFat: 0, fatRemaining: this.dailyFat, totalCalories: 0, caloriesRemaining: this.dailyCalories, noOfRecipes: 0, isKetoFriendly: true, notKetoFriendlyReason: undefined, recipes: []});
-    // this.allRecipes.push({day: 'Friday', show: true, totalCarbs: 0, carbsRemaining: this.dailyCarbs, totalProtein: 0, proteinRemaining: this.dailyProtein, totalFat: 0, fatRemaining: this.dailyFat, totalCalories: 0, caloriesRemaining: this.dailyCalories, noOfRecipes: 0, isKetoFriendly: true, notKetoFriendlyReason: undefined, recipes: []});
-    // this.allRecipes.push({day: 'Saturday', show: true, totalCarbs: 0, carbsRemaining: this.dailyCarbs, totalProtein: 0, proteinRemaining: this.dailyProtein, totalFat: 0, fatRemaining: this.dailyFat, totalCalories: 0, caloriesRemaining: this.dailyCalories, noOfRecipes: 0, isKetoFriendly: true, notKetoFriendlyReason: undefined, recipes:[]});
-    // this.allRecipes.push({day: 'Sunday', show: true, totalCarbs: 0, carbsRemaining: this.dailyCarbs, totalProtein: 0, proteinRemaining: this.dailyProtein, totalFat: 0, fatRemaining: this.dailyFat, totalCalories: 0, caloriesRemaining: this.dailyCalories, noOfRecipes: 0, isKetoFriendly: true, notKetoFriendlyReason: undefined, recipes: []});
 
   }
 
@@ -109,6 +96,7 @@ export class TimetableService {
       caloriesRemaining: number,
       noOfRecipes: number,
       recipes: {
+        recipeID: string
         recipeType: string,
         name: string,
         image: string,
@@ -153,7 +141,9 @@ export class TimetableService {
 
   }
 
-  addRecipeToDay(index: number, recipe: {recipeType: string,
+  addRecipeToDay(index: number, recipe: {
+      recipeID: string,
+      recipeType: string,
       name: string,
       image: string,
       url: string,
@@ -185,6 +175,7 @@ export class TimetableService {
     }
 
   addRecipesToDay(index: number, recipes: {
+      recipeID: string
       recipeType: string,
       name: string,
       image: string,
@@ -229,6 +220,7 @@ export class TimetableService {
       caloriesRemaining: number,
       noOfRecipes: number,
       recipes: {
+        recipeID: string,
         recipeType: string,
         name: string,
         image: string,
@@ -278,33 +270,39 @@ export class TimetableService {
       let totalFatForDay = 0;
 
       // Loop through each recipe in the day
-      dayElement.recipes.forEach(recipeElement => {
+      try {
 
-        // Add each of the recipe's nutrients totals to the total nutrients for the day
-        totalCalsForDay = totalCalsForDay + recipeElement.calories;
-        totalCarbsForDay = totalCarbsForDay + recipeElement.carbs;
-        totalProteinForDay = totalProteinForDay + recipeElement.protein;
-        totalFatForDay = totalFatForDay + recipeElement.fat;
+        dayElement.recipes.forEach(recipeElement => {
 
-        // While looping through each recipe, round the recipe's nutrient values to one decimal place
+          // Add each of the recipe's nutrients totals to the total nutrients for the day
+          totalCalsForDay = totalCalsForDay + recipeElement.calories;
+          totalCarbsForDay = totalCarbsForDay + recipeElement.carbs;
+          totalProteinForDay = totalProteinForDay + recipeElement.protein;
+          totalFatForDay = totalFatForDay + recipeElement.fat;
 
-        recipeElement.calories = parseFloat(recipeElement.calories.toFixed(1));
-        recipeElement.carbs = parseFloat(recipeElement.carbs.toFixed(1));
-        recipeElement.protein = parseFloat(recipeElement.protein.toFixed(1));
-        recipeElement.fat = parseFloat(recipeElement.fat.toFixed(1));
+          // While looping through each recipe, round the recipe's nutrient values to one decimal place
 
-      });
+          recipeElement.calories = parseFloat(recipeElement.calories.toFixed(1));
+          recipeElement.carbs = parseFloat(recipeElement.carbs.toFixed(1));
+          recipeElement.protein = parseFloat(recipeElement.protein.toFixed(1));
+          recipeElement.fat = parseFloat(recipeElement.fat.toFixed(1));
 
-      // Assign the totals to the allRecipes object variables
-      dayElement.caloriesRemaining = parseFloat((this.dailyCalories - totalCalsForDay).toFixed(1));
-      dayElement.carbsRemaining = parseFloat((this.dailyCarbs - totalCarbsForDay).toFixed(1));
-      dayElement.proteinRemaining = parseFloat((this.dailyProtein - totalProteinForDay).toFixed(1));
-      dayElement.fatRemaining = parseFloat((this.dailyFat - totalFatForDay).toFixed(1));
+        });
 
-      dayElement.totalCalories = parseFloat(totalCalsForDay.toFixed(1));
-      dayElement.totalCarbs = parseFloat(totalCarbsForDay.toFixed(1));
-      dayElement.totalProtein = parseFloat(totalProteinForDay.toFixed(1));
-      dayElement.totalFat = parseFloat(totalFatForDay.toFixed(1));
+        // Assign the totals to the allRecipes object variables
+        dayElement.caloriesRemaining = parseFloat((this.dailyCalories - totalCalsForDay).toFixed(1));
+        dayElement.carbsRemaining = parseFloat((this.dailyCarbs - totalCarbsForDay).toFixed(1));
+        dayElement.proteinRemaining = parseFloat((this.dailyProtein - totalProteinForDay).toFixed(1));
+        dayElement.fatRemaining = parseFloat((this.dailyFat - totalFatForDay).toFixed(1));
+
+        dayElement.totalCalories = parseFloat(totalCalsForDay.toFixed(1));
+        dayElement.totalCarbs = parseFloat(totalCarbsForDay.toFixed(1));
+        dayElement.totalProtein = parseFloat(totalProteinForDay.toFixed(1));
+        dayElement.totalFat = parseFloat(totalFatForDay.toFixed(1));
+
+      } catch (error) {
+        console.log(error);
+      }
 
     });
 
@@ -318,102 +316,54 @@ export class TimetableService {
 
   }
 
-  checkStorage() {
+  async clearAll() {
 
-    // We only want to check the storage key is one of the days
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    await this.auth.clearAllRecipes(this.accountService.getUserID());
+    this.allRecipes = [];
+    this.checkStorage();
+    this.updateWeeklyTotals();
+    this.arrayUpdated.emit('Array cleared');
 
-    for (let i = 0; i < days.length; i++) {
-
-      const currentDay = days[i];
-
-      // If currentDay doesn't exist in localStorage then false else true
-      const currentDayExistsInLocalStorage = window.localStorage.getItem(currentDay) === null ? false : true;
-      console.log(`${currentDay} exists in localStorage? ${currentDayExistsInLocalStorage}`);
-
-      if (currentDayExistsInLocalStorage) {
-
-        const localDayWithRecipes = window.localStorage.getItem(currentDay);
-
-        /* Check if day exists in user's Firebase timetable
-         * If it does then overwrite the localStorage and allRecipes with the data from Firebase
-         * If it doesn't then write the current day in localStorage to allRecipes and Firebase
-         */
-
-        // Push the localDayWithRecipes into allRecipes and write to Firebase, then updateWeeklyTotals
-        this.allRecipes.push(JSON.parse(localDayWithRecipes));
-        this.updateWeeklyTotals();
-
-        // Doesn't exist in localStorage
-      } else {
-
-        /* If the day exists in the user's Firebase timetable then pass it to writeToStorage() (maybe add a writeDayToStorage)
-         * else if day doesn't exist, create new day and write to Firebase timetable
-         */
-
-        // When day doesn't exist in user's firebase timetable then create it and write to Firebase
-        const newDay =  {
-          day: currentDay,
-          show: true,
-          totalCarbs: 0,
-          carbsRemaining: this.dailyCarbs,
-          totalProtein: 0,
-          proteinRemaining: this.dailyProtein,
-          totalFat: 0,
-          fatRemaining: this.dailyFat,
-          totalCalories: 0,
-          caloriesRemaining: this.dailyCalories,
-          noOfRecipes: 0,
-          isKetoFriendly: true, // Day is not keto friendly
-          notKetoFriendlyReason: '', // Day is not keto friendly reason
-          recipes: []
-        };
-
-        this.allRecipes.push(newDay);
-        this.arrayUpdated.emit('Array Changed');
-
-      }
-    }
   }
 
-  writeAllRecipesToStorage() {
+  async checkStorage() {
 
-    this.allRecipes.forEach(dayWithRecipes => {
+    // We only want to check the storage key is one of the days
+    await this.auth.updateLocalStorageFromFirebase(this.accountService.getUserID()); // This method fills storage
+    console.log(window.localStorage);
 
-      window.localStorage.setItem(dayWithRecipes.day, JSON.stringify(dayWithRecipes));
+    this.updateAllRecipesFromLocalStorage();
+    this.arrayUpdated.emit('Array changed');
 
-    });
+    console.log(this.allRecipes);
+
+  }
+
+  async updateAllRecipesFromLocalStorage() {
+
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
     for (let i = 0; i < window.localStorage.length; i++) {
-      console.log('window storage: ' + window.localStorage.key(i));
-      console.log(window.localStorage.getItem(window.localStorage.key(i)));
+
+      const currentKeyName = window.localStorage.key(i);
+
+      // Make sure we're accessing a key/value which is a day and not paypal/firebase related
+      if (days.includes(currentKeyName)) {
+
+        const dayWithRecipes = JSON.parse(window.localStorage.getItem(currentKeyName));
+        this.allRecipes.push(dayWithRecipes);
+
+        // console.log(this.allRecipes);
+
+      }
+
     }
 
-    // for (let i = 0; i < this.allRecipes.length; i++) {
-
-    //   const dayWithRecipes = this.allRecipes[i];
-
-    //   if (window.localStorage.getItem(dayWithRecipes.day) === null || window.localStorage.getItem(dayWithRecipes.day) === undefined) {
-
-    //     window.localStorage.setItem(dayWithRecipes.day, JSON.stringify(dayWithRecipes));
-
-    //   } else {
-
-    //     window.localStorage.getItem(dayWithRecipes.day)
-
-    //   }
-
-    //   const recipes = dayWithRecipes.recipes;
-
-    //   for (let j = 0; j < recipes.length; j++) {
-
-    //       this.auth.writeRecipeToUserTimetable(this.accountService.getUserID, recipes);
-
-    //   }
-    // }
   }
 
   async generate() {
+
+    console.log('Reached');
 
     // a string which will be used to store the request url to the edamam API
     let request = '';
@@ -435,6 +385,8 @@ export class TimetableService {
 
     for (let i = 0; i < this.allRecipes.length; i++) {
 
+      console.log('Reached 2');
+
       const dayWithRecipes = this.allRecipes[i];
 
       /* The reciplePlan array is assigned the result of the getRecipePlanStructure method.
@@ -452,11 +404,11 @@ export class TimetableService {
       let ingredient = '';
 
       // Remove the exclamation mark and change Monday's isKetoFriendly value back to true in the allRecipes array back to
-      if (dayWithRecipes.isKetoFriendly) {
+      if (true/* UNCOMMENT THIS IN FUTURE dayWithRecipes.isKetoFriendly*/) {
 
         console.log(`Finding recipes for ${dayWithRecipes.day}`);
 
-        recipePlan = this.getReciplePlanStructure(dayWithRecipes);
+        recipePlan = await this.getReciplePlanStructure(dayWithRecipes);
 
         for (let j = 0; j < recipePlan.length; j++) {
 
@@ -520,8 +472,6 @@ export class TimetableService {
 
     }
 
-    this.writeAllRecipesToStorage();
-
   }
 
   async searchForRecipes(index, recipeDetails, ingredient) {
@@ -529,6 +479,8 @@ export class TimetableService {
     let returnRecipe;
     let randomRecipeNo;
     let recipeFound;
+
+    console.log('Reached searchForRecipes');
 
     const from = 0;
     let to = from + 5;
@@ -574,6 +526,7 @@ export class TimetableService {
         const servings = returnRecipe['yield'];
 
         let recipeForDay: {
+          recipeID: string,
           recipeType: string,
           name: string,
           image: string,
@@ -585,7 +538,8 @@ export class TimetableService {
           fat: number,
           isKetoFriendly: boolean,
           notKetoFriendlyReason: string
-      } = {recipeType: recipeDetails.recipeType,
+      } = { recipeID: returnRecipe.uri.substring(returnRecipe.uri.indexOf('_') + 1, returnRecipe.uri.length),
+          recipeType: recipeDetails.recipeType,
           name: returnRecipe.label,
           url: returnRecipe.url,
           uri: returnRecipe.uri,
@@ -774,7 +728,7 @@ export class TimetableService {
   /* This method is designed to take in a day's recipes along with the amount of recipes and calories remaining
    * in order to configure a suitable structure for that day.
    */
-  getReciplePlanStructure(currentDay: any) {
+  async getReciplePlanStructure(currentDay: any) {
 
       // This reciplePlan object will be used to store the determined recipeType, caloriePercentage, fatPercentage, proteinPercentage
       // and carbsPercentage for each recipe.
@@ -788,7 +742,7 @@ export class TimetableService {
 
 
       // If there's no recipes, then the app checks how many calories are remaining and pushes recipe plans into the array
-      if (currentDay.noOfRecipes === 0) {
+      if (true /*UNCOMMENT THIS IN FUTURE currentDay.noOfRecipes === 0*/) {
 
         switch (true) {
 

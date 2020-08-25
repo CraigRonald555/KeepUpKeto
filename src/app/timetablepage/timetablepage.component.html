@@ -12,6 +12,7 @@
         </div>
 
         <div class="btn btn-rose pull-right" (click)='generateTimetable()'>Generate</div>
+        <div class="btn btn-default pull-right" (click)='clear()'>Clear All</div>
 
         <!-- <div class="dropdown show pull-right">
             <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -24,7 +25,7 @@
             </div>
           </div> -->
 
-        <ng-container *ngIf='todayRecipes !== undefined'>
+        <!-- <ng-container *ngIf='todayRecipes !== undefined'> -->
 
         <table class="table" *ngIf="showDaily==true">
             <thead>
@@ -35,6 +36,7 @@
                   <th class="text-right"><strong>Actions</strong></th>
                 </tr>
             </thead>
+            <ng-container *ngIf='todayRecipes !== undefined'>
             <tbody *ngFor="let currentRecipe of todayRecipes.recipes; let i = index">
                 <tr>
                     <td>{{currentRecipe.recipeType}}</td>
@@ -54,10 +56,12 @@
                     </td>
                 </tr>
             </tbody>
+
             <td></td>
             <td></td>
             <td></td>
             <td class="text-right">Calories remaining: {{todayRecipes.caloriesRemaining}}</td>
+            </ng-container>
         </table>
 
       <div class="weekly-table" *ngIf="showDaily==false">
@@ -133,7 +137,7 @@
               </tbody>
         </table>
       </div>
-    </ng-container>
+    <!-- </ng-container> -->
       <!-- (click)="allRecipes[i].recipes.push({}) -->
 
     </div>

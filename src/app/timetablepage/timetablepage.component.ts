@@ -23,9 +23,10 @@ export class TimetablepageComponent implements OnInit {
     totalCalories: number,
     caloriesRemaining: number,
     noOfRecipes: number,
-    isKetoFriendly: boolean, // Day is not keto friendly
-    notKetoFriendlyReason: string, // Day is not keto friendly reason
+    // isKetoFriendly: boolean, // Day is not keto friendly
+    // notKetoFriendlyReason: string, // Day is not keto friendly reason
     recipes: {
+      recipeID: string,
       recipeType: string,
       name: string,
       image: string,
@@ -33,8 +34,8 @@ export class TimetablepageComponent implements OnInit {
       carbs: number,
       protein: number,
       fat: number,
-      isKetoFriendly: boolean, // Recipe is not keto friendly
-      notKetoFriendlyReason: string // Recipe is not keto friendly reason
+      // isKetoFriendly: boolean, // Recipe is not keto friendly
+      // notKetoFriendlyReason: string // Recipe is not keto friendly reason
     }[]
   }[];
 
@@ -44,6 +45,7 @@ export class TimetablepageComponent implements OnInit {
     caloriesRemaining: number,
     noOfRecipes: number,
     recipes: {
+      recipeID: string,
       recipeType: string,
       name: string,
       image: string,
@@ -60,6 +62,7 @@ export class TimetablepageComponent implements OnInit {
     timetableService.arrayUpdated.subscribe(status => {
 
       this.allRecipes = timetableService.getAllRecipes();
+      this.todayRecipes = timetableService.getTodayRecipes();
       this.changeDetector.detectChanges();
 
     });
@@ -71,6 +74,12 @@ export class TimetablepageComponent implements OnInit {
     this.allRecipes = this.timetableService.getAllRecipes();
     this.todayRecipes = this.timetableService.getTodayRecipes();
     this.changeDetector.detectChanges();
+
+  }
+
+  clear() {
+
+    this.timetableService.clearAll();
 
   }
 
