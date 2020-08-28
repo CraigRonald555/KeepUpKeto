@@ -1,12 +1,14 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ElementRef, ViewChild, Renderer2, Inject, AfterViewInit } from '@angular/core';
 import { TimetableService } from '../timetable.service';
+
+// declare var whisk: any;
 
 @Component({
   selector: 'app-timetablepage',
   templateUrl: './timetablepage.component.html',
   styleUrls: ['./timetablepage.component.css']
 })
-export class TimetablepageComponent implements OnInit {
+export class TimetablepageComponent implements OnInit, AfterViewInit {
 
   showDaily = true;
   monShow = true;
@@ -55,9 +57,13 @@ export class TimetablepageComponent implements OnInit {
   };
 
 
-  tempRecipes;
+  @ViewChild('whisk') whiskElement: ElementRef;
+  @ViewChild('initialseWhisk') initWhiskElement: ElementRef;
 
-  constructor(public timetableService: TimetableService, private changeDetector: ChangeDetectorRef) {
+  afterVie
+
+
+  constructor(public timetableService: TimetableService, private changeDetector: ChangeDetectorRef, private renderer: Renderer2 ) {
 
     timetableService.arrayUpdated.subscribe(status => {
 
@@ -66,6 +72,26 @@ export class TimetablepageComponent implements OnInit {
       this.changeDetector.detectChanges();
 
     });
+
+  }
+
+  ngAfterViewInit() {
+
+    this.renderer.setProperty(this.initWhiskElement.nativeElement, 'innerHTML',
+    `<script>
+    whisk = whisk || {};
+    whisk.queue = whisk.queue || [];
+
+    whisk.queue.push(function () {
+      whisk.shoppingList.defineWidget("XKEE-MMQQ-QZOX-RKQF");
+    });</script>`);
+
+    this.renderer.setProperty(this.whiskElement.nativeElement, 'innerHTML' ,
+      `<script>whisk.queue.push(function () {
+        whisk.display("XKEE-MMQQ-QZOX-RKQF");
+      });</script>`);
+
+    this.changeDetector.detectChanges();
 
   }
 

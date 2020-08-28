@@ -12,6 +12,13 @@ import { StorageService } from './storage.service';
 export class AuthService {
 
   signedIn = new EventEmitter<User>();
+  mondayChanged = new EventEmitter<unknown>();
+  tuesdayChanged = new EventEmitter<unknown>();
+  wednesdayChanged = new EventEmitter<unknown>();
+  thursdayChanged = new EventEmitter<unknown>();
+  fridayChanged = new EventEmitter<unknown>();
+  saturdayChanged = new EventEmitter<unknown>();
+  sundayChanged = new EventEmitter<unknown>();
 
   constructor(private afAuth: AngularFireAuth, private router: Router, private fbDB: AngularFireDatabase,
               private storageService: StorageService) {
@@ -37,7 +44,67 @@ export class AuthService {
       }
 
 
-    })
+    });
+
+  }
+
+  listenToTimetableChanges(uid) {
+
+    const mondayListener = this.fbDB.database.ref(`timetables/${uid}/Monday`);
+    mondayListener.on('value', snapshot => {
+
+      console.log('Change has been detected in Timetable for Monday');
+      this.mondayChanged.emit(snapshot.val());
+
+    });
+
+    const tuesdayListener = this.fbDB.database.ref(`timetables/${uid}/Tuesday`);
+    tuesdayListener.on('value', snapshot => {
+
+      console.log('Change has been detected in Timetable for Tuesday');
+      this.tuesdayChanged.emit(snapshot.val());
+
+    });
+
+    const wednesdayListener = this.fbDB.database.ref(`timetables/${uid}/Wednesday`);
+    wednesdayListener.on('value', snapshot => {
+
+      console.log('Change has been detected in Timetable for Wednesday');
+      this.wednesdayChanged.emit(snapshot.val());
+
+    });
+
+    const thursdayListener = this.fbDB.database.ref(`timetables/${uid}/Thursday`);
+    thursdayListener.on('value', snapshot => {
+
+      console.log('Change has been detected in Timetable for Thursday');
+      this.thursdayChanged.emit(snapshot.val());
+
+    });
+
+    const fridayListener = this.fbDB.database.ref(`timetables/${uid}/Friday`);
+    fridayListener.on('value', snapshot => {
+
+      console.log('Change has been detected in Timetable for Friday');
+      this.fridayChanged.emit(snapshot.val());
+
+    });
+
+    const saturdayListener = this.fbDB.database.ref(`timetables/${uid}/Saturday`);
+    saturdayListener.on('value', snapshot => {
+
+      console.log('Change has been detected in Timetable for Saturday');
+      this.saturdayChanged.emit(snapshot.val());
+
+    });
+
+    const sundayListener = this.fbDB.database.ref(`timetables/${uid}/Sunday`);
+    sundayListener.on('value', snapshot => {
+
+      console.log('Change has been detected in Timetable for Sunday');
+      this.sundayChanged.emit(snapshot.val());
+
+    });
 
   }
 
@@ -214,7 +281,6 @@ export class AuthService {
 
     let returnValue;
 
-    //`${table}/${id}`
     await this.fbDB.database.ref(reference).once('value')
       .then(snapshot => {
 
@@ -229,6 +295,57 @@ export class AuthService {
      });
 
     return returnValue;
+
+  }
+
+  async removeRecipeFromUserTimetable(uid, dayName, recipe) {
+
+    // Check user has a timetable
+    if (await this.checkReferenceExists(`timetables/${uid}`)) {
+
+      console.log('User has a timetable in Firebase');
+
+      // Check timetable has the day the recipe is intended to be removed from
+      if (await this.checkReferenceExists(`timetables/${uid}/${dayName}`)) {
+
+        console.log('User has the day which the recipe is intended for in Firebase');
+
+        // Check recipe intended to be removed exists in the day
+        if (await this.checkReferenceExists(`timetables/${uid}/${dayName}/recipes/${recipe.recipeID}`) === true) {
+
+          console.log('Recipe to be removed exists');
+
+          await this.fbDB.database.ref(`timetables/${uid}/${dayName}/recipes/${recipe.recipeID}`).remove().catch(error => {
+
+            console.log(error);
+
+          });
+
+          this.storageService.removeRecipeFromDay(dayName, recipe.recipeID);
+
+          // Recipe doesn't exist in the day
+        } else {
+
+          // Try remove recipe from storage anyway, Firebase may have updated without telling us
+          this.storageService.removeRecipeFromDay(dayName, recipe.recipeID);
+
+        }
+
+        // Day doesn't exist
+      } else {
+
+        // Try remove recipe from storage anyway, Firebase may have updated without telling us
+        this.storageService.removeRecipeFromDay(dayName, recipe.recipeID);
+
+      }
+
+      // Timetable doesn't exist
+    } else {
+
+      // Try remove recipe from storage anyway, Firebase may have updated without telling us
+      this.storageService.removeRecipeFromDay(dayName, recipe.recipeID);
+
+    }
 
   }
 
@@ -265,6 +382,10 @@ export class AuthService {
 
           });
 
+          // Add recipe to storage as well
+          this.storageService.addRecipeToDay(dayName, recipe);
+          recipeExistsInStorage = true;
+
           recipeExistsInFirebase = true;
 
           // If recipe already exists
@@ -276,7 +397,7 @@ export class AuthService {
           // Check if recipe also exists in storage
           if (!this.storageService.checkRecipeIsInStorage(dayName, recipe)) {
 
-            this.storageService.addToRecipeToDay(dayName, recipe);
+            this.storageService.addRecipeToDay(dayName, recipe);
             recipeExistsInStorage = true;
 
           }
@@ -363,47 +484,39 @@ export class AuthService {
 
   }
 
-  async updateLocalStorageFromFirebase(uid) {
+  async updateLocalStorageFromFirebase(uid, dayName) {
 
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    // Check day exists in Firebase
+    if (await this.checkReferenceExists(`timetables/${uid}/${dayName}`)) {
 
-    for (let i = 0; i < days.length; i++) {
+      console.log(`${dayName} exists in Firebase`);
 
-      const currentDay = days[i];
+      // Check/Add day exists in localStorage - addDayToStorage will only add if there isn't one in there
+      this.storageService.addDayToStorage(dayName);
 
-      // Check day exists in Firebase
-      if (await this.checkReferenceExists(`timetables/${uid}/${currentDay}`)) {
+      // Need the show and recipes array from Firebase, first check recipes exist
+      if (await this.checkReferenceExists(`timetables/${uid}/${dayName}/recipes`)) {
 
-        console.log(`${currentDay} exists in Firebase`);
+        console.log(`${dayName}'s recipes exist in Firebase`);
 
-        // Check/Add day exists in localStorage - addDayToStorage will only add if there isn't one in there
-        this.storageService.addDayToStorage(currentDay);
+        // Retrieve list of Firebase recipes for this currentDay
+        const recipesInFirebase = await this.readDataFromFirebase(`timetables/${uid}/${dayName}/recipes`);
 
-        // Need the show and recipes array from Firebase, first check recipes exist
-        if (await this.checkReferenceExists(`timetables/${uid}/${currentDay}/recipes`)) {
+        await this.storageService.addRecipesFromFirebase(dayName, recipesInFirebase);
 
-          console.log(`${currentDay}'s recipes exist in Firebase`);
-
-          // Retrieve list of Firebase recipes for this currentDay
-          const recipesInFirebase = await this.readDataFromFirebase(`timetables/${uid}/${currentDay}/recipes`);
-
-          await this.storageService.addRecipesFromFirebase(currentDay, recipesInFirebase);
-
-          // No recipes in currentDay in Firebase
-        } else {
-
-          console.log(`There are no recipes for ${currentDay} in Firebase`);
-
-          // Perhaps write noOfRecipes to the object stored in the localStorage for currentDay
-
-        }
-
-        // Day doesn't exist in Firebase
+        // No recipes in currentDay in Firebase
       } else {
 
-        console.log(`${currentDay} doesnt exist in Firebase`);
+        console.log(`There are no recipes for ${dayName} in Firebase`);
+
+        // Perhaps write noOfRecipes to the object stored in the localStorage for currentDay
 
       }
+
+      // Day doesn't exist in Firebase
+    } else {
+
+      console.log(`${dayName} doesnt exist in Firebase`);
 
     }
 

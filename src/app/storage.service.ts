@@ -21,6 +21,7 @@ export class StorageService {
       if (dayExists) {
 
         window.localStorage.removeItem(currentDay);
+        this.setDayIsUpToDate(currentDay, false);
 
       }
 
@@ -28,24 +29,89 @@ export class StorageService {
 
   }
 
-  checkDayIsInStorage(dayName) {
+  getDayFromStorage(dayName) {
 
-    let dayExists = false;
+    const dayExists = this.checkDayIsInStorage(dayName);
+    let dayInStorage;
 
-    for (let i = 0; i < window.localStorage.length; i++) {
+    if (dayExists) {
 
-      dayExists = window.localStorage.key(i) === dayName ? true : false;
+      dayInStorage = JSON.parse(window.localStorage.getItem(dayName));
+
+    } else {
+
+      this.addDayToStorage(dayName);
+      dayInStorage = JSON.parse(window.localStorage.getItem(dayName));
 
     }
+
+    return dayInStorage;
+
+  }
+
+  setDayIsUpToDate(dayName, trueOrFalse) {
+
+    const dayExists = this.checkDayIsInStorage(dayName);
+
+    if (dayExists) {
+
+      const dayInStorage = this.getDayFromStorage(dayName);
+      dayInStorage.isUpToDate = trueOrFalse;
+      window.localStorage.setItem(dayName, JSON.stringify(dayInStorage));
+
+    } else {
+
+      this.addDayToStorage(dayName);
+      const dayInStorage = this.getDayFromStorage(dayName);
+      dayInStorage.isUpToDate = trueOrFalse;
+      window.localStorage.setItem(dayName, JSON.stringify(dayInStorage));
+
+    }
+
+  }
+
+  checkDayIsUpToDate(dayName) {
+
+    let dayIsUpToDate = false;
+    const dayExists = this.checkDayIsInStorage(dayName);
+
+    if (dayExists) {
+
+      const dayInStorage = this.getDayFromStorage(dayName);
+
+      if (dayInStorage.isUpToDate === true) {
+
+        dayIsUpToDate = true;
+
+      }
+
+    }
+
+    return dayIsUpToDate;
+
+  }
+
+  checkDayIsInStorage(dayName) {
+
+    const dayExists = window.localStorage.getItem(dayName) === null || window.localStorage.getItem(dayName) === undefined ? false : true;
 
     return dayExists;
 
   }
 
-  checkRecipeIsInStorage(dayName, recipe) {
+  checkRecipeIsInStorage(dayName, recipeID) {
 
-    let recipeExists = false
+    const dayExists = this.checkDayIsInStorage(dayName);
+    let recipeExists = false;
 
+    if (dayExists) {
+
+      const dayWithRecipes = this.getDayFromStorage(dayName);
+
+      // A fancy way of checking if the passed recipe exists in the dayWithRecipes recipes array.
+      recipeExists = dayWithRecipes.recipes.filter(recipe => recipe.recipeID === recipeID).length > 0 ? true : false;
+
+    }
 
     return recipeExists;
 
@@ -54,7 +120,7 @@ export class StorageService {
   addDayToStorage(dayName) {
 
     // Assign whether the day exists in localStorage to true or false
-    const dayExists = !window.localStorage.getItem(dayName) === null || !window.localStorage.getItem(dayName) === undefined ? true : false;
+    const dayExists = this.checkDayIsInStorage(dayName);
 
     // If day doesn't exist in local storage
     if (!dayExists) {
@@ -62,6 +128,7 @@ export class StorageService {
       const dayWithRecipes = {
         day: dayName,
         show: true,
+        isUpToDate: false,
         recipes: []
       };
 
@@ -93,36 +160,43 @@ export class StorageService {
         // Get the curent recipe details using the current recipeID e.g. { name: ..., image: ..., ... }
         const currentRecipeDetails = recipesInFirebase[currentRecipeID];
 
-        // Make call to edamam API to retrieve the url, uri, calories, carbs, protein etc.
-        const requestURL = 'https://api.edamam.com/search?app_id=4dad360d&app_key=5d6c41eeeb543f362a3b108c597193bd&r=http%3A%2F%2Fwww.edamam.com%2Fontologies%2Fedamam.owl%23recipe_' + currentRecipeID;
+        const recipeExistsInStorageDayAlready = this.checkRecipeIsInStorage(dayName, currentRecipeID);
 
-        console.log('Request to Edamam for recipe details sent');
-        let result = await this.http.get(requestURL).toPromise();
+        // Only make a call to Edamam if the recipe doesn't already exist in localStorage
+        if (!recipeExistsInStorageDayAlready) {
 
-        result = result[0];
+          // Make call to edamam API to retrieve the url, uri, calories, carbs, protein etc.
+          const requestURL = 'https://api.edamam.com/search?app_id=4dad360d&app_key=5d6c41eeeb543f362a3b108c597193bd&r=http%3A%2F%2Fwww.edamam.com%2Fontologies%2Fedamam.owl%23recipe_' + currentRecipeID;
 
-        const servings = result['yield'];
+          console.log('Request to Edamam for recipe details sent');
+          let result = await this.http.get(requestURL).toPromise();
 
-        const recipeToAdd = {
-          recipeID: currentRecipeID,
-          recipeType: currentRecipeDetails.recipeType,
-          name: currentRecipeDetails.name,
-          image: result['image'],
-          url: result['url'],
-          uri: result['uri'],
-          calories: result['calories'] / servings,
-          carbs: result['totalNutrients'].CHOCDF.quantity / servings,
-          protein: result['totalNutrients'].PROCNT.quantity  / servings,
-          fat: result['totalNutrients'].FAT.quantity / servings,
-          isKetoFriendly: true, // Recipe is not keto friendly
-          notKetoFriendlyReason: '' // Recipe is not keto friendly reason
-        };
+          result = result[0];
 
-        console.log(recipeToAdd);
+          const servings = result['yield'];
 
-        //dayWithRecipesInStorage.recipes.push(recipeToAdd);
-        this.addToRecipeToDay(dayName, recipeToAdd);
-        recipesAdded = true;
+          const recipeToAdd = {
+            recipeID: currentRecipeID,
+            recipeType: currentRecipeDetails.recipeType,
+            name: currentRecipeDetails.name,
+            image: result['image'],
+            url: result['url'],
+            uri: result['uri'],
+            calories: result['calories'] / servings,
+            carbs: result['totalNutrients'].CHOCDF.quantity / servings,
+            protein: result['totalNutrients'].PROCNT.quantity  / servings,
+            fat: result['totalNutrients'].FAT.quantity / servings,
+            isKetoFriendly: true, // Recipe is not keto friendly
+            notKetoFriendlyReason: '' // Recipe is not keto friendly reason
+          };
+
+          console.log(recipeToAdd);
+
+          //dayWithRecipesInStorage.recipes.push(recipeToAdd);
+          this.addRecipeToDay(dayName, recipeToAdd);
+          recipesAdded = true;
+
+        }
 
       }
 
@@ -167,7 +241,7 @@ export class StorageService {
         };
 
         console.log(recipeToAdd);
-        this.addToRecipeToDay(dayName, recipeToAdd);
+        this.addRecipeToDay(dayName, recipeToAdd);
         // dayWithRecipesInStorage.recipes.push(recipeToAdd);
         recipesAdded = true;
 
@@ -180,11 +254,30 @@ export class StorageService {
     // }
 
   }
+
+  removeRecipeFromDay(dayName, recipeID) {
+
+    const recipeExists = this.checkRecipeIsInStorage(dayName, recipeID);
+
+    if (recipeExists) {
+
+      console.log('Recipe exists in storage');
+
+      const dayInStorage = this.getDayFromStorage(dayName);
+
+      // Remove recipe from a day
+      dayInStorage.recipes = dayInStorage.recipes.filter(recipe => recipe.recipeID !== recipeID);
+      window.localStorage.setItem(dayName, JSON.stringify(dayInStorage));
+
+    }
+
+  }
+
   // Should receive a recipe directly from firebase therefore only contains basic info about recipe
-  addToRecipeToDay(dayName, recipe) {
+  addRecipeToDay(dayName, recipe) {
 
     // Assign whether the day exists in localStorage to true or false
-    const dayExists = window.localStorage.getItem(dayName) === null || window.localStorage.getItem(dayName) === undefined ? false : true;
+    const dayExists = this.checkDayIsInStorage(dayName);
 
     // If the day exists in localStorage
     if (dayExists) {
@@ -209,6 +302,11 @@ export class StorageService {
         dayWithRecipes.recipes.push(recipe);
         window.localStorage.setItem(dayName, JSON.stringify(dayWithRecipes));
 
+        /* As this method should only really be called after a recipe is added in Firebase, localStorage should always be up-to-date
+        * with Firebase after the recipe is added to it - meaning there's no reason to call setIsUpToDate() after a recipe
+        * is added to Storage
+        */
+
       }
 
       // If day doesn't exist in localStorage
@@ -230,6 +328,10 @@ export class StorageService {
       dayWithRecipes.recipes.push(recipe);
       window.localStorage.setItem(dayName, JSON.stringify(dayWithRecipes));
 
+      /* As this method should only really be called after a recipe is added in Firebase, localStorage should always be up-to-date
+      * with Firebase after the recipe is added to it - meaning there's no reason to call setIsUpToDate() after a recipe
+      * is added to Storage
+      */
 
     }
 
