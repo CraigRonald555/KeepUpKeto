@@ -251,6 +251,136 @@ export class AuthService {
 
   }
 
+  async checkDayMatchesBetweenStorageAndFirebase(uid, dayName) {
+
+    // Store the recipes from Storage for the given dayName
+    const recipesInStorage = this.storageService.getDayFromStorage(dayName).recipes;
+
+    // Store the recipes from Firebase for the given dayName
+    const recipesInFirebase = await this.readDataFromFirebase(`timetables/${uid}/${dayName}/recipes`);
+
+    // Before we can check the length of recipesInFirebase, we should check it's not equal to null otherwise we'll get an error
+    if (recipesInFirebase !== null) {
+
+      // If the number of recipes in Storage and Firebase don't match then set isUpToDate false
+      if (recipesInStorage.length !== Object.keys(recipesInFirebase).length) {
+
+        this.storageService.setDayIsUpToDate(dayName, false);
+
+        // If there are the same amount of recipes in each then we'll still have to check the recipeIDs in localStorage match those in Firebase
+      } else {
+
+          // Loop though each recipe in Storage
+        for (let i = 0; i < recipesInStorage.length; i++) {
+
+          console.log(`Detected recipes in Firebase for ${dayName}`);
+
+          // Store the currentRecipeID we're up to in Storage recipes loop
+          const currentRecipeIDStorage = recipesInStorage[i].recipeID;
+
+          // Before we loop through the Firebase recipes, set a found variable to false
+          let foundRecipeIDFromStorageInFirebase = false;
+
+          // Loop through the recipeIDs in Firebase
+          for (const currentRecipeIDFirebase in recipesInFirebase) {
+
+            // If the current recipe ID in Firebase is equal to the one in Storage, set the found variable to true
+            if (currentRecipeIDFirebase === currentRecipeIDStorage) {
+
+              console.log(`Found the current recipe from Storage in Firebase - ${dayName}`);
+              foundRecipeIDFromStorageInFirebase = true;
+
+            }
+
+          }
+
+          // After looping through the Firebase recipe IDs, if we didn't find the currentRecipeID from Storage in Firebase's recipes
+          if (!foundRecipeIDFromStorageInFirebase) {
+
+            // Then we need to set the isUpToDate value to false for the day in storage as there's a recipe we have in Storage which isn't in Firebase
+            this.storageService.setDayIsUpToDate(dayName, false);
+
+          }
+
+          console.log('Recipes in Firebase from checkDayMatchesBetweenStorageAndFirebase()' + recipesInFirebase);
+
+        }
+
+      }
+
+      // If recipesInFirebase is null
+    } else {
+
+      // Check recipes in storage has at least one recipe, if it does isUpToDate to false as we can't have no recipes in Firebase and some in localStorage
+      if (recipesInStorage.length > 0 ) {
+
+        this.storageService.setDayIsUpToDate(dayName, false);
+
+      }
+
+    }
+
+
+    //Old after this
+    // if (recipesInStorage.length !== Object.keys(recipesInFirebase).length) {
+
+    //   this.storageService.setDayIsUpToDate(dayName, false);
+
+    // } else {
+
+    //   // Loop though each recipe in Storage
+    //   for (let i = 0; i < recipesInStorage.length; i++) {
+
+    //     // Store the currentRecipeID we're up to in Storage recipes loop
+    //     const currentRecipeIDStorage = recipesInStorage[i].recipeID;
+
+    //     // If there's recipes in Firebase
+    //     if (recipesInFirebase !== null) {
+
+    //       console.log(`Detected recipes in Firebase for ${dayName}`);
+
+    //       // Before we loop through the Firebase recipes, set a found variable to false
+    //       let foundRecipeIDFromStorageInFirebase = false;
+
+    //       // Loop through the recipeIDs in Firebase
+    //       for (const currentRecipeIDFirebase in recipesInFirebase) {
+
+    //         // If the current recipe ID in Firebase is equal to the one in Storage, set the found variable to true
+    //         if (currentRecipeIDFirebase === currentRecipeIDStorage) {
+
+    //           console.log(`Found the current recipe from Storage in Firebase - ${dayName}`);
+    //           foundRecipeIDFromStorageInFirebase = true;
+
+    //         }
+
+    //       }
+
+    //       // After looping through the Firebase recipe IDs, if we didn't find the currentRecipeID from Storage in Firebase's recipes
+    //       if (!foundRecipeIDFromStorageInFirebase) {
+
+    //         // Then we need to set the isUpToDate value to false for the day in storage as there's a recipe we have in Storage which isn't in Firebase
+    //         this.storageService.setDayIsUpToDate(dayName, false);
+
+    //       }
+
+
+    //     } else {
+
+    //       // Nothing exists in Firebase therefore nothing should exist in localStorage, this would only be reached if there was
+    //       // a recipe in storage for the passed day therefore we should set the dayIsUpToDate to false
+
+    //       this.storageService.setDayIsUpToDate(dayName, false);
+
+    //     }
+
+    //     console.log('Recipes in Firebase from checkDayMatchesBetweenStorageAndFirebase()' + recipesInFirebase);
+
+    //   }
+
+    // }
+
+  }
+
   async checkReferenceExists(reference) {
 
     let exists = false;
@@ -510,6 +640,9 @@ export class AuthService {
         console.log(`There are no recipes for ${dayName} in Firebase`);
 
         // Perhaps write noOfRecipes to the object stored in the localStorage for currentDay
+
+        this.storageService.removeAllRecipesFromDay(dayName);
+        console.log(`Recipes should now be removed from localStorage for ${dayName}`);
 
       }
 

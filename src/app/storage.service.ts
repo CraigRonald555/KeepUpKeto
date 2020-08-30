@@ -255,6 +255,31 @@ export class StorageService {
 
   }
 
+  removeAllRecipesFromDay(dayName) {
+
+    const dayExists = this.checkDayIsInStorage(dayName);
+
+    if (dayExists) {
+
+      const emptyRecipes = [];
+
+      const dayInStorage = this.getDayFromStorage(dayName);
+      const oldRecipes = dayInStorage.recipes;
+
+      // If recipes exists in dayInStorage
+      if (!(oldRecipes === undefined || oldRecipes === null)) {
+
+        console.log(`There are currently recipes in storage for ${dayName}`);
+
+        dayInStorage.recipes = emptyRecipes;
+        window.localStorage.setItem(dayName, JSON.stringify(dayInStorage));
+
+      }
+
+    }
+
+  }
+
   removeRecipeFromDay(dayName, recipeID) {
 
     const recipeExists = this.checkRecipeIsInStorage(dayName, recipeID);

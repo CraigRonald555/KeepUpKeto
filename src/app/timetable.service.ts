@@ -3,6 +3,7 @@ import { AccountService } from './account.service';
 import {HttpClient} from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { StorageService } from './storage.service';
+import { EdamamService } from './edamam.service';
 
 @Injectable()
 export class TimetableService {
@@ -53,7 +54,7 @@ export class TimetableService {
   userIngredients;
   baseIngredients = ['chicken', 'beef', 'ribs', 'fish', 'pork', 'fish', 'lamb', 'veal', 'eggs', 'avocado', 'nuts', 'berries'];
 
-  constructor(private accountService: AccountService, private auth: AuthService, private http: HttpClient, private storageService: StorageService) {
+  constructor(private accountService: AccountService, private auth: AuthService, private edamam: EdamamService, private storageService: StorageService) {
 
     // window.localStorage.clear();
 
@@ -359,9 +360,19 @@ export class TimetableService {
 
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
+    console.log(`checkStorage() reached`);
+
     for (let i = 0; i < days.length; i++) {
 
       const currentDay = days[i];
+
+      await this.auth.checkDayMatchesBetweenStorageAndFirebase(this.accountService.getUserID(), currentDay);
+      /* Add a method in auth which loops through each recipe in the user's storages day's recipes array
+       * Declare a variable to true before the while loop begins called 'firebaseAndStorageMatch = true'
+       * If during the loop, a recipeID is not detected in the user's Firebase day's recipes array, then set the dayIsUpToDate value to false for that day in storage
+       *
+       */
+
       const dayIsUpToDate = this.storageService.checkDayIsUpToDate(currentDay);
 
       if (!dayIsUpToDate) {
@@ -406,8 +417,6 @@ export class TimetableService {
 
   async generate() {
 
-    console.log('Reached');
-
     let totalCallsToAPI = 0;
 
     // a string which will be used to store the request url to the edamam API
@@ -429,8 +438,6 @@ export class TimetableService {
     }[] = [];
 
     for (let i = 0; i < this.allRecipes.length; i++) {
-
-      console.log('Reached 2');
 
       const dayWithRecipes = this.allRecipes[i];
 
@@ -458,31 +465,35 @@ export class TimetableService {
         for (let j = 0; j < recipePlan.length; j++) {
 
           const recipeDetails = recipePlan[j];
-          let recipeReturned;
+          let recipeForMealType;
 
           // While a recipeReturned is undefined or false and there's still baseIngredients to find
-          while (!recipeReturned && tempBaseIngredients.length > 0) {
+          while (recipeForMealType === undefined && tempBaseIngredients.length > 0) {
 
             console.log('Looking for a new ingredient...');
 
+            // If there are still user preferred ingredients to try and find a recipe for
             if (tempUserIngredients.length > 0) {
-
 
               console.log('A user preferenced ingredient found...');
 
+              // Randomly select an ingredient from the user's preferred ingredients then remove it from this cycle so it can't be selected again for the same day
               const randomIngredientIndex = Math.round((Math.random()) * (tempUserIngredients.length-1));
               ingredient = tempUserIngredients[randomIngredientIndex];
               tempUserIngredients.splice(randomIngredientIndex, 1);
 
-            }
-            else if (tempUserIngredients.length === 0) {
+
+              // If there's no more user preferred ingredients to select from
+            } else if (tempUserIngredients.length === 0) {
 
               console.log('No more user perferenced ingredients left...');
 
+              // If there's still base ingredients to try and find a recipe for
               if (tempBaseIngredients.length > 0) {
 
                 console.log('A base ingredient found...');
 
+                // Randomly select an ingredient from the base ingredients then remove it from this cycle so it can't be selected again for the same day
                 const randomIngredientIndex = Math.round((Math.random()) * (tempBaseIngredients.length-1));
                 ingredient = tempBaseIngredients[randomIngredientIndex];
                 tempBaseIngredients.splice(randomIngredientIndex, 1);
@@ -491,22 +502,21 @@ export class TimetableService {
 
             }
 
-            recipeReturned = await this.searchForRecipes(i, recipeDetails, ingredient);
+            // Try to find a recipe for the meal type (breakfast, lunch or dinner etc) - Will return a recipe or undefined (if a recipe isn't found)
+            recipeForMealType = await this.edamam.searchForRecipe(recipeDetails, ingredient);
+
+            // Make sure an actual recipe returned before adding it to day
+            if (recipeForMealType !== undefined) {
+              this.addRecipeToDay(i, recipeForMealType);
+            }
+
             totalCallsToAPI++;
 
-            console.log('Returned:' + recipeReturned);
-
-            // await this.searchForRecipes(index, recipeDetails, ingredient).then(returned => {
-
-            //   console.log('Returned:' + returned);
-            //   recipeReturned = returned;
-
-            // });
-
+            console.log('Returned:' + recipeForMealType);
 
         }
+
           console.log('Exited while loop');
-          //console.log(recipePlan);
 
         }
 
@@ -520,98 +530,6 @@ export class TimetableService {
 
     console.log(window.localStorage);
     console.log(`Total calls: ${totalCallsToAPI}`);
-
-  }
-
-  async searchForRecipes(index, recipeDetails, ingredient) {
-
-    let returnRecipe;
-    let randomRecipeNo;
-    let recipeFound;
-
-    console.log('Reached searchForRecipes');
-
-    const from = 0;
-    let to = from + 5;
-
-    const minCarbs = (recipeDetails.carbs - 5 <= 0) ? 0 : recipeDetails.carbs - 5;
-    const maxCarbs = (recipeDetails.carbs < 0) ? 5 : recipeDetails.carbs + 5;
-    const minProtein = (recipeDetails.protein - 3.5 <= 0) ? 0 : recipeDetails.protein - 3.5;
-    const maxProtein = (recipeDetails.protein < 0) ? 3.5 : recipeDetails.protein + 3.5;
-    const minFat = (recipeDetails.fat - 3.5 <= 0) ? 0 : recipeDetails.fat - 3.5;
-    const maxFat = (recipeDetails.fat < 0) ? 3.5 : recipeDetails.fat + 3.5;
-    const minCalories = (recipeDetails.calories - 35 <= 0) ? 0 : recipeDetails.calories - 35;
-    const maxCalories = (recipeDetails.calories < 0) ? 35 : recipeDetails.calories + 35;
-
-    // TEMPORARILY JUST USE BASIC PARAMETERS UNTIL MEMBERSHIP UPGRADED
-    const requestURL = `https://api.edamam.com/search?q=${ingredient}&app_id=4dad360d&app_key=5d6c41eeeb543f362a3b108c597193bd&from=${from}&to=${to}&calories=${minCalories}-${maxCalories}&nutrients%5BFAT%5D=${minFat}-${maxFat}&nutrients%5BCHOCDF%5D=${minCarbs}-${maxCarbs}&nutrients%5BPROCNT%5D=${minProtein}-${maxProtein}`;
-    console.log(requestURL);
-
-    await this.http.get(requestURL).toPromise().then(async result => {
-
-
-      console.log(result);
-      const recipes = await result['hits'];
-
-      //console.log(recipes);
-
-      // Randomly select between the from and to values
-      randomRecipeNo = Math.round((Math.random() + from) * (to-1));
-      console.log(randomRecipeNo);
-
-      if (await result['count'] > 0) {
-
-        // If there's less recipes than the actually random selected
-        if (result['count'] <= to) {
-          console.log('Count less than 5');
-          to = result['count'] - 1;
-          randomRecipeNo = Math.round((Math.random() + from) * (to));
-          console.log(`${randomRecipeNo} after change`);
-        }
-
-        returnRecipe = recipes[randomRecipeNo]['recipe'];
-
-        //Use this to get the servings
-        const servings = returnRecipe['yield'];
-
-        let recipeForDay: {
-          recipeID: string,
-          recipeType: string,
-          name: string,
-          image: string,
-          url: string,
-          uri: string,
-          calories: number,
-          carbs: number,
-          protein: number,
-          fat: number,
-          isKetoFriendly: boolean,
-          notKetoFriendlyReason: string
-      } = { recipeID: returnRecipe.uri.substring(returnRecipe.uri.indexOf('_') + 1, returnRecipe.uri.length),
-          recipeType: recipeDetails.recipeType,
-          name: returnRecipe.label,
-          url: returnRecipe.url,
-          uri: returnRecipe.uri,
-          carbs: returnRecipe['totalNutrients'].CHOCDF.quantity / servings,
-          protein: returnRecipe['totalNutrients'].PROCNT.quantity  / servings,
-          fat: returnRecipe['totalNutrients'].FAT.quantity / servings,
-          calories: returnRecipe.calories / servings,
-          isKetoFriendly: true,
-          notKetoFriendlyReason: '',
-          image: ''};
-
-        this.addRecipeToDay(index, recipeForDay);
-        recipeFound = true;
-
-      } else {
-
-        recipeFound = false;
-
-      }
-
-    });
-
-    return recipeFound;
 
   }
 
