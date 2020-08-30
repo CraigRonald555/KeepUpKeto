@@ -8,7 +8,7 @@ import { TimetableService } from '../timetable.service';
   templateUrl: './timetablepage.component.html',
   styleUrls: ['./timetablepage.component.css']
 })
-export class TimetablepageComponent implements OnInit, AfterViewInit {
+export class TimetablepageComponent implements OnInit {
 
   showDaily = true;
   monShow = true;
@@ -57,13 +57,7 @@ export class TimetablepageComponent implements OnInit, AfterViewInit {
   };
 
 
-  @ViewChild('whisk') whiskElement: ElementRef;
-  @ViewChild('initialseWhisk') initWhiskElement: ElementRef;
-
-  afterVie
-
-
-  constructor(public timetableService: TimetableService, private changeDetector: ChangeDetectorRef, private renderer: Renderer2 ) {
+  constructor(public timetableService: TimetableService, private changeDetector: ChangeDetectorRef ) {
 
     timetableService.arrayUpdated.subscribe(status => {
 
@@ -72,26 +66,6 @@ export class TimetablepageComponent implements OnInit, AfterViewInit {
       this.changeDetector.detectChanges();
 
     });
-
-  }
-
-  ngAfterViewInit() {
-
-    this.renderer.setProperty(this.initWhiskElement.nativeElement, 'innerHTML',
-    `<script>
-    whisk = whisk || {};
-    whisk.queue = whisk.queue || [];
-
-    whisk.queue.push(function () {
-      whisk.shoppingList.defineWidget("XKEE-MMQQ-QZOX-RKQF");
-    });</script>`);
-
-    this.renderer.setProperty(this.whiskElement.nativeElement, 'innerHTML' ,
-      `<script>whisk.queue.push(function () {
-        whisk.display("XKEE-MMQQ-QZOX-RKQF");
-      });</script>`);
-
-    this.changeDetector.detectChanges();
 
   }
 

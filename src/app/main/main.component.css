@@ -1,0 +1,17 @@
+.addFoodBlock {
+
+  display:block;
+  min-width:100%
+
+}
+
+.btn-default:hover {
+
+  background-color: #EA1E63;
+
+}
+
+.clickableText {
+  cursor: pointer;
+  color: #0079bf;
+}
