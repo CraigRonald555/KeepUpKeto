@@ -8598,7 +8598,7 @@ a {
 .main {
   background: #FFFFFF;
   position: relative;
-  z-index: 3; }
+  }
 
 .form-check,
 label {
