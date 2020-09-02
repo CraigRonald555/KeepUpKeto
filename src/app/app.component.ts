@@ -12,7 +12,7 @@ import { EdamamService } from './edamam.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'KetoManager';
+  title = 'KeepUpKeto';
 
   constructor(private timetableService: TimetableService,
               private accountService: AccountService,

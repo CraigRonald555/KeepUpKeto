@@ -11,11 +11,11 @@ import { AuthService } from '../auth.service';
 export class MainComponent {
 
   title = 'KetoManager';
-  addRecipeOption = 0;
-  addRecipeButtonsContentSwitch = 'buttons';
 
-  showHelp = false;
+  constructor(private timetableService: TimetableService, private accountService: AccountService, public authService: AuthService) {
 
-  constructor(private timetableService: TimetableService, private accountService: AccountService, public authService: AuthService) { }
+
+
+  }
 
 }

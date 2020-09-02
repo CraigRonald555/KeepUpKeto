@@ -53,7 +53,6 @@ export class AuthService {
     const mondayListener = this.fbDB.database.ref(`timetables/${uid}/Monday`);
     mondayListener.on('value', snapshot => {
 
-      console.log('Change has been detected in Timetable for Monday');
       this.mondayChanged.emit(snapshot.val());
 
     });
@@ -61,7 +60,6 @@ export class AuthService {
     const tuesdayListener = this.fbDB.database.ref(`timetables/${uid}/Tuesday`);
     tuesdayListener.on('value', snapshot => {
 
-      console.log('Change has been detected in Timetable for Tuesday');
       this.tuesdayChanged.emit(snapshot.val());
 
     });
@@ -69,7 +67,6 @@ export class AuthService {
     const wednesdayListener = this.fbDB.database.ref(`timetables/${uid}/Wednesday`);
     wednesdayListener.on('value', snapshot => {
 
-      console.log('Change has been detected in Timetable for Wednesday');
       this.wednesdayChanged.emit(snapshot.val());
 
     });
@@ -77,7 +74,6 @@ export class AuthService {
     const thursdayListener = this.fbDB.database.ref(`timetables/${uid}/Thursday`);
     thursdayListener.on('value', snapshot => {
 
-      console.log('Change has been detected in Timetable for Thursday');
       this.thursdayChanged.emit(snapshot.val());
 
     });
@@ -85,7 +81,6 @@ export class AuthService {
     const fridayListener = this.fbDB.database.ref(`timetables/${uid}/Friday`);
     fridayListener.on('value', snapshot => {
 
-      console.log('Change has been detected in Timetable for Friday');
       this.fridayChanged.emit(snapshot.val());
 
     });
@@ -93,7 +88,6 @@ export class AuthService {
     const saturdayListener = this.fbDB.database.ref(`timetables/${uid}/Saturday`);
     saturdayListener.on('value', snapshot => {
 
-      console.log('Change has been detected in Timetable for Saturday');
       this.saturdayChanged.emit(snapshot.val());
 
     });
@@ -101,7 +95,6 @@ export class AuthService {
     const sundayListener = this.fbDB.database.ref(`timetables/${uid}/Sunday`);
     sundayListener.on('value', snapshot => {
 
-      console.log('Change has been detected in Timetable for Sunday');
       this.sundayChanged.emit(snapshot.val());
 
     });

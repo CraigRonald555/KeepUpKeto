@@ -43,7 +43,6 @@ export class TimetableService {
   currentDate = new Date();
   currentDayIndex = this.currentDate.getDay(); // with Index on the end because it returns an ID not the actual name
   arrayUpdated = new EventEmitter<string>();
-  dayToAddRecipeTo = -1; // This value gets updated in the timetablepage.component (currently)
 
   // Get user's daily calorie and macro requirements from accountDetails service
   dailyCalories;
@@ -57,6 +56,7 @@ export class TimetableService {
   constructor(private accountService: AccountService, private auth: AuthService, private edamam: EdamamService, private storageService: StorageService) {
 
     // window.localStorage.clear();
+    //this.activateDayChangeListeners();
 
     // Make sure allRecipes is initiated
     if (typeof this.allRecipes === 'undefined') {
@@ -83,15 +83,49 @@ export class TimetableService {
 
   }
 
+  getRemainingNutrients() {
+
+    let remainingNutrients = [];
+
+    for (let i = 0; i < this.allRecipes.length; i++) {
+
+      const currentDayWithRecipes = this.allRecipes[i];
+
+      const dayName = currentDayWithRecipes.day;
+      const remainingCalories = currentDayWithRecipes.caloriesRemaining;
+      const remainingCarbs = currentDayWithRecipes.carbsRemaining;
+      const remainingFat = currentDayWithRecipes.fatRemaining;
+      const remainingProtein = currentDayWithRecipes.proteinRemaining;
+
+      const newRemainingNutrientObject = {'day': dayName, 'remainingCalories': remainingCalories,
+      'remainingCarbs': remainingCarbs, 'remainingFat': remainingFat, 'remainingProtein': remainingProtein };
+
+      remainingNutrients.push(newRemainingNutrientObject);
+
+
+    }
+
+    return remainingNutrients;
+
+  }
+
   activateDayChangeListeners() {
 
-    this.auth.mondayChanged.subscribe(async snapshotValue => {console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Monday', true); });
-    this.auth.tuesdayChanged.subscribe(async snapshotValue => {console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Tuesday', true); });
-    this.auth.wednesdayChanged.subscribe(async snapshotValue => {console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Wednesday', true); });
-    this.auth.thursdayChanged.subscribe(async snapshotValue => {console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Thursday', true); });
-    this.auth.fridayChanged.subscribe(async snapshotValue => {console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Friday', true); });
-    this.auth.saturdayChanged.subscribe(async snapshotValue => {console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Saturday', true); });
-    this.auth.sundayChanged.subscribe(async snapshotValue => {console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Sunday', true); });
+
+    this.auth.mondayChanged.subscribe(async snapshotValue => {
+      console.log('Change has been detected in Timetable for Monday');
+      console.log(snapshotValue);
+      await this.checkStorage();
+      this.storageService.setDayIsUpToDate('Monday', true);
+
+    });
+
+    this.auth.tuesdayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Tueday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Tuesday', true); });
+    this.auth.wednesdayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Wednesday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Wednesday', true); });
+    this.auth.thursdayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Thursday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Thursday', true); });
+    this.auth.fridayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Friday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Friday', true); });
+    this.auth.saturdayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Saturday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Saturday', true); });
+    this.auth.sundayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Sunday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Sunday', true); });
 
   }
 

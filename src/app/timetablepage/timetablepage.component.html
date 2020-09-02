@@ -96,7 +96,7 @@
                           <button type="button" rel="tooltip" class="btn btn-primary" (click)="currentDay.show=true" *ngIf="!currentDay.show">
                               <i class="material-icons">arrow_drop_down</i>
                           </button>
-                          <button type="button" class="btn btn-success btn-round" (click)="this.timetableService.dayToAddRecipeTo = i" data-toggle="modal" data-target="#exampleModal">
+                          <button type="button" class="btn btn-success btn-round" (click)="selectedRecipeIndex = i" data-toggle="modal" data-target="#exampleModal">
                               <i class="material-icons">add</i>
                           </button>
                         </div>
@@ -138,6 +138,151 @@
         </table>
       </div>
 
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="exampleModalLabel" *ngIf="addRecipeButtonsContentSwitch === 'buttons'">Select from the options below</div>
+
+        <button type="button" class="btn btn-default btn-round" (click)="addRecipeButtonsContentSwitch = 'buttons'" *ngIf="addRecipeButtonsContentSwitch === 'content'">
+          <i class="material-icons">keyboard_arrow_left</i>Back
+        </button>
+
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="addRecipeButtonsContentSwitch = 'buttons'; showHelp = false">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <ng-container class='fade' *ngIf="addRecipeButtonsContentSwitch === 'buttons'">
+
+          <button (click)='retrieveRemainingNutrients()' type="button" class='btn btn-default addFoodBlock' (click)="addRecipeButtonsContentSwitch = 'content'; addRecipeOption = 0; showHelp = false">Search for Recipes</button>
+          <button type="button" class='btn btn-default addFoodBlock' (click)="addRecipeButtonsContentSwitch = 'content'; addRecipeOption = 1; showHelp = false">Search for Specific Food</button>
+          <button type="button" class='btn btn-default addFoodBlock' (click)="addRecipeButtonsContentSwitch = 'content'; addRecipeOption = 2; showHelp = false">Add a Custom Recipe</button>
+          <button type="button" class='btn btn-default addFoodBlock' (click)="addRecipeButtonsContentSwitch = 'content'; addRecipeOption = 3; showHelp = false">Add from my Favourites</button>
+          <br/>
+          <p class='clickableText' (click)='showHelp = !showHelp'>Not sure which option to click?</p>
+          <div class='help' *ngIf='showHelp'>
+            <p><b>Search for Recipes</b> - Find recipes for your recipe plan, search for recipes from our database based on ingredients, time to cook, and more.</p>
+            <p><b>Search for Specific Food</b> - Find specific, more individual foods which aren't included in recipes, for example, add those tasty dark chocolate treats which don't appear in the recipes</p>
+            <p><b>Add a Custom Recipe</b> - Have your own recipe you'd like to add to your recipe plan? This option will allow you to add it</p>
+            <p><b>Add from my Favourites</b> - Already have recipes saved in your favourite list? Retrieve them here and add them to your recipe plan</p>
+          </div>
+
+        </ng-container>
+
+        <ng-container class='fade' (click)="addRecipeButtonsContentSwitch = 'buttons'" *ngIf="addRecipeButtonsContentSwitch === 'content'">
+
+          <ng-container *ngIf="addRecipeOption === 0">
+            Search for recipes...
+
+            <form #searchForRecipesForm='ngForm' ngNativeValidate>
+
+              <div id="user-data">
+                <div class="form-group">
+                  <label for="ingredient" required>Ingredient</label>
+                  <input type="text" name="ingredient" id="name" class="form-control" ngModel minlength=1 #ingredient='ngModel'>
+                  <span class="help-block" *ngIf='(!ingredient.valid || ingredient.value.length === 0) && ingredient.touched'>Please enter in your preferred ingredient</span>
+                </div>
+              </div>
+
+              <p class='clickableText' (click)='searchForRecipesAdvanced = !searchForRecipesAdvanced'>More options</p>
+
+              <div class='advanced' *ngIf='searchForRecipesAdvanced'>
+
+                <div class="row">
+
+                  <div class="form-group col-md-4">
+                    <label for="weight">Calories</label>
+                    <div class="input-group">
+                      <input type="number" name="calories" id="calories" placeholder='NEED TO BIND TO THIS' class="form-control" ngModel #calories='ngModel' minlength='1' required [disabled]=useRecommended>
+                      <!-- <span class="help-block" *ngIf='(!calories.valid || calories.value.length === 0) && calories.touched'>
+                        Please make sure you enter in your weight in pounds
+                      </span> -->
+                    </div>
+                  </div>
+
+                  <div class="form-group col-md-4">
+                    <label for="weight">Carbs</label>
+                    <div class="input-group">
+                      <input type="number" name="carbs" id="carbs" placeholder="NEED TO BIND TO THIS" class="form-control" ngModel #carbs='ngModel' minlength='1' required [disabled]=useRecommended>
+                      <!-- <span class="help-block" *ngIf='(!modelKilograms.valid || modelKilograms.value.length === 0) && modelKilograms.touched'>
+                        Please make sure you enter in your weight in kilograms
+                      </span> -->
+                    </div>
+                  </div>
+
+                  <div class="form-group col-md-4">
+                    <label for="fat">Fat</label>
+                    <div class="input-group">
+                      <input type="number" name="fat" id="fat" placeholder="NEED TO BIND TO THIS" class="form-control" ngModel #fat='ngModel' minlength='1' required [disabled]=useRecommended>
+                      <!-- <span class="help-block" *ngIf='(!modelKilograms.valid || modelKilograms.value.length === 0) && modelKilograms.touched'>
+                        Please make sure you enter in your weight in kilograms
+                      </span> -->
+                    </div>
+                  </div>
+
+                  <div class="form-group col-md-4">
+                    <label for="protein">Protein</label>
+                    <div class="input-group">
+                      <input type="number" name="protein" id="protein" placeholder="NEED TO BIND TO THIS" class="form-control" ngModel #protein='ngModel' minlength='1' required [disabled]=useRecommended>
+                      <!-- <span class="help-block" *ngIf='(!modelKilograms.valid || modelKilograms.value.length === 0) && modelKilograms.touched'>
+                        Please make sure you enter in your weight in kilograms
+                      </span> -->
+                    </div>
+                  </div>
+
+                  <div class="form-group col-md-4">
+                    <div class="form-check">
+                      <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" value="" checked="" (click)='useRecommended = !useRecommended; printUseRecommended()'>
+                        Use recommended nutrients
+                        <span class="form-check-sign">
+                          <span class="check"></span>
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- <div class="form-group col-md-4">
+                    <label for='recommended'></label>
+                    <div class="form-check">
+                      <label class="form-check-label" (click)='useRecommended = !useRecommended; printUseRecommended()'>
+                        Use recommended options
+                        <span class="circle">
+                          <span class="check" *ngIf='useRecommended === true'></span>
+                        </span>
+                      </label>
+                    </div>
+                  </div> -->
+
+                </div>
+
+              </div>
+
+            </form>
+
+          </ng-container>
+          <ng-container *ngIf="addRecipeOption === 1">
+            Search for food...
+          </ng-container>
+          <ng-container *ngIf="addRecipeOption === 2">
+            Add a custom recipe...
+          </ng-container>
+          <ng-container *ngIf="addRecipeOption === 3">
+            Add from favourite recipes
+          </ng-container>
+
+        </ng-container>
+      </div>
+      <!-- <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div> -->
     </div>
   </div>
 </div>

@@ -56,6 +56,34 @@ export class TimetablepageComponent implements OnInit {
     }[]
   };
 
+    //A DDED FROM MAIN FOR THE ADD RECIPE MODAL BOX
+
+    selectedRecipeIndex = -1;
+
+    addRecipeOption = 0;
+    addRecipeButtonsContentSwitch = 'buttons';
+
+    showHelp = false;
+
+    searchForRecipesAdvanced = false;
+    useRecommended = true;
+    remainingNutrients = [];
+    recommendedNutrientsForSelectedDay = { calories: 0, carbs: 0, fat: 0, protein: 0 };
+
+    retrieveRemainingNutrients() {
+
+      this.remainingNutrients = this.timetableService.getRemainingNutrients();
+      console.log(this.remainingNutrients);
+
+    }
+
+    printUseRecommended() {
+
+      console.log("Use recommended: " + this.useRecommended);
+
+    }
+
+    ////////////////////////////////////////////////
 
   constructor(public timetableService: TimetableService, private changeDetector: ChangeDetectorRef ) {
 
