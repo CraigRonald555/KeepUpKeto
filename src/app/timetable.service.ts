@@ -53,6 +53,8 @@ export class TimetableService {
   userIngredients;
   baseIngredients = ['chicken', 'beef', 'ribs', 'fish', 'pork', 'fish', 'lamb', 'veal', 'eggs', 'avocado', 'nuts', 'berries'];
 
+
+
   constructor(private accountService: AccountService, private auth: AuthService, private edamam: EdamamService, private storageService: StorageService) {
 
     // window.localStorage.clear();
@@ -83,27 +85,12 @@ export class TimetableService {
 
   }
 
-  getRemainingNutrients() {
+  getRemainingNutrients(dayIndex) {
 
-    let remainingNutrients = [];
+    const dayWithRecipes = this.getDayByIndex(dayIndex);
 
-    for (let i = 0; i < this.allRecipes.length; i++) {
-
-      const currentDayWithRecipes = this.allRecipes[i];
-
-      const dayName = currentDayWithRecipes.day;
-      const remainingCalories = currentDayWithRecipes.caloriesRemaining;
-      const remainingCarbs = currentDayWithRecipes.carbsRemaining;
-      const remainingFat = currentDayWithRecipes.fatRemaining;
-      const remainingProtein = currentDayWithRecipes.proteinRemaining;
-
-      const newRemainingNutrientObject = {'day': dayName, 'remainingCalories': remainingCalories,
-      'remainingCarbs': remainingCarbs, 'remainingFat': remainingFat, 'remainingProtein': remainingProtein };
-
-      remainingNutrients.push(newRemainingNutrientObject);
-
-
-    }
+    const remainingNutrients = {'caloriesRemaining': dayWithRecipes.caloriesRemaining,
+    'carbsRemaining': dayWithRecipes.carbsRemaining, 'fatRemaining': dayWithRecipes.fatRemaining, 'proteinRemaining': dayWithRecipes.proteinRemaining };
 
     return remainingNutrients;
 

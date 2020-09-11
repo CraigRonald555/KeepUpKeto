@@ -25,6 +25,8 @@ import { MainComponent } from './main/main.component';
 import { LoginpageComponent } from './loginpage/loginpage.component';
 import { MoreInfoComponent } from './more-info/more-info.component';
 import { SignupComponent } from './signup/signup.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 const appRoutes = [
 
@@ -59,7 +61,9 @@ const appRoutes = [
     AngularFireModule.initializeApp(environment.firebaseConfig),
     RouterModule.forRoot(appRoutes),
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    BrowserAnimationsModule,
+    MatProgressSpinnerModule
   ],
   providers: [TimetableService, AccountService],
   bootstrap: [AppComponent]

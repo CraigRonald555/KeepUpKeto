@@ -165,39 +165,45 @@ export class StorageService {
         // Only make a call to Edamam if the recipe doesn't already exist in localStorage
         if (!recipeExistsInStorageDayAlready) {
 
-          // Make call to edamam API to retrieve the url, uri, calories, carbs, protein etc.
-          const requestURL = 'https://api.edamam.com/search?app_id=4dad360d&app_key=5d6c41eeeb543f362a3b108c597193bd&r=http%3A%2F%2Fwww.edamam.com%2Fontologies%2Fedamam.owl%23recipe_' + currentRecipeID;
+          try {
 
-          console.log('Request to Edamam for recipe details sent');
-          let result = await this.http.get(requestURL).toPromise();
+            // Make call to edamam API to retrieve the url, uri, calories, carbs, protein etc.
+            const requestURL = 'https://api.edamam.com/search?app_id=4dad360d&app_key=5d6c41eeeb543f362a3b108c597193bd&r=http%3A%2F%2Fwww.edamam.com%2Fontologies%2Fedamam.owl%23recipe_' + currentRecipeID;
 
-          result = result[0];
+            console.log('Request to Edamam for recipe details sent');
+            let result = await this.http.get(requestURL).toPromise();
 
-          const servings = result['yield'];
+            result = result[0];
 
-          const recipeToAdd = {
-            recipeID: currentRecipeID,
-            recipeType: currentRecipeDetails.recipeType,
-            name: currentRecipeDetails.name,
-            image: result['image'],
-            url: result['url'],
-            uri: result['uri'],
-            calories: result['calories'] / servings,
-            carbs: result['totalNutrients'].CHOCDF.quantity / servings,
-            protein: result['totalNutrients'].PROCNT.quantity  / servings,
-            fat: result['totalNutrients'].FAT.quantity / servings,
-            isKetoFriendly: true, // Recipe is not keto friendly
-            notKetoFriendlyReason: '' // Recipe is not keto friendly reason
-          };
+            const servings = result['yield'];
 
-          console.log(recipeToAdd);
+            const recipeToAdd = {
+              recipeID: currentRecipeID,
+              recipeType: currentRecipeDetails.recipeType,
+              name: currentRecipeDetails.name,
+              image: result['image'],
+              url: result['url'],
+              uri: result['uri'],
+              calories: result['calories'] / servings,
+              carbs: result['totalNutrients'].CHOCDF.quantity / servings,
+              protein: result['totalNutrients'].PROCNT.quantity  / servings,
+              fat: result['totalNutrients'].FAT.quantity / servings,
+              isKetoFriendly: true, // Recipe is not keto friendly
+              notKetoFriendlyReason: '' // Recipe is not keto friendly reason
+            };
 
-          //dayWithRecipesInStorage.recipes.push(recipeToAdd);
-          this.addRecipeToDay(dayName, recipeToAdd);
-          recipesAdded = true;
+            console.log(recipeToAdd);
 
+            //dayWithRecipesInStorage.recipes.push(recipeToAdd);
+            this.addRecipeToDay(dayName, recipeToAdd);
+            recipesAdded = true;
+
+          } catch (error) {
+
+            console.log(`${error} - most likely due to Edamam having deleted the recipe`);
+
+          }
         }
-
       }
 
       // If day doesn't exist in localStorage

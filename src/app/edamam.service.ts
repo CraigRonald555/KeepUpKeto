@@ -8,6 +8,76 @@ export class EdamamService {
 
   constructor(private http: HttpClient) { }
 
+  async searchForRecipes(recipeDetails, ingredient, maxResults) {
+
+    const allRecipes = [];
+    let returnRecipes = [];
+    let recipeToBePushed;
+
+    const minCarbs = (recipeDetails.carbs - 5 <= 0) ? 0 : recipeDetails.carbs - 5;
+    const maxCarbs = (recipeDetails.carbs < 0) ? 5 : recipeDetails.carbs + 5;
+    const minProtein = (recipeDetails.protein - 3.5 <= 0) ? 0 : recipeDetails.protein - 3.5;
+    const maxProtein = (recipeDetails.protein < 0) ? 3.5 : recipeDetails.protein + 3.5;
+    const minFat = (recipeDetails.fat - 3.5 <= 0) ? 0 : recipeDetails.fat - 3.5;
+    const maxFat = (recipeDetails.fat < 0) ? 3.5 : recipeDetails.fat + 3.5;
+    const minCalories = (recipeDetails.calories - 35 <= 0) ? 0 : recipeDetails.calories - 35;
+    const maxCalories = (recipeDetails.calories < 0) ? 35 : recipeDetails.calories + 35;
+
+    const requestURL = `https://api.edamam.com/search?q=${ingredient}&app_id=4dad360d&app_key=5d6c41eeeb543f362a3b108c597193bd&from=0&to=${maxResults}&calories=${minCalories}-${maxCalories}&nutrients%5BFAT%5D=${minFat}-${maxFat}&nutrients%5BCHOCDF%5D=${minCarbs}-${maxCarbs}&nutrients%5BPROCNT%5D=${minProtein}-${maxProtein}`;
+
+
+    await this.http.get(requestURL).toPromise().then(async result => {
+
+      const recipes = await result['hits'];
+
+      for (let i = 0; i < recipes.length; i++) {
+
+        const currentRecipe = recipes[i]['recipe'];
+
+        recipeToBePushed = {
+
+          recipeID: currentRecipe.uri.substring(currentRecipe.uri.indexOf('_') + 1, currentRecipe.uri.length),
+          name: currentRecipe.label,
+          url: currentRecipe.url,
+          image: currentRecipe.image,
+          uri: currentRecipe.uri,
+          carbs: Math.round(currentRecipe['totalNutrients'].CHOCDF.quantity / currentRecipe.yield * 10) / 10,
+          protein: Math.round(currentRecipe['totalNutrients'].PROCNT.quantity  / currentRecipe.yield * 10) / 10,
+          fat: Math.round(currentRecipe['totalNutrients'].FAT.quantity / currentRecipe.yield * 10) / 10,
+          calories: Math.round(currentRecipe.calories / currentRecipe.yield * 10) / 10,
+
+        };
+
+        console.log(recipeToBePushed);
+        allRecipes.push(recipeToBePushed);
+
+      }
+
+    });
+
+
+    // More than 10 results so we need to split the array into a datatype more suitable for pagination (double array)
+    if (allRecipes.length > 10 ) {
+
+      const requiredPages = Math.floor(allRecipes.length / 10);
+
+      for (let i = 0, j = 0; i < requiredPages; i++) {
+
+        returnRecipes[i] = allRecipes.slice(j, j + 9);
+        j = j + 10;
+
+      }
+
+    } else {
+
+      returnRecipes[0] = allRecipes;
+
+    }
+
+    return returnRecipes;
+
+  }
+
   async searchForRecipe(recipeDetails, ingredient) {
 
     let returnRecipe;
@@ -84,10 +154,9 @@ export class EdamamService {
           calories: returnRecipe.calories / servings,
           isKetoFriendly: true,
           notKetoFriendlyReason: '',
-          image: ''};
-
+          image: ''
+        };
       }
-
     });
 
     return recipeForDay;

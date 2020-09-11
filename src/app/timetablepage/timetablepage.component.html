@@ -96,7 +96,7 @@
                           <button type="button" rel="tooltip" class="btn btn-primary" (click)="currentDay.show=true" *ngIf="!currentDay.show">
                               <i class="material-icons">arrow_drop_down</i>
                           </button>
-                          <button type="button" class="btn btn-success btn-round" (click)="selectedRecipeIndex = i" data-toggle="modal" data-target="#exampleModal">
+                          <button type="button" class="btn btn-success btn-round" (click)="selectedDayIndex = i" data-toggle="modal" data-target="#exampleModal">
                               <i class="material-icons">add</i>
                           </button>
                         </div>
@@ -178,16 +178,24 @@
         <ng-container class='fade' (click)="addRecipeButtonsContentSwitch = 'buttons'" *ngIf="addRecipeButtonsContentSwitch === 'content'">
 
           <ng-container *ngIf="addRecipeOption === 0">
-            Search for recipes...
 
             <form #searchForRecipesForm='ngForm' ngNativeValidate>
 
-              <div id="user-data">
-                <div class="form-group">
-                  <label for="ingredient" required>Ingredient</label>
-                  <input type="text" name="ingredient" id="name" class="form-control" ngModel minlength=1 #ingredient='ngModel'>
-                  <span class="help-block" *ngIf='(!ingredient.valid || ingredient.value.length === 0) && ingredient.touched'>Please enter in your preferred ingredient</span>
+              <div class="row">
+
+                <div class="input-group">
+                  <div class="input-group-prepend" style='padding-right:10px;'>
+                    <select name="recipeType" id="recipeType" class="browser-default custom-select mb-3" [(ngModel)]="selectedRecipeType">
+                      <option selected>Select recipe type</option>
+                      <option class="dropdown-item" value="Breakfast">Breakfast</option>
+                      <option class="dropdown-item" value="Lunch">Lunch</option>
+                      <option class="dropdown-item" value="Dinner">Dinner</option>
+                      <option class="dropdown-item" value="Snack">Snack</option>
+                    </select>
+                  </div>
+                  <input type="text" name="ingredient" id="ingredient" placeholder='Ingredient...' class="form-control" ngModel #ingredient='ngModel' minlength='1' required>
                 </div>
+
               </div>
 
               <p class='clickableText' (click)='searchForRecipesAdvanced = !searchForRecipesAdvanced'>More options</p>
@@ -199,7 +207,7 @@
                   <div class="form-group col-md-4">
                     <label for="weight">Calories</label>
                     <div class="input-group">
-                      <input type="number" name="calories" id="calories" placeholder='NEED TO BIND TO THIS' class="form-control" ngModel #calories='ngModel' minlength='1' required [disabled]=useRecommended>
+                      <input type="number" name="calories" id="calories" placeholder='{{this.remainingNutrients.caloriesRemaining}}' class="form-control" ngModel #calories='ngModel' minlength='1' required [disabled]=useRecommended>
                       <!-- <span class="help-block" *ngIf='(!calories.valid || calories.value.length === 0) && calories.touched'>
                         Please make sure you enter in your weight in pounds
                       </span> -->
@@ -209,7 +217,7 @@
                   <div class="form-group col-md-4">
                     <label for="weight">Carbs</label>
                     <div class="input-group">
-                      <input type="number" name="carbs" id="carbs" placeholder="NEED TO BIND TO THIS" class="form-control" ngModel #carbs='ngModel' minlength='1' required [disabled]=useRecommended>
+                      <input type="number" name="carbs" id="carbs" placeholder="{{this.remainingNutrients.carbsRemaining}}" class="form-control" ngModel #carbs='ngModel' minlength='1' required [disabled]=useRecommended>
                       <!-- <span class="help-block" *ngIf='(!modelKilograms.valid || modelKilograms.value.length === 0) && modelKilograms.touched'>
                         Please make sure you enter in your weight in kilograms
                       </span> -->
@@ -219,7 +227,7 @@
                   <div class="form-group col-md-4">
                     <label for="fat">Fat</label>
                     <div class="input-group">
-                      <input type="number" name="fat" id="fat" placeholder="NEED TO BIND TO THIS" class="form-control" ngModel #fat='ngModel' minlength='1' required [disabled]=useRecommended>
+                      <input type="number" name="fat" id="fat" placeholder="{{this.remainingNutrients.fatRemaining}}" class="form-control" ngModel #fat='ngModel' minlength='1' required [disabled]=useRecommended>
                       <!-- <span class="help-block" *ngIf='(!modelKilograms.valid || modelKilograms.value.length === 0) && modelKilograms.touched'>
                         Please make sure you enter in your weight in kilograms
                       </span> -->
@@ -229,7 +237,7 @@
                   <div class="form-group col-md-4">
                     <label for="protein">Protein</label>
                     <div class="input-group">
-                      <input type="number" name="protein" id="protein" placeholder="NEED TO BIND TO THIS" class="form-control" ngModel #protein='ngModel' minlength='1' required [disabled]=useRecommended>
+                      <input type="number" name="protein" id="protein" placeholder="{{this.remainingNutrients.proteinRemaining}}" class="form-control" ngModel #protein='ngModel' minlength='1' required [disabled]=useRecommended>
                       <!-- <span class="help-block" *ngIf='(!modelKilograms.valid || modelKilograms.value.length === 0) && modelKilograms.touched'>
                         Please make sure you enter in your weight in kilograms
                       </span> -->
@@ -237,6 +245,7 @@
                   </div>
 
                   <div class="form-group col-md-4">
+                    <br/>
                     <div class="form-check">
                       <label class="form-check-label">
                         <input class="form-check-input" type="checkbox" value="" checked="" (click)='useRecommended = !useRecommended; printUseRecommended()'>
@@ -248,25 +257,91 @@
                     </div>
                   </div>
 
-                  <!-- <div class="form-group col-md-4">
-                    <label for='recommended'></label>
-                    <div class="form-check">
-                      <label class="form-check-label" (click)='useRecommended = !useRecommended; printUseRecommended()'>
-                        Use recommended options
-                        <span class="circle">
-                          <span class="check" *ngIf='useRecommended === true'></span>
-                        </span>
-                      </label>
-                    </div>
-                  </div> -->
-
                 </div>
 
               </div>
 
+              <button type="button" class="btn btn-primary pull-right" (click)='searchForRecipes()'>Search</button>
+
             </form>
 
+            <mat-progress-spinner class="text-center" mode="indeterminate" *ngIf="resultsReturned === 0"></mat-progress-spinner>
+
+            <div id="results" style="margin-top: 75px" *ngIf="resultsReturned === 1">
+              <hr>
+              <h4>Results</h4>
+
+              <div class="card" *ngFor="let result of searchResults[pageNumber-1]; let j = index;">
+
+                <div class="card-body">
+                  <h6 class="card-title">
+                    {{result.name}}
+                  </h6>
+                </div>
+
+                <div class="card-footer">
+                  Calories: {{result.calories}} | Carbs: {{result.carbs}} | Protein: {{result.protein}} | Fat: {{result.fat}} <br/>
+                  <a (click)='addRecipeFromSearch(pageNumber-1, j)'>Add</a>
+                </div>
+
+              </div>
+
+              <nav aria-label="...">
+                <ul class="pagination justify-content-center">
+
+                  <!-- Only show when pageNumber is not equal to 1 -->
+                  <li class="page-item" *ngIf='pageNumber !== 1'>
+                    <a class="page-link" (click)='pageNumber = pageNumber - 1'>Previous</a>
+                  </li>
+
+                  <!-- Only show when pageNumber is equal to maxPage number i.e. when you're on the last page
+                       Don't show when there's maxPage number is greater than two otherwise we'll be showing -1 and 0 for when maxPage is 1 and 2 respectively-->
+                  <li class="page-item" *ngIf='pageNumber === maxPage && maxPage > 2'>
+                    <a class="page-link" (click)='pageNumber = pageNumber - 2'>
+                      {{pageNumber - 2}}
+                    </a>
+                  </li>
+
+                  <!-- Don't show page number if pageNumber is 1 -->
+                  <li class="page-item" *ngIf='pageNumber !== 1'>
+                    <a class="page-link" (click)='pageNumber = pageNumber - 1'>{{pageNumber - 1}}</a>
+                  </li>
+
+                  <!-- Current pageNumber -->
+                  <li class="page-item active">
+                    <span class="page-link">
+                      {{pageNumber}}
+                      <span class="sr-only">(current)</span>
+                    </span>
+                  </li>
+
+                  <!-- Don't show if pageNumber is equal to the maxPage -->
+                  <li class="page-item" *ngIf='pageNumber !== maxPage'>
+                    <a class="page-link" (click)='pageNumber = pageNumber + 1'>
+                      {{pageNumber + 1}}
+                    </a>
+                  </li>
+
+                  <!-- Only show when pageNumber is equal to one i.e. when you're on the first page
+                       Don't show when there's maxPage number is greater than two otherwise we'll be showing pages with no results-->
+                  <li class="page-item" *ngIf='pageNumber === 1 && maxPage > 2'>
+                    <a class="page-link" (click)='pageNumber = pageNumber + 2'>
+                      {{pageNumber + 2}}
+                    </a>
+                  </li>
+
+                  <!-- Only show when pageNumber is not equal to maxPage number -->
+                  <li class="page-item" *ngIf="pageNumber !== maxPage">
+                    <a class="page-link" (click)='pageNumber = pageNumber + 1'>Next</a>
+                  </li>
+
+                </ul>
+              </nav>
+
+            </div>
+
           </ng-container>
+
           <ng-container *ngIf="addRecipeOption === 1">
             Search for food...
           </ng-container>
