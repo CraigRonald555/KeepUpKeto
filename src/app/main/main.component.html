@@ -1,76 +1,134 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Page Title</title>
+<nav class="navbar navbar-color-on-scroll fixed-top navbar-expand-lg navbar-transparent" color-on-scroll="100" id="sectionsNav" style="background-color:crimson">
+  <div class="container">
+      <div class="navbar-translate">
+          <a class="navbar-brand" routerLink="/" ><strong>{{title}}</strong></a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+              <span class="navbar-toggler-icon"></span>
+              <span class="navbar-toggler-icon"></span>
+          </button>
+      </div>
+      <div class="collapse navbar-collapse">
+          <ul class="navbar-nav ml-auto">
+              <li class="dropdown nav-item">
+                  <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
+                      <i class="material-icons">apps</i> My Profile
+                  </a>
+                  <div class="dropdown-menu dropdown-with-icons">
+                      <a routerLink='/timetable' class="dropdown-item">
+                          <i class="material-icons">layers</i> My Timetables
+                      </a>
+                      <a routerLink='/landing' (click)='this.authService.signOut()' class="dropdown-item">
+                        <i class="material-icons">layers</i> Sign Out
+                    </a>
+                      <!-- <a routerLink='/users/1/2' class="dropdown-item">
+                        <i class="material-icons">layers</i> My Timetables Test
+                    </a> -->
+                  </div>
+              </li>
+              <div class='nav-item'>
+                <a routerLink='/landing' class="nav-link">
+                  Landing Page
+                </a>
+              </div>
+              <!-- <div class='nav-item'>
+                <a href='#' class="nav-link" (click)="login()">
+                  Login
+                </a>
+              </div> -->
+          </ul>
 
-<script async="true" src="https://cdn.whisk.com/sdk/shopping-list.js" type="text/javascript"></script>
-<script>
-  var whisk = whisk || {};
-  whisk.queue = whisk.queue || [];
-
-  whisk.queue.push(function () {
-    whisk.shoppingList.defineWidget("HETI-XHHE-RNCR-CYIU");
-  });
-</script>
-
-</head>
-
-<body>
-
-<article class="h-recipe">
-  <h1 class="p-name">Bagels</h1>
-
-  <ul>
-    <li class="p-ingredient">Flour</li>
-    <li class="p-ingredient">Sugar</li>
-    <li class="p-ingredient">Yeast</li>
-  </ul>
-
-  <p>Takes <time class="dt-duration" datetime="1H">1 hour</time>,
-     serves <data class="p-yield" value="4">four people</data>.</p>
-
-  <div class="e-instructions">
-    <ol>
-      <li>Start by mixing all the ingredients together.</li>
-    </ol>
+      </div>
   </div>
-</article>
+</nav>
+
+  <div class="page-header header-filter clear-filter" data-parallax="true" style="background-image: url('assets/img/bg-image.jpg'); transform: translate3d(0px, 0px, 0px); height: 400px">
+        <!-- <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="brand">
+                        <h1>Material Kit
+                            <span class="pro-badge">
+                                Pro
+                            </span>
+                        </h1>
+                        <h3 class="title"> Start the Development With A Badass Bootstrap 4 UI Kit inspired by Material Design. </h3>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+    </div>
+
+  <div class="main main-raised">
+    <div class="section">
+      <router-outlet></router-outlet>
+    </div>
 
 
-<div id="HETI-XHHE-RNCR-CYIU">
-  <script>
-    whisk.queue.push(function () {
-      whisk.display("HETI-XHHE-RNCR-CYIU");
-    });
-  </script>
+  <footer class="footer footer-black footer-big">
+      <div class="container">
+          <div class="content">
+              <div class="row">
+                  <div class="col-md-4">
+                      <h5>About Us</h5>
+                      <p>Keto Up Keto</p>
+                  </div>
+                  <div class="col-md-4">
+                      <h5>Social Feed</h5>
+                      <div class="social-feed">
+                          <div class="feed-line">
+                              <i class="fa fa-twitter"></i>
+                              <p>Follow us on twitter!</p>
+                          </div>
+                          <div class="feed-line">
+                              <i class="fa fa-facebook-square"></i>
+                              <p>Follow us on Facebook!</p>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-md-4">
+                      <h5>Instagram Feed</h5>
+                      <div class="gallery-feed">
+                          <!-- <img src="assets/img/kit/pro/faces/card-profile6-square.jpg" class="img img-raised rounded" alt=""> -->
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <hr>
+          <ul class="float-left">
+              <li>
+                  <a href="#pablo">
+                      Blog
+                  </a>
+              </li>
+              <li>
+                  <a href="#pablo">
+                      Presentation
+                  </a>
+              </li>
+              <li>
+                  <a href="#pablo">
+                      Discover
+                  </a>
+              </li>
+              <li>
+                  <a href="#pablo">
+                      Payment
+                  </a>
+              </li>
+              <li>
+                  <a href="#pablo">
+                      Contact Us
+                  </a>
+              </li>
+          </ul>
+          <div class="copyright float-right">
+              Copyright ©
+              <script>
+                  document.write(new Date().getFullYear())
+              </script>2020 Keep Up Keto
+          </div>
+      </div>
+  </footer>
+
 </div>
-
-<!--
-
-<button onclick(addRecipesToShoppingList())>Add recipes to shopping list</button>
-
-<script>
-
-function addRecipesToShoppingList() {
-
-	whisk.queue.push(function() {
-		whisk.listeners.addClickListener(
-			'whisk-multiple-recipes',
-			'shoppingList.addRecipesToList',
-			{
-				recipes: [
-					'https://www.goodtoknow.co.uk/recipes/baked-spiced-chicken-with-couscous',
-					'https://www.bbcgoodfood.com/recipes/strawberry-green-goddess-smoothie',
-					'https://www.bbcgoodfood.com/recipes/bone-broth'
-				],
-			}
-		);
-	});
-}
-</script>
-
--->
-
-
-</body>
-</html>
