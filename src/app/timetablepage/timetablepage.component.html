@@ -186,11 +186,7 @@
                 <div class="input-group">
                   <div class="input-group-prepend" style='padding-right:10px;'>
                     <select name="recipeType" id="recipeType" class="browser-default custom-select mb-3" [(ngModel)]="selectedRecipeType">
-                      <option selected>Select recipe type</option>
-                      <option class="dropdown-item" value="Breakfast">Breakfast</option>
-                      <option class="dropdown-item" value="Lunch">Lunch</option>
-                      <option class="dropdown-item" value="Dinner">Dinner</option>
-                      <option class="dropdown-item" value="Snack">Snack</option>
+                      <option *ngFor="let type of recipeTypes" [ngValue]="type">{{type}}</option>
                     </select>
                   </div>
                   <input type="text" name="ingredient" id="ingredient" placeholder='Ingredient...' class="form-control" ngModel #ingredient='ngModel' minlength='1' required>
@@ -200,14 +196,14 @@
 
               <p class='clickableText' (click)='searchForRecipesAdvanced = !searchForRecipesAdvanced'>More options</p>
 
-              <div class='advanced' *ngIf='searchForRecipesAdvanced'>
+              <div class='advanced' [hidden]='searchForRecipesAdvanced'>
 
                 <div class="row">
 
                   <div class="form-group col-md-4">
                     <label for="weight">Calories</label>
                     <div class="input-group">
-                      <input type="number" name="calories" id="calories" placeholder='{{this.remainingNutrients.caloriesRemaining}}' class="form-control" ngModel #calories='ngModel' minlength='1' required [disabled]=useRecommended>
+                      <input type="number" name="calories" id="calories" [(ngModel)]="this.remainingNutrients.caloriesRemaining" [value]="this.remainingNutrients.caloriesRemaining" class="form-control" ngModel #calories='ngModel' minlength='1' required [readonly]=useRecommended>
                       <!-- <span class="help-block" *ngIf='(!calories.valid || calories.value.length === 0) && calories.touched'>
                         Please make sure you enter in your weight in pounds
                       </span> -->
@@ -217,7 +213,7 @@
                   <div class="form-group col-md-4">
                     <label for="weight">Carbs</label>
                     <div class="input-group">
-                      <input type="number" name="carbs" id="carbs" placeholder="{{this.remainingNutrients.carbsRemaining}}" class="form-control" ngModel #carbs='ngModel' minlength='1' required [disabled]=useRecommended>
+                      <input type="number" name="carbs" id="carbs" [(ngModel)]="this.remainingNutrients.carbsRemaining" [value]="this.remainingNutrients.carbsRemaining" class="form-control" ngModel #carbs='ngModel' minlength='1' required [readonly]=useRecommended>
                       <!-- <span class="help-block" *ngIf='(!modelKilograms.valid || modelKilograms.value.length === 0) && modelKilograms.touched'>
                         Please make sure you enter in your weight in kilograms
                       </span> -->
@@ -227,7 +223,7 @@
                   <div class="form-group col-md-4">
                     <label for="fat">Fat</label>
                     <div class="input-group">
-                      <input type="number" name="fat" id="fat" placeholder="{{this.remainingNutrients.fatRemaining}}" class="form-control" ngModel #fat='ngModel' minlength='1' required [disabled]=useRecommended>
+                      <input type="number" name="fat" id="fat" [(ngModel)]="this.remainingNutrients.fatRemaining" [value]="this.remainingNutrients.fatRemaining" class="form-control" ngModel #fat='ngModel' minlength='1' required [readonly]=useRecommended>
                       <!-- <span class="help-block" *ngIf='(!modelKilograms.valid || modelKilograms.value.length === 0) && modelKilograms.touched'>
                         Please make sure you enter in your weight in kilograms
                       </span> -->
@@ -237,7 +233,7 @@
                   <div class="form-group col-md-4">
                     <label for="protein">Protein</label>
                     <div class="input-group">
-                      <input type="number" name="protein" id="protein" placeholder="{{this.remainingNutrients.proteinRemaining}}" class="form-control" ngModel #protein='ngModel' minlength='1' required [disabled]=useRecommended>
+                      <input type="number" name="protein" id="protein" [(ngModel)]="this.remainingNutrients.proteinRemaining" [value]="this.remainingNutrients.proteinRemaining" class="form-control" ngModel #protein='ngModel' minlength='1' required [readonly]=useRecommended>
                       <!-- <span class="help-block" *ngIf='(!modelKilograms.valid || modelKilograms.value.length === 0) && modelKilograms.touched'>
                         Please make sure you enter in your weight in kilograms
                       </span> -->
@@ -262,6 +258,7 @@
               </div>
 
               <button type="button" class="btn btn-primary pull-right" (click)='searchForRecipes()'>Search</button>
+              <span class="help-block" *ngIf='searchFormError'>Please make sure you have entered a value for all the boxes above before searching</span>
 
             </form>
 

@@ -196,7 +196,7 @@ export class TimetableService {
 
         // Write recipe to localStorage and Firebase
         this.writeRecipeToStorage(dayWithRecipes.day, recipe);
-        dayWithRecipes.noOfRecipes++;
+        // dayWithRecipes.noOfRecipes++;
 
         this.updateWeeklyTotals();
 
@@ -225,7 +225,7 @@ export class TimetableService {
 
       const dayWithRecipes = this.getDayByIndex(index);
       dayWithRecipes.recipes.push(...recipes);
-      dayWithRecipes.noOfRecipes += recipes.length;
+      // dayWithRecipes.noOfRecipes += recipes.length;
 
       this.updateWeeklyTotals();
 
@@ -251,7 +251,7 @@ export class TimetableService {
 
     const dayWithRecipes = this.getDayByIndex(dayIndex);
     dayWithRecipes.recipes.splice(recipeIndex, 1);
-    dayWithRecipes.noOfRecipes--;
+    // dayWithRecipes.noOfRecipes--;
 
     this.updateWeeklyTotals();
     this.arrayUpdated.emit('Array updated');
@@ -281,7 +281,7 @@ export class TimetableService {
       await this.auth.removeRecipeFromUserTimetable(this.accountService.getUserID(), dayObject.day, dayObject.recipes[recipeIndex]);
 
       dayObject.recipes.splice(recipeIndex, 1);
-      dayObject.noOfRecipes--;
+      // dayObject.noOfRecipes--;
 
       this.updateWeeklyTotals();
       this.arrayUpdated.emit('Array updated');
@@ -481,7 +481,7 @@ export class TimetableService {
 
         console.log(`Finding recipes for ${dayWithRecipes.day}`);
 
-        recipePlan = await this.getReciplePlanStructure(dayWithRecipes);
+        recipePlan = this.getRecipePlanStructure(dayWithRecipes);
 
         for (let j = 0; j < recipePlan.length; j++) {
 
@@ -716,7 +716,9 @@ export class TimetableService {
   /* This method is designed to take in a day's recipes along with the amount of recipes and calories remaining
    * in order to configure a suitable structure for that day.
    */
-  async getReciplePlanStructure(currentDay: any) {
+  getRecipePlanStructure(currentDay: any) {
+
+      const noOfRecipes = currentDay.recipes.length;
 
       // This reciplePlan object will be used to store the determined recipeType, caloriePercentage, fatPercentage, proteinPercentage
       // and carbsPercentage for each recipe.
@@ -730,7 +732,7 @@ export class TimetableService {
 
 
       // If there's no recipes, then the app checks how many calories are remaining and pushes recipe plans into the array
-      if (true /*UNCOMMENT THIS IN FUTURE currentDay.noOfRecipes === 0*/) {
+      if (noOfRecipes === 0) {
 
         switch (true) {
 
@@ -832,7 +834,7 @@ export class TimetableService {
 
         }
 
-      if (currentDay.noOfRecipes > 0) {
+      if (noOfRecipes > 0) {
 
         /* If there's one or more recipes then the application has to loop through all the recipes and check to see
          * which recipeTypes (breakfast, lunch, dinner, etc.) have already been included.
@@ -1065,6 +1067,8 @@ export class TimetableService {
             break;
 
           case includeBreakfast && !includeLunch && !includeDinner:
+
+            console.log('Reach incluedBreakfast but not lunch or dinner');
 
             if (currentDay.caloriesRemaining < 500) {
 

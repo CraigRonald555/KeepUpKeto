@@ -69,9 +69,10 @@ export class TimetablepageComponent implements OnInit {
     searchForRecipesAdvanced = false;
     useRecommended = true;
     remainingNutrients;
-    recommendedNutrientsForSelectedDay = { calories: 0, carbs: 0, fat: 0, protein: 0 };
 
     @ViewChild('searchForRecipesForm') searchForRecipesForm;
+    searchFormError = false;
+    recipeTypes = ['Select your recipe', 'Breakfast', 'Lunch', 'Dinner', 'Snack'];
     selectedRecipeType;
     searchResults = [];
     pageNumber = 1;
@@ -81,9 +82,31 @@ export class TimetablepageComponent implements OnInit {
 
     retrieveRemainingNutrients() {
 
-      this.remainingNutrients = this.timetableService.getRemainingNutrients(this.selectedDayIndex);
-      this.recommendedNutrientsForSelectedDay = {calories: this.remainingNutrients.caloriesRemaining, carbs: this.remainingNutrients.carbsRemaining,
-      fat: this.remainingNutrients.fatRemaining, protein: this.remainingNutrients.proteinRemaining};
+      // Get a recipePlan for the selected day
+      const recipePlanStructure = this.timetableService.getRecipePlanStructure(this.allRecipes[this.selectedDayIndex]);
+      console.log(this.allRecipes[this.selectedDayIndex]);
+      console.log(recipePlanStructure);
+      let remainingCalories = 0; let remainingCarbs = 0; let remainingFat = 0; let remainingProtein = 0;
+
+      // Add all the nutrients for each element in the recipePlan to retrieve the remaining amounts
+      recipePlanStructure.forEach(recipePlan => {
+
+        remainingCalories += recipePlan.calories; remainingCarbs += recipePlan.carbs; remainingFat += recipePlan.fat;
+        remainingProtein += recipePlan.protein;
+
+      });
+
+      // Get the length of the recipePlan
+      const remainingMealsForDay = recipePlanStructure.length;
+
+      // Divide each nutrient by the amount of meals left to be found to figure out how much we can allocate for when a user tries to find a recipe
+      remainingCalories = remainingCalories / remainingMealsForDay; remainingCarbs = remainingCarbs / remainingMealsForDay;
+      remainingFat = remainingFat / remainingMealsForDay; remainingProtein = remainingProtein / remainingMealsForDay;
+
+      //this.remainingNutrients = this.timetableService.getRemainingNutrients(this.selectedDayIndex);
+      this.remainingNutrients = {caloriesRemaining: remainingCalories,
+      carbsRemaining: remainingCarbs, fatRemaining: remainingFat, proteinRemaining: remainingProtein };
+
       console.log(this.remainingNutrients);
       // this.changeDetector.detectChanges();
 
@@ -99,6 +122,8 @@ export class TimetablepageComponent implements OnInit {
 
   constructor(public timetableService: TimetableService, private edamamService: EdamamService, private changeDetector: ChangeDetectorRef ) {
 
+    this.selectedRecipeType = this.recipeTypes[0];
+
     timetableService.arrayUpdated.subscribe(status => {
 
       this.allRecipes = timetableService.getAllRecipes();
@@ -111,22 +136,51 @@ export class TimetablepageComponent implements OnInit {
 
   async searchForRecipes() {
 
-    // Reset pageNumber back to 1
-    this.pageNumber = 1;
+    this.searchForRecipesForm.statusChanges.subscribe(status => {
 
-    const recipeDetails = {
-      calories: this.searchForRecipesForm.value.calories,
-      carbs: this.searchForRecipesForm.value.carbs,
-      protein: this.searchForRecipesForm.value.protein,
-      fat: this.searchForRecipesForm.value.fat
-    };
+      if (status === 'VALID' && this.selectedRecipeType !== this.recipeTypes[0]) {
 
-    // Set to 0 as this value means the results are being searched for
-    this.resultsReturned = 0;
-    this.searchResults = await this.edamamService.searchForRecipes(recipeDetails, this.searchForRecipesForm.value.ingredient, this.maxResults);
-    this.maxPage = this.searchResults.length;
-    this.resultsReturned = 1;
-    console.log(`${this.maxPage}`);
+        this.searchFormError = false;
+        console.log('Search form changed to valid, selectedRecipeType = ' + this.selectedRecipeType);
+
+      } else {
+
+        this.searchFormError = true;
+        console.log('Search form changed is invalid, selectedRecipeType = ' + this.selectedRecipeType);
+
+      }
+
+    });
+
+    // If every value of the form has something in it and the selectedRecipeType is not the default value
+    if (this.searchForRecipesForm.valid && this.selectedRecipeType !== this.recipeTypes[0]) {
+
+      this.searchFormError = false;
+
+      // Reset pageNumber back to 1
+      this.pageNumber = 1;
+
+      const recipeDetails = {
+        calories: this.searchForRecipesForm.value.calories,
+        carbs: this.searchForRecipesForm.value.carbs,
+        protein: this.searchForRecipesForm.value.protein,
+        fat: this.searchForRecipesForm.value.fat
+      };
+
+      // Set to 0 as this value means the results are being searched for
+      this.resultsReturned = 0;
+      this.searchResults = await this.edamamService.searchForRecipes(recipeDetails, this.searchForRecipesForm.value.ingredient, this.maxResults);
+      this.maxPage = this.searchResults.length;
+      this.resultsReturned = 1;
+      console.log(`${this.maxPage}`);
+
+      // The form isn't valid or the recipe type hasn't been selected
+    } else {
+
+      // Set the form error value to true to show the help bleck
+      this.searchFormError = true;
+
+    }
 
   }
 
