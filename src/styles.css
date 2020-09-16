@@ -75,14 +75,19 @@ img.inner_img {
   padding-left: 10px;
 }
 
-.breakfast_inner_img {
+.inner_img {
   margin-top: -20px;
   padding-left: 10px;
-  background: url('assets/img/breakfast_main.png');
   background-repeat: no-repeat;
   background-size: 100%;
+}
+
+.inner_text {
+
   color: white;
-  padding-top: 175px;
+  margin-top: -50px;
+  padding-left: 10px;
+
 }
 
 .owl-item {
