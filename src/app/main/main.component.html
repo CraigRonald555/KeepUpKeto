@@ -1,134 +1,47 @@
-<nav class="navbar navbar-color-on-scroll fixed-top navbar-expand-lg navbar-transparent" color-on-scroll="100" id="sectionsNav" style="background-color:crimson">
+<nav class="navbar" id="sectionsNav" style="background-color:crimson">
   <div class="container">
       <div class="navbar-translate">
           <a class="navbar-brand" routerLink="/" ><strong>{{title}}</strong></a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-              <span class="navbar-toggler-icon"></span>
-              <span class="navbar-toggler-icon"></span>
-          </button>
-      </div>
-      <div class="collapse navbar-collapse">
-          <ul class="navbar-nav ml-auto">
-              <li class="dropdown nav-item">
-                  <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
-                      <i class="material-icons">apps</i> My Profile
-                  </a>
-                  <div class="dropdown-menu dropdown-with-icons">
-                      <a routerLink='/timetable' class="dropdown-item">
-                          <i class="material-icons">layers</i> My Timetables
-                      </a>
-                      <a routerLink='/landing' (click)='this.authService.signOut()' class="dropdown-item">
-                        <i class="material-icons">layers</i> Sign Out
-                    </a>
-                      <!-- <a routerLink='/users/1/2' class="dropdown-item">
-                        <i class="material-icons">layers</i> My Timetables Test
-                    </a> -->
-                  </div>
-              </li>
-              <div class='nav-item'>
-                <a routerLink='/landing' class="nav-link">
-                  Landing Page
-                </a>
-              </div>
-              <!-- <div class='nav-item'>
-                <a href='#' class="nav-link" (click)="login()">
-                  Login
-                </a>
-              </div> -->
-          </ul>
-
       </div>
   </div>
 </nav>
 
-  <div class="page-header header-filter clear-filter" data-parallax="true" style="background-image: url('assets/img/bg-image.jpg'); transform: translate3d(0px, 0px, 0px); height: 400px">
-        <!-- <div class="container">
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="brand">
-                        <h1>Material Kit
-                            <span class="pro-badge">
-                                Pro
-                            </span>
-                        </h1>
-                        <h3 class="title"> Start the Development With A Badass Bootstrap 4 UI Kit inspired by Material Design. </h3>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-    </div>
+  <router-outlet></router-outlet>
 
-  <div class="main main-raised">
-    <div class="section">
-      <router-outlet></router-outlet>
-    </div>
-
-
-  <footer class="footer footer-black footer-big">
-      <div class="container">
-          <div class="content">
-              <div class="row">
-                  <div class="col-md-4">
-                      <h5>About Us</h5>
-                      <p>Keto Up Keto</p>
-                  </div>
-                  <div class="col-md-4">
-                      <h5>Social Feed</h5>
-                      <div class="social-feed">
-                          <div class="feed-line">
-                              <i class="fa fa-twitter"></i>
-                              <p>Follow us on twitter!</p>
-                          </div>
-                          <div class="feed-line">
-                              <i class="fa fa-facebook-square"></i>
-                              <p>Follow us on Facebook!</p>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="col-md-4">
-                      <h5>Instagram Feed</h5>
-                      <div class="gallery-feed">
-                          <!-- <img src="assets/img/kit/pro/faces/card-profile6-square.jpg" class="img img-raised rounded" alt=""> -->
-                      </div>
-                  </div>
-              </div>
-          </div>
-          <hr>
-          <ul class="float-left">
-              <li>
-                  <a href="#pablo">
-                      Blog
-                  </a>
-              </li>
-              <li>
-                  <a href="#pablo">
-                      Presentation
-                  </a>
-              </li>
-              <li>
-                  <a href="#pablo">
-                      Discover
-                  </a>
-              </li>
-              <li>
-                  <a href="#pablo">
-                      Payment
-                  </a>
-              </li>
-              <li>
-                  <a href="#pablo">
-                      Contact Us
-                  </a>
-              </li>
-          </ul>
-          <div class="copyright float-right">
-              Copyright ©
-              <script>
-                  document.write(new Date().getFullYear())
-              </script>2020 Keep Up Keto
+<footer>
+  <!-- <div class="row"> -->
+      <div class="col-md-2 f-box">
+          <a href="#">
+              <span class="box_img diary d-block"></span>
+              <span class="d-block content">Diary</span>
+          </a>
+      </div>
+      <div class="col-md-2 f-box">
+          <a href="#">
+              <span class="box_img friend d-block"></span>
+              <span class="d-block content">Friends</span>
+          </a>
+      </div>
+      <div class="col-md-2 f-box">
+          <div class="box_pattern">
+              <a href="#">
+                  <span class="plus_btn"><img src="assets/img/footer_plus.png"></span>
+              </a>
           </div>
       </div>
-  </footer>
+      <div class="col-md-2 f-box">
+          <a href="#">
+              <span class="box_img plans d-block"></span>
+              <span class="d-block content">Plans</span>
+          </a>
+      </div>
 
-</div>
+      <div class="col-md-2 f-box">
+          <a href="#">
+          <span class="box_img recipes d-block"></span>
+          <span class="d-block content">Recipes</span>
+      </a>
+      </div>
+
+  <!-- </div> -->
+</footer>

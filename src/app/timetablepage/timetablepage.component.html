@@ -1,360 +1,128 @@
+<div class="container" style="background: white">
+
+  <div class="row">
+
+    <div class="col-6 col-sm-6" style="padding-left: 30px">
+
+      <h4>Your Meal Plan</h4>
+
+      <div class="row">
+
+        <div class="col-md-12" style='border-left: 2px solid #bac9ff'>
+          <h6>Eaten</h6>
+          <p><img src='assets/img/eat.png' /> 300 kcal</p>
+        </div>
+
+      </div>
+
+      <div class="mt-2"></div>
+
+      <div class="row">
+
+        <div class="col-md-12" style='border-left: 2px solid #ffb9ce'>
+          <h6>Burned</h6>
+          <p><img src='assets/img/burn.png' /> 200 kcal</p>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="col-6 col-sm-6 text-center">
+
+      <img src="assets/img/calory_circle.png" width=230 height=230>
+
+    </div>
+
+  </div>
+
+  <div class="row">
+
+    <div class="col-3 col-sm-3">
+      <h6>Carbs</h6>
+      <div class="progress p1">
+        <div class="progress-bar " role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="10" style="width: 30%;"></div>
+      </div>
+      <p>12g left</p>
+    </div>
+
+    <div class="col-3 col-sm-3">
+      <h6>Protein</h6>
+      <div class="progress p2">
+        <div class="progress-bar" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="10" style="width: 80%;"></div>
+      </div>
+      <p>30g left</p>
+    </div>
+
+    <div class="col-3 col-sm-3">
+      <h6>Fat</h6>
+      <div class="progress p3">
+        <div class="progress-bar" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="10" style="width: 20%;"></div>
+      </div>
+      <p>10g left</p>
+    </div>
+
+    <div class="col-3 col-sm-3">
+      <h6>Calories</h6>
+      <div class="progress p4">
+        <div class="progress-bar" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="10" style="width: 40%;"></div>
+      </div>
+      <p>20g left</p>
+    </div>
+
+  </div>
+
+</div>
+
 <div class="container">
   <div class="row">
-    <div class="col-lg-12">
-        <div class="btn-group" role="group" *ngIf="showDaily===true">
-        <button type="button" class="btn btn-primary" (click)="showDaily=true">Daily</button>
-        <button type="button" class="btn btn-primary btn-link" (click)="showDaily=false">Weekly</button>
-        </div>
-
-        <div class="btn-group" role="group" *ngIf="showDaily===false">
-          <button type="button" class="btn btn-primary btn-link" (click)="showDaily=true">Daily</button>
-          <button type="button" class="btn btn-primary" (click)="showDaily=false">Weekly</button>
-        </div>
-
-        <div class="btn btn-rose pull-right" (click)='generateTimetable()'>Find me recipes!</div>
-        <div class="btn btn-default pull-right" (click)='clear()'>Clear All</div>
-
-        <!-- <div class="dropdown show pull-right">
-            <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Dropdown link
-            </a>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-              <a class="dropdown-item" href="#">Table 1</a>
-              <a class="dropdown-item" href="#">Table 2</a>
-              <a class="dropdown-item" href="#">Table 3</a>
-            </div>
-          </div> -->
-
-        <!-- <ng-container *ngIf='todayRecipes !== undefined'> -->
-
-        <table class="table" *ngIf="showDaily==true">
-            <thead>
-                <tr>
-                  <th><strong>Type</strong></th>
-                  <th><strong>Name</strong></th>
-                  <th><strong>Carbs</strong></th>
-                  <th class="text-right"><strong>Actions</strong></th>
-                </tr>
-            </thead>
-            <ng-container *ngIf='todayRecipes !== undefined'>
-            <tbody *ngFor="let currentRecipe of todayRecipes.recipes; let i = index">
-                <tr>
-                    <td>{{currentRecipe.recipeType}}</td>
-                    <td>{{currentRecipe.name}}</td>
-                    <td>{{currentRecipe.carbs}}</td>
-                    <td class="td-actions text-right">
-                        <button type="button" rel="tooltip" class="btn btn-info">
-                            <i class="material-icons">person</i>
-                        </button>
-                        <button type="button" rel="tooltip" class="btn btn-success">
-                            <i class="material-icons">edit</i>
-                        </button>
-                        <button type="button" rel="tooltip" class="btn btn-danger" (click)="this.timetableService.removeRecipeByObject(this.todayRecipes, i);">
-                            <i class="material-icons">close</i>
-                        </button>
-                        {{this.todayRecipes.noOfRecipes}}
-                    </td>
-                </tr>
-            </tbody>
-
-            <td></td>
-            <td></td>
-            <td></td>
-            <td class="text-right">Calories remaining: {{todayRecipes.caloriesRemaining}}</td>
-            </ng-container>
-        </table>
-
-      <div class="weekly-table" *ngIf="showDaily==false">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th class="text-center"><strong>Day</strong></th>
-                    <th><strong>Type</strong></th>
-                    <th><strong>Name</strong></th>
-                    <th><strong>Calories</strong></th>
-                    <th class='showBasedOnSS'><strong>Carbs</strong></th>
-                    <th class='showBasedOnSS'><strong>Protein</strong></th>
-                    <th class='showBasedOnSS'><strong>Fat</strong></th>
-                    <th class="text-right"><strong>Actions</strong></th>
-                </tr>
-            </thead>
-            <!-- <div class="table-class" *ngFor="let currentDay of allRecipes"> -->
-            <tbody *ngFor="let currentDay of allRecipes; let i = index;">
-                <tr style="background-color: #f7f7f7"> <!--background: linear-gradient(to bottom, #f7f7f7, #ECEBEB)-->
-                    <td class="text-center" style="color:black"><strong>{{currentDay.day}}</strong></td>
-                    <td></td>
-                    <td></td>
-                    <td class='showBasedOnSS'></td>
-                    <td class='showBasedOnSS'></td>
-                    <td class='showBasedOnSS'></td>
-                    <td></td>
-                    <td class="td-actions text-right">
-                        <div class="btn-group">
-                          <button type="button" rel="tooltip" class="btn btn-primary" (click)="currentDay.show=false" *ngIf="currentDay.show">
-                              <i class="material-icons">arrow_drop_up</i>
-                          </button>
-                          <button type="button" rel="tooltip" class="btn btn-primary" (click)="currentDay.show=true" *ngIf="!currentDay.show">
-                              <i class="material-icons">arrow_drop_down</i>
-                          </button>
-                          <button type="button" class="btn btn-success btn-round" (click)="selectedDayIndex = i" data-toggle="modal" data-target="#exampleModal">
-                              <i class="material-icons">add</i>
-                          </button>
-                        </div>
-                    </td>
-                </tr>
-                <ng-container *ngIf="currentDay.show === true">
-
-                  <tr *ngFor="let current of currentDay['recipes']; let j = index;">
-                      <td class="td-actions text-center">
-                        <button type="button" rel="tooltip" class="btn btn-success btn-round">
-                        <i class="material-icons"><a href="{{current.url}}" target="_blank">edit</a></i>
-                        </button>
-                      </td>
-                      <td>{{current.recipeType}}</td>
-                      <td>{{current.name}}</td>
-                      <td>{{current.calories}}</td>
-                      <td class='showBasedOnSS'>{{current.carbs}}g</td>
-                      <td class='showBasedOnSS'>{{current.protein}}g</td>
-                      <td class='showBasedOnSS'>{{current.fat}}g</td>
-                      <td class="td-actions text-right">
-                          <button type="button" rel="tooltip" class="btn btn-danger btn-round" (click)="this.timetableService.removeRecipeByIndex(i,j);">
-                              <i class="material-icons">close</i>
-                          </button>
-                      </td>
-                  </tr>
-
-                  <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td class='showBasedOnSS'>{{currentDay.totalCarbs}}</td>
-                    <td class='showBasedOnSS'>{{currentDay.totalProtein}}</td>
-                    <td class='showBasedOnSS'>{{currentDay.totalFat}}</td>
-                    <td class="text-right">Calories remaining: {{currentDay.caloriesRemaining}}</td>
-                  </tr>
-                </ng-container>
-              </tbody>
-        </table>
-      </div>
-
+    <div class="dropdown">
+      <div class="mt-5"></div>
+      <div class="text-center">More info</div>
     </div>
   </div>
 </div>
 
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-title" id="exampleModalLabel" *ngIf="addRecipeButtonsContentSwitch === 'buttons'">Select from the options below</div>
+<div class="container" style="background: #f3f5f9">
 
-        <button type="button" class="btn btn-default btn-round" (click)="addRecipeButtonsContentSwitch = 'buttons'" *ngIf="addRecipeButtonsContentSwitch === 'content'">
-          <i class="material-icons">keyboard_arrow_left</i>Back
-        </button>
+  <div class="row">
 
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="addRecipeButtonsContentSwitch = 'buttons'; showHelp = false">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-
-        <ng-container class='fade' *ngIf="addRecipeButtonsContentSwitch === 'buttons'">
-
-          <button (click)='retrieveRemainingNutrients()' type="button" class='btn btn-default addFoodBlock' (click)="addRecipeButtonsContentSwitch = 'content'; addRecipeOption = 0; showHelp = false">Search for Recipes</button>
-          <button type="button" class='btn btn-default addFoodBlock' (click)="addRecipeButtonsContentSwitch = 'content'; addRecipeOption = 1; showHelp = false">Search for Specific Food</button>
-          <button type="button" class='btn btn-default addFoodBlock' (click)="addRecipeButtonsContentSwitch = 'content'; addRecipeOption = 2; showHelp = false">Add a Custom Recipe</button>
-          <button type="button" class='btn btn-default addFoodBlock' (click)="addRecipeButtonsContentSwitch = 'content'; addRecipeOption = 3; showHelp = false">Add from my Favourites</button>
-          <br/>
-          <p class='clickableText' (click)='showHelp = !showHelp'>Not sure which option to click?</p>
-          <div class='help' *ngIf='showHelp'>
-            <p><b>Search for Recipes</b> - Find recipes for your recipe plan, search for recipes from our database based on ingredients, time to cook, and more.</p>
-            <p><b>Search for Specific Food</b> - Find specific, more individual foods which aren't included in recipes, for example, add those tasty dark chocolate treats which don't appear in the recipes</p>
-            <p><b>Add a Custom Recipe</b> - Have your own recipe you'd like to add to your recipe plan? This option will allow you to add it</p>
-            <p><b>Add from my Favourites</b> - Already have recipes saved in your favourite list? Retrieve them here and add them to your recipe plan</p>
-          </div>
-
-        </ng-container>
-
-        <ng-container class='fade' (click)="addRecipeButtonsContentSwitch = 'buttons'" *ngIf="addRecipeButtonsContentSwitch === 'content'">
-
-          <ng-container *ngIf="addRecipeOption === 0">
-
-            <form #searchForRecipesForm='ngForm' ngNativeValidate>
-
-              <div class="row">
-
-                <div class="input-group">
-                  <div class="input-group-prepend" style='padding-right:10px;'>
-                    <select name="recipeType" id="recipeType" class="browser-default custom-select mb-3" [(ngModel)]="selectedRecipeType">
-                      <option *ngFor="let type of recipeTypes" [ngValue]="type">{{type}}</option>
-                    </select>
-                  </div>
-                  <input type="text" name="ingredient" id="ingredient" placeholder='Ingredient...' class="form-control" ngModel #ingredient='ngModel' minlength='1' required>
-                </div>
-
-              </div>
-
-              <p class='clickableText' (click)='searchForRecipesAdvanced = !searchForRecipesAdvanced'>More options</p>
-
-              <div class='advanced' [hidden]='searchForRecipesAdvanced'>
-
-                <div class="row">
-
-                  <div class="form-group col-md-4">
-                    <label for="weight">Calories</label>
-                    <div class="input-group">
-                      <input type="number" step=any name="calories" id="calories" [(ngModel)]="this.remainingNutrients.caloriesRemaining" [value]="this.remainingNutrients.caloriesRemaining" class="form-control" ngModel #calories='ngModel' minlength='1' required [readonly]=useRecommended>
-                      <!-- <span class="help-block" *ngIf='(!calories.valid || calories.value.length === 0) && calories.touched'>
-                        Please make sure you enter in your weight in pounds
-                      </span> -->
-                    </div>
-                  </div>
-
-                  <div class="form-group col-md-4">
-                    <label for="weight">Carbs</label>
-                    <div class="input-group">
-                      <input type="number" step=any name="carbs" id="carbs" [(ngModel)]="this.remainingNutrients.carbsRemaining" [value]="this.remainingNutrients.carbsRemaining" class="form-control" ngModel #carbs='ngModel' minlength='1' required [readonly]=useRecommended>
-                      <!-- <span class="help-block" *ngIf='(!modelKilograms.valid || modelKilograms.value.length === 0) && modelKilograms.touched'>
-                        Please make sure you enter in your weight in kilograms
-                      </span> -->
-                    </div>
-                  </div>
-
-                  <div class="form-group col-md-4">
-                    <label for="fat">Fat</label>
-                    <div class="input-group">
-                      <input type="number" step=any name="fat" id="fat" [(ngModel)]="this.remainingNutrients.fatRemaining" [value]="this.remainingNutrients.fatRemaining" class="form-control" ngModel #fat='ngModel' minlength='1' required [readonly]=useRecommended>
-                      <!-- <span class="help-block" *ngIf='(!modelKilograms.valid || modelKilograms.value.length === 0) && modelKilograms.touched'>
-                        Please make sure you enter in your weight in kilograms
-                      </span> -->
-                    </div>
-                  </div>
-
-                  <div class="form-group col-md-4">
-                    <label for="protein">Protein</label>
-                    <div class="input-group">
-                      <input type="number" step=any name="protein" id="protein" [(ngModel)]="this.remainingNutrients.proteinRemaining" [value]="this.remainingNutrients.proteinRemaining" class="form-control" ngModel #protein='ngModel' minlength='1' required [readonly]=useRecommended>
-                      <!-- <span class="help-block" *ngIf='(!modelKilograms.valid || modelKilograms.value.length === 0) && modelKilograms.touched'>
-                        Please make sure you enter in your weight in kilograms
-                      </span> -->
-                    </div>
-                  </div>
-
-                  <div class="form-group col-md-4">
-                    <br/>
-                    <div class="form-check">
-                      <label class="form-check-label">
-                        <input class="form-check-input" type="checkbox" value="" checked="" (click)='useRecommended = !useRecommended; printUseRecommended()'>
-                        Use recommended nutrients
-                        <span class="form-check-sign">
-                          <span class="check"></span>
-                        </span>
-                      </label>
-                    </div>
-                  </div>
-
-                </div>
-
-              </div>
-
-              <button type="button" class="btn btn-primary pull-right" (click)='searchForRecipes()'>Search</button>
-              <span class="help-block" *ngIf='searchFormError'>Please make sure you have entered a value for all the boxes above before searching</span>
-
-            </form>
-
-            <mat-progress-spinner class="text-center" mode="indeterminate" *ngIf="resultsReturned === 0"></mat-progress-spinner>
-
-            <div id="results" style="margin-top: 75px" *ngIf="resultsReturned === 1">
-              <hr>
-              <h4>Results</h4>
-
-              <div class="card" *ngFor="let result of searchResults[pageNumber-1]; let j = index;">
-
-                <div class="card-body">
-                  <h6 class="card-title">
-                    {{result.name}}
-                  </h6>
-                </div>
-
-                <div class="card-footer">
-                  Calories: {{result.calories}} | Carbs: {{result.carbs}} | Protein: {{result.protein}} | Fat: {{result.fat}} <br/>
-                  <a (click)='addRecipeFromSearch(pageNumber-1, j)'>Add</a>
-                </div>
-
-              </div>
-
-              <nav aria-label="...">
-                <ul class="pagination justify-content-center">
-
-                  <!-- Only show when pageNumber is not equal to 1 -->
-                  <li class="page-item" *ngIf='pageNumber !== 1'>
-                    <a class="page-link" (click)='pageNumber = pageNumber - 1'>Previous</a>
-                  </li>
-
-                  <!-- Only show when pageNumber is equal to maxPage number i.e. when you're on the last page
-                       Don't show when there's maxPage number is greater than two otherwise we'll be showing -1 and 0 for when maxPage is 1 and 2 respectively-->
-                  <li class="page-item" *ngIf='pageNumber === maxPage && maxPage > 2'>
-                    <a class="page-link" (click)='pageNumber = pageNumber - 2'>
-                      {{pageNumber - 2}}
-                    </a>
-                  </li>
-
-                  <!-- Don't show page number if pageNumber is 1 -->
-                  <li class="page-item" *ngIf='pageNumber !== 1'>
-                    <a class="page-link" (click)='pageNumber = pageNumber - 1'>{{pageNumber - 1}}</a>
-                  </li>
-
-                  <!-- Current pageNumber -->
-                  <li class="page-item active">
-                    <span class="page-link">
-                      {{pageNumber}}
-                      <span class="sr-only">(current)</span>
-                    </span>
-                  </li>
-
-                  <!-- Don't show if pageNumber is equal to the maxPage -->
-                  <li class="page-item" *ngIf='pageNumber !== maxPage'>
-                    <a class="page-link" (click)='pageNumber = pageNumber + 1'>
-                      {{pageNumber + 1}}
-                    </a>
-                  </li>
-
-                  <!-- Only show when pageNumber is equal to one i.e. when you're on the first page
-                       Don't show when there's maxPage number is greater than two otherwise we'll be showing pages with no results-->
-                  <li class="page-item" *ngIf='pageNumber === 1 && maxPage > 2'>
-                    <a class="page-link" (click)='pageNumber = pageNumber + 2'>
-                      {{pageNumber + 2}}
-                    </a>
-                  </li>
-
-                  <!-- Only show when pageNumber is not equal to maxPage number -->
-                  <li class="page-item" *ngIf="pageNumber !== maxPage">
-                    <a class="page-link" (click)='pageNumber = pageNumber + 1'>Next</a>
-                  </li>
-
-                </ul>
-              </nav>
-
-            </div>
-
-          </ng-container>
-
-          <ng-container *ngIf="addRecipeOption === 1">
-            Search for food...
-          </ng-container>
-          <ng-container *ngIf="addRecipeOption === 2">
-            Add a custom recipe...
-          </ng-container>
-          <ng-container *ngIf="addRecipeOption === 3">
-            Add from favourite recipes
-          </ng-container>
-
-        </ng-container>
-      </div>
-      <!-- <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div> -->
+    <div class="col-6 col-sm-6">
+      <h3>Monday <small><small> (Swipe left to see all meals)</small></small></h3>
     </div>
+
+    <div class="col-6 col-sm-6 text-right">
+      <h4>Plan your week <img src="assets/img/menu.png" alt="Weekly plan" /></h4>
+    </div>
+
   </div>
+
+  <div class="mb-5"></div>
+
+  <owl-carousel [options]="mySlideOptions" [items]="myCarouselItems" [carouselClasses]="['owl-carousel', 'owl-theme']">
+    <div class="item" *ngFor="let item of mySlideItems;let i = index">
+      <div [class]="item.recipeTypeHTML">
+        <div class="row">
+            <div class="col-12">
+              <div class="breakfast_inner_img">
+                <h3>{{item.recipeType}}</h3>
+                <h4>{{item.name}}</h4>
+                <h4>{{item.calories}} kcal</h4>
+              </div>
+                <!-- <img src="./assets/img/{{item.recipeTypeHTML}}_main.png" alt="" class="breakfast_inner_img"> -->
+            </div>
+            <!-- <div class="col-12">
+                <h3>{{item.recipeType}}</h3>
+                <h4>{{item.name}}</h4>
+            </div>
+            <div class="col-12">
+
+            </div> -->
+        </div>
+      </div>
+    </div>
+   </owl-carousel>
+
 </div>
+
+<div class="footerSeparator" style="height: 150px"></div>

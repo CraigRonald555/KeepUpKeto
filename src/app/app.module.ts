@@ -26,7 +26,8 @@ import { LoginpageComponent } from './loginpage/loginpage.component';
 import { MoreInfoComponent } from './more-info/more-info.component';
 import { SignupComponent } from './signup/signup.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { OwlModule } from 'ngx-owl-carousel';
+// import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 const appRoutes = [
 
@@ -58,12 +59,13 @@ const appRoutes = [
   ],
   imports: [
     BrowserModule,
+    OwlModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
     RouterModule.forRoot(appRoutes),
     HttpClientModule,
     FormsModule,
-    BrowserAnimationsModule,
-    MatProgressSpinnerModule
+    // MatProgressSpinnerModule,
+    BrowserAnimationsModule
   ],
   providers: [TimetableService, AccountService],
   bootstrap: [AppComponent]

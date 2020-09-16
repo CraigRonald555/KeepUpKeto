@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef, ElementRef, ViewChild, Renderer2,
 import { TimetableService } from '../timetable.service';
 import { EdamamService } from '../edamam.service';
 import { NgForm } from '@angular/forms';
-import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+// import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 // declare var whisk: any;
 
@@ -55,7 +55,9 @@ export class TimetablepageComponent implements OnInit {
       name: string,
       image: string,
       calories: number,
-      carbs: number
+      carbs: number,
+      protein: number,
+      fat: number,
     }[]
   };
 
@@ -79,6 +81,87 @@ export class TimetablepageComponent implements OnInit {
     maxResults = 50;
     maxPage = Math.floor(this.maxResults / 10);
     resultsReturned = -1; // -1 = false, 0 = searching, 1 = returned
+
+    mySlideItems = [];
+
+    myCarouselItems = [];
+
+    mySlideOptions = {margin: 20, dots: false, nav: false, responsive: {
+      0: {
+        items: 1,
+        autoplay: false,
+      },
+       361: {
+        items: 2,
+        autoplay: false,
+      },
+      600: {
+        items: 2,
+        autoplay: false,
+      },
+      680: {
+        items: 3,
+        autoplay: false,
+      },
+
+    }};
+    //myCarouselOptions = {items: 3, dots: false, nav: true};
+
+    addRecipeToCarousel(recipe) {
+
+      recipe = {
+        recipeID: '12891289',
+        recipeType: 'Breakfast',
+        recipeTypeHTML: 'breakfast',
+        name: 'Chicken Avocado ',
+        image: 'nvm',
+        calories: 50,
+        carbs: 12,
+        protein: 40,
+        fat: 10,
+      };
+
+      const recipe2 = {
+        recipeID: '12891289',
+        recipeType: 'Lunch',
+        recipeTypeHTML: 'lunch',
+        name: 'Chicken Avocado ',
+        image: 'nvm',
+        calories: 50,
+        carbs: 12,
+        protein: 40,
+        fat: 10,
+      };
+      const recipe3 = {
+        recipeID: '12891289',
+        recipeType: 'Snack',
+        recipeTypeHTML: 'snack',
+        name: 'Chicken Avocado ',
+        image: 'nvm',
+        calories: 50,
+        carbs: 12,
+        protein: 40,
+        fat: 10,
+      };
+      const recipe4 = {
+        recipeID: '12891289',
+        recipeType: 'Dinner',
+        recipeTypeHTML: 'dinner',
+        name: 'Lorem ipsum dolor sit amet, consectetur',
+        image: 'nvm',
+        calories: 50,
+        carbs: 12,
+        protein: 40,
+        fat: 10,
+      };
+
+      this.mySlideItems.push(recipe);
+      this.mySlideItems.push(recipe2);
+      this.mySlideItems.push(recipe3);
+      this.mySlideItems.push(recipe4);
+
+    }
+
 
     retrieveRemainingNutrients() {
 
@@ -123,6 +206,8 @@ export class TimetablepageComponent implements OnInit {
   constructor(public timetableService: TimetableService, private edamamService: EdamamService, private changeDetector: ChangeDetectorRef ) {
 
     this.selectedRecipeType = this.recipeTypes[0];
+
+    this.addRecipeToCarousel('Recipe object would be here');
 
     timetableService.arrayUpdated.subscribe(status => {
 
