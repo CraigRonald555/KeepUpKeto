@@ -96,6 +96,9 @@ img.inner_img {
 }
 .owl-item.active {
   opacity: 1;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-right: 10px;
 }
 
 .breakfast{

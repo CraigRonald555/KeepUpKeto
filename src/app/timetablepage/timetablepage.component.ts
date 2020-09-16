@@ -86,7 +86,7 @@ export class TimetablepageComponent implements OnInit {
 
     myCarouselItems = [];
 
-    mySlideOptions = {margin: 20, dots: false, nav: false, responsive: {
+    mySlideOptions = {margin: 5, dots: false, nav: false, responsive: {
       0: {
         items: 1,
         autoplay: false,
