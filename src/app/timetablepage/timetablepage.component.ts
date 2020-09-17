@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef, ElementRef, ViewChild, Renderer2,
 import { TimetableService } from '../timetable.service';
 import { EdamamService } from '../edamam.service';
 import { NgForm } from '@angular/forms';
+import { OwlCarousel } from 'ngx-owl-carousel';
 // import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 // declare var whisk: any;
@@ -27,7 +28,6 @@ export class TimetablepageComponent implements OnInit {
     fatRemaining: number,
     totalCalories: number,
     caloriesRemaining: number,
-    noOfRecipes: number,
     // isKetoFriendly: boolean, // Day is not keto friendly
     // notKetoFriendlyReason: string, // Day is not keto friendly reason
     recipes: {
@@ -47,8 +47,14 @@ export class TimetablepageComponent implements OnInit {
   todayRecipes: {
     day: string,
     show: boolean,
+    totalCarbs: number,
+    carbsRemaining: number,
+    totalProtein: number,
+    proteinRemaining: number,
+    totalFat: number,
+    fatRemaining: number,
+    totalCalories: number,
     caloriesRemaining: number,
-    noOfRecipes: number,
     recipes: {
       recipeID: string,
       recipeType: string,
@@ -82,8 +88,20 @@ export class TimetablepageComponent implements OnInit {
     maxPage = Math.floor(this.maxResults / 10);
     resultsReturned = -1; // -1 = false, 0 = searching, 1 = returned
 
-    mySlideItems = [];
+    progressBars = {
+      carbsPercentage: 0,
+      carbsRemaining: 0,
+      proteinPercentage: 0,
+      proteinRemaining: 0,
+      fatPercentage: 0,
+      fatRemaining: 0,
+      caloriesPercentage: 0,
+      caloriesRemaining: 0
+    };
 
+    itemsLoaded = false;
+    mySlideItems = [];
+    @ViewChild('owlElement') owlElement: OwlCarousel;
     myCarouselItems = [];
 
     mySlideOptions = {margin: 5, dots: false, nav: false, responsive: {
@@ -107,58 +125,25 @@ export class TimetablepageComponent implements OnInit {
     }};
     //myCarouselOptions = {items: 3, dots: false, nav: true};
 
-    addRecipeToCarousel(recipe) {
+    addRecipesToTodayCarousel(recipes) {
 
-      recipe = {
-        recipeID: '12891289',
-        recipeType: 'Breakfast',
-        recipeTypeHTML: 'breakfast',
-        name: 'Chicken Avocado ',
-        image: 'nvm',
-        calories: 50,
-        carbs: 12,
-        protein: 40,
-        fat: 10,
-      };
+      //this.itemsLoaded = false;
+      // this.owlElement.reInit();
 
-      const recipe2 = {
-        recipeID: '12891289',
-        recipeType: 'Lunch',
-        recipeTypeHTML: 'lunch',
-        name: 'Chicken Avocado ',
-        image: 'nvm',
-        calories: 50,
-        carbs: 12,
-        protein: 40,
-        fat: 10,
-      };
-      const recipe3 = {
-        recipeID: '12891289',
-        recipeType: 'Snack',
-        recipeTypeHTML: 'snack',
-        name: 'Chicken Avocado ',
-        image: 'nvm',
-        calories: 50,
-        carbs: 12,
-        protein: 40,
-        fat: 10,
-      };
-      const recipe4 = {
-        recipeID: '12891289',
-        recipeType: 'Dinner',
-        recipeTypeHTML: 'dinner',
-        name: 'Lorem ipsum dolor sit amet, consectetur',
-        image: 'nvm',
-        calories: 50,
-        carbs: 12,
-        protein: 40,
-        fat: 10,
-      };
+      this.mySlideItems = [];
 
-      this.mySlideItems.push(recipe);
-      this.mySlideItems.push(recipe2);
-      this.mySlideItems.push(recipe3);
-      this.mySlideItems.push(recipe4);
+      for (let i = 0; i < recipes.length; i++) {
+
+        const currentRecipe = recipes[i];
+        currentRecipe.recipeTypeHTML = currentRecipe.recipeType.toLowerCase();
+        this.mySlideItems.push(currentRecipe);
+
+      }
+
+      this.owlElement.reInit();
+      // this.owlElement.refresh();
+
+      //this.itemsLoaded = true;
 
     }
 
@@ -207,12 +192,26 @@ export class TimetablepageComponent implements OnInit {
 
     this.selectedRecipeType = this.recipeTypes[0];
 
-    this.addRecipeToCarousel('Recipe object would be here');
-
     timetableService.arrayUpdated.subscribe(status => {
 
       this.allRecipes = timetableService.getAllRecipes();
       this.todayRecipes = timetableService.getTodayRecipes();
+
+      this.addRecipesToTodayCarousel(this.todayRecipes.recipes);
+
+      this.progressBars = {
+        carbsPercentage: 100 - ((this.todayRecipes.carbsRemaining / this.todayRecipes.totalCarbs) * 10),
+        carbsRemaining: Math.floor(this.todayRecipes.carbsRemaining),
+        proteinPercentage: 100 - ((this.todayRecipes.proteinRemaining / this.todayRecipes.totalProtein) * 10),
+        proteinRemaining: Math.floor(this.todayRecipes.proteinRemaining),
+        fatPercentage: 100 - ((this.todayRecipes.fatRemaining / this.todayRecipes.totalFat) * 10),
+        fatRemaining: Math.floor(this.todayRecipes.fatRemaining),
+        caloriesPercentage: 100 -((this.todayRecipes.caloriesRemaining / this.todayRecipes.totalCalories) * 10),
+        caloriesRemaining: Math.floor(this.todayRecipes.caloriesRemaining)
+      };
+
+      console.log(this.progressBars);
+
       this.changeDetector.detectChanges();
 
     });
@@ -283,6 +282,7 @@ export class TimetablepageComponent implements OnInit {
 
     this.allRecipes = this.timetableService.getAllRecipes();
     this.todayRecipes = this.timetableService.getTodayRecipes();
+    this.mySlideItems = [];
     this.changeDetector.detectChanges();
 
   }

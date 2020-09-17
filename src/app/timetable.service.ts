@@ -96,25 +96,25 @@ export class TimetableService {
 
   }
 
-  activateDayChangeListeners() {
+  // activateDayChangeListeners() {
 
 
-    this.auth.mondayChanged.subscribe(async snapshotValue => {
-      console.log('Change has been detected in Timetable for Monday');
-      console.log(snapshotValue);
-      await this.checkStorage();
-      this.storageService.setDayIsUpToDate('Monday', true);
+  //   this.auth.mondayChanged.subscribe(async snapshotValue => {
+  //     console.log('Change has been detected in Timetable for Monday');
+  //     console.log(snapshotValue);
+  //     await this.checkStorage();
+  //     this.storageService.setDayIsUpToDate('Monday', true);
 
-    });
+  //   });
 
-    this.auth.tuesdayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Tueday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Tuesday', true); });
-    this.auth.wednesdayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Wednesday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Wednesday', true); });
-    this.auth.thursdayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Thursday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Thursday', true); });
-    this.auth.fridayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Friday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Friday', true); });
-    this.auth.saturdayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Saturday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Saturday', true); });
-    this.auth.sundayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Sunday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Sunday', true); });
+  //   this.auth.tuesdayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Tueday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Tuesday', true); });
+  //   this.auth.wednesdayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Wednesday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Wednesday', true); });
+  //   this.auth.thursdayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Thursday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Thursday', true); });
+  //   this.auth.fridayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Friday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Friday', true); });
+  //   this.auth.saturdayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Saturday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Saturday', true); });
+  //   this.auth.sundayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Sunday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Sunday', true); });
 
-  }
+  // }
 
   getAllRecipes(): any {
 
@@ -131,21 +131,27 @@ export class TimetableService {
     let todayRecipes: {
       day: string,
       show: boolean,
+      totalCarbs: number,
+      carbsRemaining: number,
+      totalProtein: number,
+      proteinRemaining: number,
+      totalFat: number,
+      fatRemaining: number,
+      totalCalories: number,
       caloriesRemaining: number,
-      noOfRecipes: number,
       recipes: {
-        recipeID: string
+        recipeID: string,
         recipeType: string,
         name: string,
         image: string,
         calories: number,
         carbs: number,
-        fat: number,
         protein: number,
-        url: string
+        fat: number,
       }[]
-    };
+    }
 
+    // Find today in the allRecipes array and save to todayRecipes
     this.allRecipes.forEach(element => {
 
        if (element.day === currentDayName) {

@@ -93,6 +93,9 @@ img.inner_img {
 .owl-item {
   opacity: 0;
   transition: opacity 500ms;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-right: 10px;
 }
 .owl-item.active {
   opacity: 1;
