@@ -222,6 +222,7 @@ footer a .content {
 
 }
 .plus_btn {
+  padding-top: 8px;
   width: 47px;
   height: 47px;
   color: #fff;
@@ -233,9 +234,7 @@ footer a .content {
   box-shadow: 0px 8px 7.6px 0.4px rgba(255, 69, 125, 0.34);
   -webkit-box-shadow: 0px 8px 7.6px 0.4px rgba(255, 69, 125, 0.34);
 }
-.plus_btn > i.fas.fa-plus{
-padding: 17px;
-}
+
 .box_pattern {
   background-color: #fff;
   border-radius: 15px;
