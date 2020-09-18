@@ -70,12 +70,12 @@ border-radius: 20px;
 
 /* Carousel */
 
-/* img.inner_img {
+inner_img {
   margin-top: -20px;
   padding-left: 10px;
-} */
+}
 
-.inner_img {
+img.inner_img {
   margin-top: -20px;
   padding-left: 10px;
   background-repeat: no-repeat;
@@ -116,14 +116,6 @@ border-radius: 20px;
   min-height: 250px;
   overflow:visible;
 
-}
-
-.addText {
-  margin: 0;
-  position: absolute;
-  top: 50%;
-  -ms-transform: translateY(-50%);
-  transform: translateY(-50%);
 }
 
 .breakfast{

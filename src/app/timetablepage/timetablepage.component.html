@@ -106,7 +106,7 @@
         <div class="row">
 
             <div class="col-12">
-              <div class="pull-right clickable" style='padding-right: 12px; padding-top: 7px;' (click)="this.timetableService.removeRecipeByObject(this.todayRecipes, i);">
+              <div class="clickable" style='position: fixed; right: 20px; ' (click)="this.timetableService.removeRecipeByObject(this.todayRecipes, i);">
                 <i class="material-icons" style="color: white">close</i>
               </div>
               <img src="./assets/img/{{item.recipeTypeHTML}}_main.png" alt="" class="inner_img">
