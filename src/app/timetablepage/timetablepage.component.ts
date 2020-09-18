@@ -12,7 +12,7 @@ import { OwlCarousel } from 'ngx-owl-carousel';
   templateUrl: './timetablepage.component.html',
   styleUrls: ['./timetablepage.component.css']
 })
-export class TimetablepageComponent implements OnInit {
+export class TimetablepageComponent implements AfterViewInit {
 
   showDaily = true;
   monShow = true;
@@ -197,20 +197,7 @@ export class TimetablepageComponent implements OnInit {
       this.allRecipes = timetableService.getAllRecipes();
       this.todayRecipes = timetableService.getTodayRecipes();
 
-      this.addRecipesToTodayCarousel(this.todayRecipes.recipes);
-
-      this.progressBars = {
-        carbsPercentage: 100 - ((this.todayRecipes.carbsRemaining / this.todayRecipes.totalCarbs) * 10),
-        carbsRemaining: Math.floor(this.todayRecipes.carbsRemaining),
-        proteinPercentage: 100 - ((this.todayRecipes.proteinRemaining / this.todayRecipes.totalProtein) * 10),
-        proteinRemaining: Math.floor(this.todayRecipes.proteinRemaining),
-        fatPercentage: 100 - ((this.todayRecipes.fatRemaining / this.todayRecipes.totalFat) * 10),
-        fatRemaining: Math.floor(this.todayRecipes.fatRemaining),
-        caloriesPercentage: 100 -((this.todayRecipes.caloriesRemaining / this.todayRecipes.totalCalories) * 10),
-        caloriesRemaining: Math.floor(this.todayRecipes.caloriesRemaining)
-      };
-
-      console.log(this.progressBars);
+      this.updateProgress();
 
       this.changeDetector.detectChanges();
 
@@ -278,12 +265,33 @@ export class TimetablepageComponent implements OnInit {
 
   }
 
-  ngOnInit() {
+  ngAfterViewInit() {
 
     this.allRecipes = this.timetableService.getAllRecipes();
     this.todayRecipes = this.timetableService.getTodayRecipes();
-    this.mySlideItems = [];
+    this.updateProgress();
+
     this.changeDetector.detectChanges();
+
+  }
+
+  updateProgress() {
+
+    this.addRecipesToTodayCarousel(this.todayRecipes.recipes);
+
+    this.progressBars = {
+      carbsPercentage: 100 - ((this.todayRecipes.carbsRemaining / this.todayRecipes.totalCarbs) * 10),
+      carbsRemaining: Math.floor(this.todayRecipes.carbsRemaining),
+      proteinPercentage: 100 - ((this.todayRecipes.proteinRemaining / this.todayRecipes.totalProtein) * 10),
+      proteinRemaining: Math.floor(this.todayRecipes.proteinRemaining),
+      fatPercentage: 100 - ((this.todayRecipes.fatRemaining / this.todayRecipes.totalFat) * 10),
+      fatRemaining: Math.floor(this.todayRecipes.fatRemaining),
+      caloriesPercentage: 100 - ((this.todayRecipes.caloriesRemaining / this.todayRecipes.totalCalories) * 10),
+      caloriesRemaining: Math.floor(this.todayRecipes.caloriesRemaining)
+    };
+
+    console.log('Progress');
+    console.log(this.progressBars);
 
   }
 
