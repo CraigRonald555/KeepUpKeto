@@ -99,6 +99,7 @@
   </div>
 
   <div class="mb-5"></div>
+  <p class="clickable" (click)="selectedDayIndex = 0" data-toggle="modal" data-target="#exampleModal">Test - add new meal</p>
 
   <owl-carousel [options]="mySlideOptions" [items]="myCarouselItems" [carouselClasses]="['owl-carousel', 'owl-theme']" #owlElement>
     <div class="item" *ngFor="let item of mySlideItems;let i = index">
