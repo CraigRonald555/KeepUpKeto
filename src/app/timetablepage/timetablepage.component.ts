@@ -67,126 +67,128 @@ export class TimetablepageComponent implements AfterViewInit {
     }[]
   };
 
-    selectedDayIndex = -1;
+  selectedDayIndex = -1;
 
-    addRecipeOption = 0;
-    addRecipeButtonsContentSwitch = 'buttons';
+  addRecipeOption = 0;
+  addRecipeButtonsContentSwitch = 'buttons';
 
-    showHelp = false;
+  showHelp = false;
 
-    searchForRecipesAdvanced = false;
-    useRecommended = true;
-    remainingNutrients;
+  searchForRecipesAdvanced = false;
+  useRecommended = true;
+  remainingNutrients;
 
-    @ViewChild('searchForRecipesForm') searchForRecipesForm;
-    searchFormError = false;
-    recipeTypes = ['Select your recipe', 'Breakfast', 'Lunch', 'Dinner', 'Snack'];
-    selectedRecipeType;
-    searchResults = [];
-    pageNumber = 1;
-    maxResults = 50;
-    maxPage = Math.floor(this.maxResults / 10);
-    resultsReturned = -1; // -1 = false, 0 = searching, 1 = returned
+  @ViewChild('searchForRecipesForm') searchForRecipesForm;
+  searchFormError = false;
+  recipeTypes = ['Select your recipe', 'Breakfast', 'Lunch', 'Dinner', 'Snack'];
+  selectedRecipeType;
+  searchResults = [];
+  pageNumber = 1;
+  maxResults = 50;
+  maxPage = Math.floor(this.maxResults / 10);
+  resultsReturned = -1; // -1 = false, 0 = searching, 1 = returned
 
-    progressBars = {
-      carbsPercentage: 0,
-      carbsRemaining: 0,
-      proteinPercentage: 0,
-      proteinRemaining: 0,
-      fatPercentage: 0,
-      fatRemaining: 0,
-      caloriesPercentage: 0,
-      caloriesRemaining: 0
-    };
+  progressBars = {
+    carbsPercentage: 0,
+    carbsRemaining: 0,
+    proteinPercentage: 0,
+    proteinRemaining: 0,
+    fatPercentage: 0,
+    fatRemaining: 0,
+    caloriesPercentage: 0,
+    caloriesRemaining: 0
+  };
 
-    itemsLoaded = false;
-    mySlideItems = [];
-    @ViewChild('owlElement') owlElement: OwlCarousel;
-    myCarouselItems = [];
+  itemsLoaded = false;
+  mySlideItems = [];
+  @ViewChild('owlElement') owlElement: OwlCarousel;
+  myCarouselItems = [];
 
-    mySlideOptions = {margin: 5, dots: false, nav: false, responsive: {
-      0: {
-        items: 1,
-        autoplay: false,
-      },
-       361: {
-        items: 2,
-        autoplay: false,
-      },
-      600: {
-        items: 2,
-        autoplay: false,
-      },
-      680: {
-        items: 3,
-        autoplay: false,
-      },
+  mySlideOptions = {margin: 5, dots: false, nav: false, responsive: {
+    0: {
+      items: 1,
+      autoplay: false,
+    },
+      361: {
+      items: 2,
+      autoplay: false,
+    },
+    600: {
+      items: 2,
+      autoplay: false,
+    },
+    680: {
+      items: 3,
+      autoplay: false,
+    },
 
-    }};
-    //myCarouselOptions = {items: 3, dots: false, nav: true};
+  }};
+  //myCarouselOptions = {items: 3, dots: false, nav: true};
 
-    addRecipesToTodayCarousel(recipes) {
+  addRecipesToTodayCarousel(recipes) {
 
-      //this.itemsLoaded = false;
-      // this.owlElement.reInit();
+    //this.itemsLoaded = false;
+    // this.owlElement.reInit();
 
-      this.mySlideItems = [];
+    this.mySlideItems = [];
 
-      for (let i = 0; i < recipes.length; i++) {
+    for (let i = 0; i < recipes.length; i++) {
 
-        const currentRecipe = recipes[i];
-        currentRecipe.recipeTypeHTML = currentRecipe.recipeType.toLowerCase();
-        this.mySlideItems.push(currentRecipe);
-
-      }
-
-      this.owlElement.reInit();
-      // this.owlElement.refresh();
-
-      //this.itemsLoaded = true;
+      const currentRecipe = recipes[i];
+      currentRecipe.recipeTypeHTML = currentRecipe.recipeType.toLowerCase();
+      currentRecipe.isRecipe = true;
+      this.mySlideItems.push(currentRecipe);
 
     }
 
+    this.mySlideItems.push({isRecipe: false});
+    this.owlElement.reInit();
+    // this.owlElement.refresh();
 
-    retrieveRemainingNutrients() {
+    //this.itemsLoaded = true;
 
-      // Get a recipePlan for the selected day
-      const recipePlanStructure = this.timetableService.getRecipePlanStructure(this.allRecipes[this.selectedDayIndex]);
-      console.log(this.allRecipes[this.selectedDayIndex]);
-      console.log(recipePlanStructure);
-      let remainingCalories = 0; let remainingCarbs = 0; let remainingFat = 0; let remainingProtein = 0;
+  }
 
-      // Add all the nutrients for each element in the recipePlan to retrieve the remaining amounts
-      recipePlanStructure.forEach(recipePlan => {
 
-        remainingCalories += recipePlan.calories; remainingCarbs += recipePlan.carbs; remainingFat += recipePlan.fat;
-        remainingProtein += recipePlan.protein;
+  retrieveRemainingNutrients() {
 
-      });
+    // Get a recipePlan for the selected day
+    const recipePlanStructure = this.timetableService.getRecipePlanStructure(this.allRecipes[this.selectedDayIndex]);
+    console.log(this.allRecipes[this.selectedDayIndex]);
+    console.log(recipePlanStructure);
+    let remainingCalories = 0; let remainingCarbs = 0; let remainingFat = 0; let remainingProtein = 0;
 
-      // Get the length of the recipePlan
-      const remainingMealsForDay = recipePlanStructure.length;
+    // Add all the nutrients for each element in the recipePlan to retrieve the remaining amounts
+    recipePlanStructure.forEach(recipePlan => {
 
-      // Divide each nutrient by the amount of meals left to be found to figure out how much we can allocate for when a user tries to find a recipe
-      remainingCalories = remainingCalories / remainingMealsForDay; remainingCarbs = remainingCarbs / remainingMealsForDay;
-      remainingFat = remainingFat / remainingMealsForDay; remainingProtein = remainingProtein / remainingMealsForDay;
+      remainingCalories += recipePlan.calories; remainingCarbs += recipePlan.carbs; remainingFat += recipePlan.fat;
+      remainingProtein += recipePlan.protein;
 
-      //this.remainingNutrients = this.timetableService.getRemainingNutrients(this.selectedDayIndex);
-      this.remainingNutrients = {caloriesRemaining: remainingCalories,
-      carbsRemaining: remainingCarbs, fatRemaining: remainingFat, proteinRemaining: remainingProtein };
+    });
 
-      console.log(this.remainingNutrients);
-      // this.changeDetector.detectChanges();
+    // Get the length of the recipePlan
+    const remainingMealsForDay = recipePlanStructure.length;
 
-    }
+    // Divide each nutrient by the amount of meals left to be found to figure out how much we can allocate for when a user tries to find a recipe
+    remainingCalories = remainingCalories / remainingMealsForDay; remainingCarbs = remainingCarbs / remainingMealsForDay;
+    remainingFat = remainingFat / remainingMealsForDay; remainingProtein = remainingProtein / remainingMealsForDay;
 
-    printUseRecommended() {
+    //this.remainingNutrients = this.timetableService.getRemainingNutrients(this.selectedDayIndex);
+    this.remainingNutrients = {caloriesRemaining: remainingCalories,
+    carbsRemaining: remainingCarbs, fatRemaining: remainingFat, proteinRemaining: remainingProtein };
 
-      console.log("Use recommended: " + this.useRecommended);
+    console.log(this.remainingNutrients);
+    // this.changeDetector.detectChanges();
 
-    }
+  }
 
-    ////////////////////////////////////////////////
+  printUseRecommended() {
+
+    console.log("Use recommended: " + this.useRecommended);
+
+  }
+
+  ////////////////////////////////////////////////
 
   constructor(public timetableService: TimetableService, private edamamService: EdamamService, private changeDetector: ChangeDetectorRef ) {
 

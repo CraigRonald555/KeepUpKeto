@@ -18,9 +18,8 @@
 
 }
 
-.clickableText {
+.clickable {
   cursor: pointer;
-  color: #0079bf;
 }
 
 .help-block {

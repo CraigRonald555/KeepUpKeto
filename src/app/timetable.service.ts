@@ -268,15 +268,23 @@ export class TimetableService {
     dayObject: {
       day: string,
       show: boolean,
+      totalCarbs: number,
+      carbsRemaining: number,
+      totalProtein: number,
+      proteinRemaining: number,
+      totalFat: number,
+      fatRemaining: number,
+      totalCalories: number,
       caloriesRemaining: number,
-      noOfRecipes: number,
       recipes: {
         recipeID: string,
         recipeType: string,
         name: string,
         image: string,
         calories: number,
-        carbs: number
+        carbs: number,
+        protein: number,
+        fat: number,
       }[]
     },
     recipeIndex: number) {

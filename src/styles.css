@@ -70,10 +70,10 @@ border-radius: 20px;
 
 /* Carousel */
 
-img.inner_img {
+/* img.inner_img {
   margin-top: -20px;
   padding-left: 10px;
-}
+} */
 
 .inner_img {
   margin-top: -20px;
@@ -104,17 +104,39 @@ img.inner_img {
   padding-right: 10px;
 }
 
+.add {
+  background: url('assets/img/add_recipe_bg.png');
+  background-size: 100%;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  border-radius: 22px;
+  border: 2px dashed #89d8bc;
+    box-shadow: 8px 16px 14.07px -4.93px rgba(255, 255, 255, 0.29);
+  -webkit-box-shadow: 8px 16px 14.07px -4.93px rgba(255, 255, 255, 0.29);
+  min-height: 250px;
+  overflow:visible;
+
+}
+
+.addText {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
 .breakfast{
   background: url('assets/img/breakfast_bg.png');
-    background-size: 100%;
-    background-position: 0 0;
-    background-repeat: no-repeat;
-    border-radius: 22px;
-     box-shadow: 8px 16px 14.07px -4.93px rgba(250, 116, 127, 0.29);
-    -webkit-box-shadow: 8px 16px 14.07px -4.93px rgba(250, 116, 127, 0.29);
-    min-height: 250px;
-    overflow:visible
-  }
+  background-size: 100%;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  border-radius: 22px;
+    box-shadow: 8px 16px 14.07px -4.93px rgba(250, 116, 127, 0.29);
+  -webkit-box-shadow: 8px 16px 14.07px -4.93px rgba(250, 116, 127, 0.29);
+  min-height: 250px;
+  overflow:visible
+}
   .lunch{
   background: url('assets/img/lunch_bg.png');
     background-size: 100%;

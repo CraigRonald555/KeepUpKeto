@@ -102,9 +102,13 @@
 
   <owl-carousel [options]="mySlideOptions" [items]="myCarouselItems" [carouselClasses]="['owl-carousel', 'owl-theme']" #owlElement>
     <div class="item" *ngFor="let item of mySlideItems;let i = index">
-      <div [class]="item.recipeTypeHTML">
+      <div [class]="item.recipeTypeHTML" *ngIf="item.isRecipe === true">
         <div class="row">
+
             <div class="col-12">
+              <div class="pull-right clickable" style='padding-right: 12px; padding-top: 7px;' (click)="this.timetableService.removeRecipeByObject(this.todayRecipes, i);">
+                <i class="material-icons" style="color: white">close</i>
+              </div>
               <img src="./assets/img/{{item.recipeTypeHTML}}_main.png" alt="" class="inner_img">
               <div class="inner_text">
                 <h3>{{item.recipeType}}</h3>
@@ -112,9 +116,234 @@
                 <h4>{{item.calories}} kcal</h4>
               </div>
             </div>
+
         </div>
       </div>
+
+      <div class="add" *ngIf="item.isRecipe === false">
+        <div class="col-12">
+          <p (click)="selectedDayIndex = i" data-toggle="modal" data-target="#exampleModal">Add new meal</p>
+        </div>
+      </div>
+
     </div>
    </owl-carousel>
 
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="exampleModalLabel" *ngIf="addRecipeButtonsContentSwitch === 'buttons'">Select from the options below</div>
+
+        <button type="button" class="btn btn-default btn-round" (click)="addRecipeButtonsContentSwitch = 'buttons'" *ngIf="addRecipeButtonsContentSwitch === 'content'">
+          <i class="material-icons">keyboard_arrow_left</i>Back
+        </button>
+
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="addRecipeButtonsContentSwitch = 'buttons'; showHelp = false">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <ng-container class='fade' *ngIf="addRecipeButtonsContentSwitch === 'buttons'">
+
+          <button (click)='retrieveRemainingNutrients()' type="button" class='btn btn-default addFoodBlock' (click)="addRecipeButtonsContentSwitch = 'content'; addRecipeOption = 0; showHelp = false">Search for Recipes</button>
+          <button type="button" class='btn btn-default addFoodBlock' (click)="addRecipeButtonsContentSwitch = 'content'; addRecipeOption = 1; showHelp = false">Search for Specific Food</button>
+          <button type="button" class='btn btn-default addFoodBlock' (click)="addRecipeButtonsContentSwitch = 'content'; addRecipeOption = 2; showHelp = false">Add a Custom Recipe</button>
+          <button type="button" class='btn btn-default addFoodBlock' (click)="addRecipeButtonsContentSwitch = 'content'; addRecipeOption = 3; showHelp = false">Add from my Favourites</button>
+          <br/>
+          <p class='clickableText' (click)='showHelp = !showHelp'>Not sure which option to click?</p>
+          <div class='help' *ngIf='showHelp'>
+            <p><b>Search for Recipes</b> - Find recipes for your recipe plan, search for recipes from our database based on ingredients, time to cook, and more.</p>
+            <p><b>Search for Specific Food</b> - Find specific, more individual foods which aren't included in recipes, for example, add those tasty dark chocolate treats which don't appear in the recipes</p>
+            <p><b>Add a Custom Recipe</b> - Have your own recipe you'd like to add to your recipe plan? This option will allow you to add it</p>
+            <p><b>Add from my Favourites</b> - Already have recipes saved in your favourite list? Retrieve them here and add them to your recipe plan</p>
+          </div>
+
+        </ng-container>
+
+        <ng-container class='fade' (click)="addRecipeButtonsContentSwitch = 'buttons'" *ngIf="addRecipeButtonsContentSwitch === 'content'">
+
+          <ng-container *ngIf="addRecipeOption === 0">
+
+            <form #searchForRecipesForm='ngForm' ngNativeValidate>
+
+              <div class="row">
+
+                <div class="input-group">
+                  <div class="input-group-prepend" style='padding-right:10px;'>
+                    <select name="recipeType" id="recipeType" class="browser-default custom-select mb-3" [(ngModel)]="selectedRecipeType">
+                      <option *ngFor="let type of recipeTypes" [ngValue]="type">{{type}}</option>
+                    </select>
+                  </div>
+                  <input type="text" name="ingredient" id="ingredient" placeholder='Ingredient...' class="form-control" ngModel #ingredient='ngModel' minlength='1' required>
+                </div>
+
+              </div>
+
+              <p class='clickableText' (click)='searchForRecipesAdvanced = !searchForRecipesAdvanced'>More options</p>
+
+              <div class='advanced' [hidden]='searchForRecipesAdvanced'>
+
+                <div class="row">
+
+                  <div class="form-group col-md-4">
+                    <label for="weight">Calories</label>
+                    <div class="input-group">
+                      <input type="number" step=any name="calories" id="calories" [(ngModel)]="this.remainingNutrients.caloriesRemaining" [value]="this.remainingNutrients.caloriesRemaining" class="form-control" ngModel #calories='ngModel' minlength='1' required [readonly]=useRecommended>
+                      <!-- <span class="help-block" *ngIf='(!calories.valid || calories.value.length === 0) && calories.touched'>
+                        Please make sure you enter in your weight in pounds
+                      </span> -->
+                    </div>
+                  </div>
+
+                  <div class="form-group col-md-4">
+                    <label for="weight">Carbs</label>
+                    <div class="input-group">
+                      <input type="number" step=any name="carbs" id="carbs" [(ngModel)]="this.remainingNutrients.carbsRemaining" [value]="this.remainingNutrients.carbsRemaining" class="form-control" ngModel #carbs='ngModel' minlength='1' required [readonly]=useRecommended>
+                      <!-- <span class="help-block" *ngIf='(!modelKilograms.valid || modelKilograms.value.length === 0) && modelKilograms.touched'>
+                        Please make sure you enter in your weight in kilograms
+                      </span> -->
+                    </div>
+                  </div>
+
+                  <div class="form-group col-md-4">
+                    <label for="fat">Fat</label>
+                    <div class="input-group">
+                      <input type="number" step=any name="fat" id="fat" [(ngModel)]="this.remainingNutrients.fatRemaining" [value]="this.remainingNutrients.fatRemaining" class="form-control" ngModel #fat='ngModel' minlength='1' required [readonly]=useRecommended>
+                      <!-- <span class="help-block" *ngIf='(!modelKilograms.valid || modelKilograms.value.length === 0) && modelKilograms.touched'>
+                        Please make sure you enter in your weight in kilograms
+                      </span> -->
+                    </div>
+                  </div>
+
+                  <div class="form-group col-md-4">
+                    <label for="protein">Protein</label>
+                    <div class="input-group">
+                      <input type="number" step=any name="protein" id="protein" [(ngModel)]="this.remainingNutrients.proteinRemaining" [value]="this.remainingNutrients.proteinRemaining" class="form-control" ngModel #protein='ngModel' minlength='1' required [readonly]=useRecommended>
+                      <!-- <span class="help-block" *ngIf='(!modelKilograms.valid || modelKilograms.value.length === 0) && modelKilograms.touched'>
+                        Please make sure you enter in your weight in kilograms
+                      </span> -->
+                    </div>
+                  </div>
+
+                  <div class="form-group col-md-4">
+                    <br/>
+                    <div class="form-check">
+                      <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" value="" checked="" (click)='useRecommended = !useRecommended; printUseRecommended()'>
+                        Use recommended nutrients
+                        <span class="form-check-sign">
+                          <span class="check"></span>
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+
+              <button type="button" class="btn btn-primary pull-right" (click)='searchForRecipes()'>Search</button>
+              <span class="help-block" *ngIf='searchFormError'>Please make sure you have entered a value for all the boxes above before searching</span>
+
+            </form>
+
+            <!-- <mat-progress-spinner class="text-center" mode="indeterminate" *ngIf="resultsReturned === 0"></mat-progress-spinner> -->
+
+            <div id="results" style="margin-top: 75px" *ngIf="resultsReturned === 1">
+              <hr>
+              <h4>Results</h4>
+
+              <div class="card" *ngFor="let result of searchResults[pageNumber-1]; let j = index;">
+
+                <div class="card-body">
+                  <h6 class="card-title">
+                    {{result.name}}
+                  </h6>
+                </div>
+
+                <div class="card-footer">
+                  Calories: {{result.calories}} | Carbs: {{result.carbs}} | Protein: {{result.protein}} | Fat: {{result.fat}} <br/>
+                  <a (click)='addRecipeFromSearch(pageNumber-1, j)'>Add</a>
+                </div>
+
+              </div>
+
+              <nav aria-label="...">
+                <ul class="pagination justify-content-center">
+
+                  <!-- Only show when pageNumber is not equal to 1 -->
+                  <li class="page-item" *ngIf='pageNumber !== 1'>
+                    <a class="page-link" (click)='pageNumber = pageNumber - 1'>Previous</a>
+                  </li>
+
+                  <!-- Only show when pageNumber is equal to maxPage number i.e. when you're on the last page
+                       Don't show when there's maxPage number is greater than two otherwise we'll be showing -1 and 0 for when maxPage is 1 and 2 respectively-->
+                  <li class="page-item" *ngIf='pageNumber === maxPage && maxPage > 2'>
+                    <a class="page-link" (click)='pageNumber = pageNumber - 2'>
+                      {{pageNumber - 2}}
+                    </a>
+                  </li>
+
+                  <!-- Don't show page number if pageNumber is 1 -->
+                  <li class="page-item" *ngIf='pageNumber !== 1'>
+                    <a class="page-link" (click)='pageNumber = pageNumber - 1'>{{pageNumber - 1}}</a>
+                  </li>
+
+                  <!-- Current pageNumber -->
+                  <li class="page-item active">
+                    <span class="page-link">
+                      {{pageNumber}}
+                      <span class="sr-only">(current)</span>
+                    </span>
+                  </li>
+
+                  <!-- Don't show if pageNumber is equal to the maxPage -->
+                  <li class="page-item" *ngIf='pageNumber !== maxPage'>
+                    <a class="page-link" (click)='pageNumber = pageNumber + 1'>
+                      {{pageNumber + 1}}
+                    </a>
+                  </li>
+
+                  <!-- Only show when pageNumber is equal to one i.e. when you're on the first page
+                       Don't show when there's maxPage number is greater than two otherwise we'll be showing pages with no results-->
+                  <li class="page-item" *ngIf='pageNumber === 1 && maxPage > 2'>
+                    <a class="page-link" (click)='pageNumber = pageNumber + 2'>
+                      {{pageNumber + 2}}
+                    </a>
+                  </li>
+
+                  <!-- Only show when pageNumber is not equal to maxPage number -->
+                  <li class="page-item" *ngIf="pageNumber !== maxPage">
+                    <a class="page-link" (click)='pageNumber = pageNumber + 1'>Next</a>
+                  </li>
+
+                </ul>
+              </nav>
+
+            </div>
+
+          </ng-container>
+
+          <ng-container *ngIf="addRecipeOption === 1">
+            Search for food...
+          </ng-container>
+          <ng-container *ngIf="addRecipeOption === 2">
+            Add a custom recipe...
+          </ng-container>
+          <ng-container *ngIf="addRecipeOption === 3">
+            Add from favourite recipes
+          </ng-container>
+
+        </ng-container>
+      </div>
+      <!-- <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div> -->
+    </div>
+  </div>
 </div>
