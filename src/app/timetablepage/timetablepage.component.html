@@ -122,7 +122,8 @@
 
       <div class="add" *ngIf="item.isRecipe === false">
         <div class="col-12">
-          <p class="clickable" (click)="selectedDayIndex = i" data-toggle="modal" data-target="#exampleModal">Add new meal</p>
+          <!-- Need add a method which returns the current day's index and assign it to selectedDayIndex -->
+          <p class="clickable" (click)="selectedDayIndex = 0" data-toggle="modal" data-target="#exampleModal">Add new meal</p>
         </div>
       </div>
 
