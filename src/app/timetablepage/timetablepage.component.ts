@@ -3,7 +3,7 @@ import { TimetableService } from '../timetable.service';
 import { EdamamService } from '../edamam.service';
 import { NgForm } from '@angular/forms';
 import { OwlCarousel } from 'ngx-owl-carousel';
-// import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 // declare var whisk: any;
 
