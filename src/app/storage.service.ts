@@ -149,7 +149,7 @@ export class StorageService {
 
     if (dayExistsInLocalStorage) {
 
-      const dayWithRecipesInStorage = JSON.parse(window.localStorage.getItem(dayName));
+      // const dayWithRecipesInStorage = JSON.parse(window.localStorage.getItem(dayName));
 
       //Loop through the recipeIDs in the Firebase object
       for (const currentRecipeID in recipesInFirebase) {
@@ -177,6 +177,13 @@ export class StorageService {
 
             const servings = result['yield'];
 
+            let ingredientsArray = [];
+            result['ingredientLines'].forEach(ingredientObject => {
+
+              ingredientsArray.push(ingredientObject);
+
+            });
+
             const recipeToAdd = {
               recipeID: currentRecipeID,
               recipeType: currentRecipeDetails.recipeType,
@@ -188,13 +195,14 @@ export class StorageService {
               carbs: result['totalNutrients'].CHOCDF.quantity / servings,
               protein: result['totalNutrients'].PROCNT.quantity  / servings,
               fat: result['totalNutrients'].FAT.quantity / servings,
+              ingredients: ingredientsArray,
               isKetoFriendly: true, // Recipe is not keto friendly
               notKetoFriendlyReason: '' // Recipe is not keto friendly reason
             };
 
+            console.log('Recipe added to storage:');
             console.log(recipeToAdd);
 
-            //dayWithRecipesInStorage.recipes.push(recipeToAdd);
             this.addRecipeToDay(dayName, recipeToAdd);
             recipesAdded = true;
 
@@ -210,7 +218,7 @@ export class StorageService {
     } else {
 
       this.addDayToStorage(dayName);
-      const dayWithRecipesInStorage = JSON.parse(window.localStorage.getItem(dayName));
+      // const dayWithRecipesInStorage = JSON.parse(window.localStorage.getItem(dayName));
 
       // Loop through the recipeIDs in the Firebase object
       for (const recipeID in recipesInFirebase) {
@@ -231,6 +239,13 @@ export class StorageService {
 
         const servings = result['yield'];
 
+        let ingredients = [];
+        result['ingredientLines'].forEach(ingredientObject => {
+
+          ingredients.push(ingredientObject);
+
+        });
+
         const recipeToAdd = {
           recipeID: recipeID,
           recipeType: recipeDetails.recipeType,
@@ -242,6 +257,7 @@ export class StorageService {
           carbs: result['totalNutrients'].CHOCDF.quantity / servings,
           protein: result['totalNutrients'].PROCNT.quantity  / servings,
           fat: result['totalNutrients'].FAT.quantity / servings,
+          ingredients: ingredients,
           isKetoFriendly: true, // Recipe is not keto friendly
           notKetoFriendlyReason: '' // Recipe is not keto friendly reason
         };
@@ -315,7 +331,7 @@ export class StorageService {
 
       // Assign the day's recipes to recipes
       const recipes: { recipeID: string, recipeType: string, name: string, image: string, calories: number, carbs: number,
-        protein: number, fat: number, isKetoFriendly: boolean,
+        protein: number, fat: number, ingredients: [], isKetoFriendly: boolean,
         notKetoFriendlyReason: string }[] = JSON.parse(window.localStorage.getItem(dayName)).recipes;
 
       // Check if the recipe already exists in storage
@@ -348,7 +364,7 @@ export class StorageService {
 
       // Assign the day's recipes to recipes
       const recipes: { recipeID: string, recipeType: string, name: string, image: string, calories: number, carbs: number,
-        protein: number, fat: number, isKetoFriendly: boolean,
+        protein: number, fat: number, ingredients: [], isKetoFriendly: boolean,
         notKetoFriendlyReason: string }[] = JSON.parse(window.localStorage.getItem(dayName)).recipes;
 
       console.log(`Recipes array after day just added to Storage: ${recipes}`);

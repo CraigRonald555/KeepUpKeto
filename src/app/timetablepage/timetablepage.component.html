@@ -88,25 +88,23 @@
   <div class="row">
 
     <div class="col-6 col-sm-6">
-      <h3>Monday</h3>
-      <small>(Swipe left to see all meals)</small>
+      <h3>{{this.timetableService.getTodayName()}}</h3>
     </div>
 
     <div class="col-6 col-sm-6 text-right">
-      <h4>Plan your week <img src="assets/img/menu.png" alt="Weekly plan" /></h4>
+      <h3>Plan your week <span class='material-icons'>arrow_forward_ios</span></h3>
     </div>
 
   </div>
 
   <div class="mb-5"></div>
-  <p class="clickable" (click)="selectedDayIndex = 0" data-toggle="modal" data-target="#exampleModal">Test - add new meal</p>
 
   <owl-carousel [options]="mySlideOptions" [items]="myCarouselItems" [carouselClasses]="['owl-carousel', 'owl-theme']" #owlElement>
     <div class="item" *ngFor="let item of mySlideItems;let i = index">
-      <div [class]="item.recipeTypeHTML" *ngIf="item.isRecipe === true">
+      <div [class]="item.recipeTypeHTML" (dblclick)="navigateToRecipe(item.recipeID)">
         <div class="row">
-
             <div class="col-12">
+
               <div class="clickable" style='position: fixed; right: 20px; ' (click)="this.timetableService.removeRecipeByObject(this.todayRecipes, i);">
                 <i class="material-icons" style="color: white">close</i>
               </div>
@@ -118,13 +116,6 @@
               </div>
             </div>
 
-        </div>
-      </div>
-
-      <div class="add" *ngIf="item.isRecipe === false">
-        <div class="col-12">
-          <!-- Need add a method which returns the current day's index and assign it to selectedDayIndex -->
-          <p class="clickable" (click)="selectedDayIndex = 0" data-toggle="modal" data-target="#exampleModal">Add new meal</p>
         </div>
       </div>
 
@@ -187,7 +178,7 @@
 
               <p class='clickableText' (click)='searchForRecipesAdvanced = !searchForRecipesAdvanced'>More options</p>
 
-              <div class='advanced' [hidden]='searchForRecipesAdvanced'>
+              <div class='advanced' [hidden]='!searchForRecipesAdvanced'>
 
                 <div class="row">
 

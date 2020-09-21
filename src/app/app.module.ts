@@ -10,9 +10,7 @@ import { environment } from '../environments/environment';
 
 import { AppComponent } from './app.component';
 import { HomepageComponent } from './homepage/homepage.component';
-import { MealCardComponent } from './meal-card/meal-card.component';
 import { TimetablepageComponent } from './timetablepage/timetablepage.component';
-import { MealsForTodayComponent } from './homepage/meals-for-today/meals-for-today.component';
 import { ProgressComponent } from './homepage/progress/progress.component';
 import { TodaytableComponent } from './homepage/todaytable/todaytable.component';
 import { AddMealComponent } from './add-meal/add-meal.component';
@@ -23,11 +21,11 @@ import {HttpClientModule} from '@angular/common/http';
 import { LandingpageComponent } from './landingpage/landingpage.component';
 import { MainComponent } from './main/main.component';
 import { LoginpageComponent } from './loginpage/loginpage.component';
-import { MoreInfoComponent } from './more-info/more-info.component';
 import { SignupComponent } from './signup/signup.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { OwlModule } from 'ngx-owl-carousel';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { RecipeComponent } from './recipe/recipe.component';
 
 const appRoutes = [
 
@@ -35,7 +33,7 @@ const appRoutes = [
   { path: '', component: MainComponent, children: [
     { path: 'home', component: HomepageComponent},
     { path: 'timetable', component: TimetablepageComponent},
-    { path: 'more', component: MoreInfoComponent}
+    { path: 'recipes', component: RecipeComponent}
   ] },
   { path: 'landing', component: LandingpageComponent}
 
@@ -45,23 +43,21 @@ const appRoutes = [
   declarations: [
     AppComponent,
     HomepageComponent,
-    MealCardComponent,
     TimetablepageComponent,
-    MealsForTodayComponent,
     ProgressComponent,
     TodaytableComponent,
     AddMealComponent,
     LandingpageComponent,
     MainComponent,
     LoginpageComponent,
-    MoreInfoComponent,
-    SignupComponent
+    SignupComponent,
+    RecipeComponent
   ],
   imports: [
     BrowserModule,
     OwlModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
-    RouterModule.forRoot(appRoutes),
+    RouterModule.forRoot(appRoutes, {onSameUrlNavigation: 'reload'}),
     HttpClientModule,
     FormsModule,
     MatProgressSpinnerModule,

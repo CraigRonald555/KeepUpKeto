@@ -34,6 +34,7 @@ export class TimetableService {
       carbs: number,
       protein: number,
       fat: number,
+      ingredients: [],
       isKetoFriendly: boolean, // Recipe is not keto friendly
       notKetoFriendlyReason: string // Recipe is not keto friendly reason
     }[]
@@ -43,6 +44,7 @@ export class TimetableService {
   currentDate = new Date();
   currentDayIndex = this.currentDate.getDay(); // with Index on the end because it returns an ID not the actual name
   arrayUpdated = new EventEmitter<string>();
+  dataLoaded = false;
 
   // Get user's daily calorie and macro requirements from accountDetails service
   dailyCalories;
@@ -78,6 +80,8 @@ export class TimetableService {
       this.auth.listenToTimetableChanges(this.accountService.getUserID());
       await this.checkStorage();
       this.updateWeeklyTotals();
+
+      this.dataLoaded = true;
 
       console.log('Updated account details in timetable service');
 
@@ -126,7 +130,7 @@ export class TimetableService {
 
     console.log('Request received at timetable.service getTodayRecipes()')
 
-    const currentDayName: string = this.getDayName();
+    const currentDayName: string = this.getTodayName();
 
     let todayRecipes: {
       day: string,
@@ -148,6 +152,7 @@ export class TimetableService {
         carbs: number,
         protein: number,
         fat: number,
+        ingredients: []
       }[]
     }
 
@@ -166,7 +171,25 @@ export class TimetableService {
 
   }
 
-  getDayName(): string {
+  getDayIndexByName(dayName): number {
+
+    let dayIndex = -1;
+
+    this.allRecipes.forEach((dayWithRecipes, index) => {
+
+      if (dayWithRecipes.day === dayName) {
+
+        dayIndex = index;
+
+      }
+
+    });
+
+    return dayIndex;
+
+  }
+
+  getTodayName(): string {
 
     let currentDayName;
 
@@ -194,7 +217,8 @@ export class TimetableService {
       calories: number,
       carbs: number,
       protein: number,
-      fat: number}) {
+      fat: number,
+      ingredients: []}) {
 
         // Add recipe to dayWithRecipes
         const dayWithRecipes = this.getDayByIndex(index);
@@ -302,7 +326,7 @@ export class TimetableService {
 
   }
 
-  private getDayByIndex(index: number) {
+  getDayByIndex(index: number) {
 
     let dayWithRecipes;
 

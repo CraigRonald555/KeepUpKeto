@@ -1,9 +1,10 @@
-import { Component, OnInit, ChangeDetectorRef, ElementRef, ViewChild, Renderer2, Inject, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ElementRef, ViewChild, Renderer2, Inject, AfterViewInit, NgZone } from '@angular/core';
 import { TimetableService } from '../timetable.service';
 import { EdamamService } from '../edamam.service';
 import { NgForm } from '@angular/forms';
 import { OwlCarousel } from 'ngx-owl-carousel';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { NavigationExtras, Router } from '@angular/router';
 
 // declare var whisk: any;
 
@@ -39,6 +40,7 @@ export class TimetablepageComponent implements AfterViewInit {
       carbs: number,
       protein: number,
       fat: number,
+      ingredients: []
       // isKetoFriendly: boolean, // Recipe is not keto friendly
       // notKetoFriendlyReason: string // Recipe is not keto friendly reason
     }[]
@@ -64,6 +66,7 @@ export class TimetablepageComponent implements AfterViewInit {
       carbs: number,
       protein: number,
       fat: number,
+      ingredients: []
     }[]
   };
 
@@ -123,11 +126,11 @@ export class TimetablepageComponent implements AfterViewInit {
     },
 
   }};
-  //myCarouselOptions = {items: 3, dots: false, nav: true};
+  // myCarouselOptions = {items: 3, dots: false, nav: true};
 
   addRecipesToTodayCarousel(recipes) {
 
-    //this.itemsLoaded = false;
+    // this.itemsLoaded = false;
     // this.owlElement.reInit();
 
     this.mySlideItems = [];
@@ -141,11 +144,10 @@ export class TimetablepageComponent implements AfterViewInit {
 
     }
 
-    this.mySlideItems.push({isRecipe: false});
     this.owlElement.reInit();
     // this.owlElement.refresh();
 
-    //this.itemsLoaded = true;
+    // this.itemsLoaded = true;
 
   }
 
@@ -182,6 +184,19 @@ export class TimetablepageComponent implements AfterViewInit {
 
   }
 
+  navigateToRecipe(recipeID) {
+
+    this.selectedDayIndex = this.timetableService.getDayIndexByName(this.timetableService.getTodayName());
+
+    let navigationExtras: NavigationExtras = {
+      queryParams: { 'selectedDayIndex': this.selectedDayIndex, 'recipeID': recipeID }
+    };
+
+    // Use ngZone run to remove the silly 'did you forget to run ngZone' error which would break owlCarousel and not actually navigate to recipe page
+    this.ngZone.run(() => this.router.navigate(['recipes/'], { queryParams: { 'selectedDayIndex': this.selectedDayIndex, 'recipeID': recipeID }})).then();
+
+  }
+
   printUseRecommended() {
 
     console.log("Use recommended: " + this.useRecommended);
@@ -190,9 +205,10 @@ export class TimetablepageComponent implements AfterViewInit {
 
   ////////////////////////////////////////////////
 
-  constructor(public timetableService: TimetableService, private edamamService: EdamamService, private changeDetector: ChangeDetectorRef ) {
+  constructor(public timetableService: TimetableService, private edamamService: EdamamService, private router: Router, private changeDetector: ChangeDetectorRef, private ngZone: NgZone ) {
 
     this.selectedRecipeType = this.recipeTypes[0];
+    // window.localStorage.clear();
 
     timetableService.arrayUpdated.subscribe(status => {
 
@@ -281,14 +297,23 @@ export class TimetablepageComponent implements AfterViewInit {
 
     this.addRecipesToTodayCarousel(this.todayRecipes.recipes);
 
+    console.log(`Daily Carbs: ${this.timetableService.dailyCarbs}`);
+    console.log(`Used Carbs ${this.todayRecipes.totalCarbs}`);
+    console.log(`Daily Protein: ${this.timetableService.dailyProtein}`);
+    console.log(`Used Protein ${this.todayRecipes.totalProtein}`);
+    console.log(`Daily Fat: ${this.timetableService.dailyFat}`);
+    console.log(`Used Fat ${this.todayRecipes.totalFat}`);
+    console.log(`Daily Calories: ${this.timetableService.dailyCalories}`);
+    console.log(`Used Calories: ${this.todayRecipes.totalCalories}`);
+
     this.progressBars = {
-      carbsPercentage: 100 - ((this.todayRecipes.carbsRemaining / this.todayRecipes.totalCarbs) * 10),
+      carbsPercentage: (this.todayRecipes.totalCarbs / this.timetableService.dailyCarbs) * 100,
       carbsRemaining: Math.floor(this.todayRecipes.carbsRemaining),
-      proteinPercentage: 100 - ((this.todayRecipes.proteinRemaining / this.todayRecipes.totalProtein) * 10),
+      proteinPercentage:(this.todayRecipes.totalProtein / this.timetableService.dailyProtein) * 100,
       proteinRemaining: Math.floor(this.todayRecipes.proteinRemaining),
-      fatPercentage: 100 - ((this.todayRecipes.fatRemaining / this.todayRecipes.totalFat) * 10),
+      fatPercentage: (this.todayRecipes.totalFat / this.timetableService.dailyFat) * 100,
       fatRemaining: Math.floor(this.todayRecipes.fatRemaining),
-      caloriesPercentage: 100 - ((this.todayRecipes.caloriesRemaining / this.todayRecipes.totalCalories) * 10),
+      caloriesPercentage: (this.todayRecipes.totalCalories / this.timetableService.dailyCalories) * 100,
       caloriesRemaining: Math.floor(this.todayRecipes.caloriesRemaining)
     };
 

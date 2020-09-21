@@ -30,7 +30,7 @@ export class TodaytableComponent implements OnInit {
   ngOnInit() {
 
     this.todayRecipes = this.timetableService.getTodayRecipes();
-    this.currentDay = this.timetableService.getDayName();
+    this.currentDay = this.timetableService.getTodayName();
     this.changeDetector.detectChanges();
     console.log(this.currentDay);
 

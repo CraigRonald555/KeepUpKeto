@@ -4,6 +4,10 @@ html {
   overflow-x : hidden
 }
 
+.clickable {
+  cursor: pointer;
+}
+
 .dropdown {
 
   background: url('assets/img/bg.jpg');
@@ -122,43 +126,46 @@ img.inner_img {
   background: url('assets/img/breakfast_bg.png');
   background-size: 100%;
   background-position: 0 0;
+  background-color: #fb757f;
   background-repeat: no-repeat;
   border-radius: 22px;
     box-shadow: 8px 16px 14.07px -4.93px rgba(250, 116, 127, 0.29);
   -webkit-box-shadow: 8px 16px 14.07px -4.93px rgba(250, 116, 127, 0.29);
-  min-height: 250px;
+  min-height: 325px;
   overflow:visible
 }
   .lunch{
   background: url('assets/img/lunch_bg.png');
     background-size: 100%;
     background-position: 0 0;
+    background-color: #5f65e0;
     background-repeat: no-repeat;
     border-radius: 22px;
     box-shadow: 8px 16px 14.07px -4.93px rgba(94, 100, 223, 0.29);
   -webkit-box-shadow:8px 16px 14.07px -4.93px rgba(94, 100, 223, 0.29);
-    min-height: 250px;
+    min-height: 325px;
   }
   .snack{
   background: url('assets/img/snack_bg.png');
     background-size: 100%;
     background-position: 0 0;
+    background-color: #ff6896;
     background-repeat: no-repeat;
     border-radius: 22px;
      box-shadow: 8px 16px 14.07px -4.93px rgba(255, 85, 137, 0.29);
     -webkit-box-shadow: 8px 16px 14.07px -4.93px rgba(255, 85, 137, 0.29);
-    min-height: 250px;
+    min-height: 325px;
   }
   .dinner{
   background: url('assets/img/dinner_bg.png');
     background-size: 100%;
     background-position: 0 0;
+    background-color: #e78d0c;
     background-repeat: no-repeat;
     border-radius: 22px;
     box-shadow: 8px 16px 14.07px -4.93px rgba(233, 144, 16, 0.29);
   -webkit-box-shadow:8px 16px 14.07px -4.93px rgba(233, 144, 16, 0.29);
-  min-height: 250px;
-    z-index: 500;
+  min-height: 325px;
   }
 
 /*footer*/
