@@ -41,23 +41,7 @@ export class RecipeComponent implements OnInit {
       this.recipeDetails = this.findRecipeInRecipesArray(selectedDayWithRecipes, this.route.snapshot.queryParams['recipeID']);
       console.log(this.recipeDetails);
 
-      // Fill in progress bars
-
-      this.progressBars = {
-        carbsPercentage: (this.recipeDetails.carbs / this.timetableService.dailyCarbs) * 100,
-        carbsTotal: this.recipeDetails.carbs,
-        carbsDaily: this.timetableService.dailyCarbs,
-        proteinPercentage: (this.recipeDetails.protein / this.timetableService.dailyProtein) * 100,
-        proteinTotal: this.recipeDetails.protein,
-        proteinDaily: this.timetableService.dailyProtein,
-        fatPercentage: (this.recipeDetails.fat / this.timetableService.dailyFat) * 100,
-        fatTotal: this.recipeDetails.fat,
-        fatDaily: this.timetableService.dailyFat,
-        caloriesPercentage: (this.recipeDetails.calories / this.timetableService.dailyCalories) * 100,
-        caloriesTotal: this.recipeDetails.calories,
-        caloriesDaily: this.timetableService.dailyCalories,
-
-      }
+      this.fillProgressBars();
 
       this.dataLoaded = true;
 
@@ -84,6 +68,8 @@ export class RecipeComponent implements OnInit {
 
         this.recipeDetails = this.findRecipeInRecipesArray(selectedDayWithRecipes, params['recipeID']);
 
+        this.fillProgressBars();
+
       });
 
       this.dataLoaded = true;
@@ -94,6 +80,28 @@ export class RecipeComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+  }
+
+  fillProgressBars() {
+
+    // Fill in progress bars
+
+    this.progressBars = {
+      carbsPercentage: (this.recipeDetails.carbs / this.timetableService.dailyCarbs) * 100,
+      carbsTotal: this.recipeDetails.carbs,
+      carbsDaily: this.timetableService.dailyCarbs,
+      proteinPercentage: (this.recipeDetails.protein / this.timetableService.dailyProtein) * 100,
+      proteinTotal: this.recipeDetails.protein,
+      proteinDaily: this.timetableService.dailyProtein,
+      fatPercentage: (this.recipeDetails.fat / this.timetableService.dailyFat) * 100,
+      fatTotal: this.recipeDetails.fat,
+      fatDaily: this.timetableService.dailyFat,
+      caloriesPercentage: (this.recipeDetails.calories / this.timetableService.dailyCalories) * 100,
+      caloriesTotal: this.recipeDetails.calories,
+      caloriesDaily: this.timetableService.dailyCalories,
+
+    }
 
   }
 
