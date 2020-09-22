@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { EdamamService } from '../edamam.service';
 import { TimetableService } from '../timetable.service';
@@ -9,7 +9,7 @@ import { TimetableService } from '../timetable.service';
   templateUrl: './recipe.component.html',
   styleUrls: ['./recipe.component.css']
 })
-export class RecipeComponent implements OnInit {
+export class RecipeComponent {
 
   recipeDetails;
   dataLoaded = false;
@@ -70,10 +70,6 @@ export class RecipeComponent implements OnInit {
       this.changeDetector.detectChanges();
 
     });
-
-  }
-
-  ngOnInit(): void {
 
   }
 
