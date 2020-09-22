@@ -62,10 +62,11 @@ export class RecipeComponent implements OnInit {
         this.recipeDetails = this.findRecipeInRecipesArray(selectedDayWithRecipes, params['recipeID']);
 
         this.fillProgressBars();
+        this.dataLoaded = true;
 
       });
 
-      this.dataLoaded = true;
+
       this.changeDetector.detectChanges();
 
     });
