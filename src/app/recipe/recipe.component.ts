@@ -40,6 +40,8 @@ export class RecipeComponent {
 
       this.recipeDetails = this.findRecipeInRecipesArray(selectedDayWithRecipes, this.route.snapshot.queryParams['recipeID']);
       console.log(this.recipeDetails);
+      console.log("Ingredients from recipeDetails - constructor: ")
+      console.log(this.recipeDetails.ingredients);
 
       this.fillProgressBars();
 
@@ -60,6 +62,9 @@ export class RecipeComponent {
         console.log(`Query params: ${params['selectedDayIndex']} and ${params['recipeID']}`);
 
         this.recipeDetails = this.findRecipeInRecipesArray(selectedDayWithRecipes, params['recipeID']);
+
+        console.log("Ingredients from recipeDetails - queryParamSubscribe: ")
+        console.log(this.recipeDetails.ingredients);
 
         this.fillProgressBars();
         this.dataLoaded = true;
