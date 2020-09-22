@@ -188,10 +188,6 @@ export class TimetablepageComponent implements AfterViewInit {
 
     this.selectedDayIndex = this.timetableService.getDayIndexByName(this.timetableService.getTodayName());
 
-    let navigationExtras: NavigationExtras = {
-      queryParams: { 'selectedDayIndex': this.selectedDayIndex, 'recipeID': recipeID }
-    };
-
     // Use ngZone run to remove the silly 'did you forget to run ngZone' error which would break owlCarousel and not actually navigate to recipe page
     this.ngZone.run(() => this.router.navigate(['recipes/'], { queryParams: { 'selectedDayIndex': this.selectedDayIndex, 'recipeID': recipeID }})).then();
 
@@ -208,7 +204,7 @@ export class TimetablepageComponent implements AfterViewInit {
   constructor(public timetableService: TimetableService, private edamamService: EdamamService, private router: Router, private changeDetector: ChangeDetectorRef, private ngZone: NgZone ) {
 
     this.selectedRecipeType = this.recipeTypes[0];
-    // window.localStorage.clear();
+    window.localStorage.clear();
 
     timetableService.arrayUpdated.subscribe(status => {
 

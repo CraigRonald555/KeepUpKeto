@@ -89,6 +89,9 @@
 
     <div class="col-6 col-sm-6">
       <h3>{{this.timetableService.getTodayName()}}</h3>
+      <div class="clickable" data-toggle="modal" data-target="#exampleModal" (click)='selectedDayIndex = this.timetableService.getDayIndexByName(this.timetableService.getTodayName())'>
+        Add recipe to today
+      </div>
     </div>
 
     <div class="col-6 col-sm-6 text-right">
