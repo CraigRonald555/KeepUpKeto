@@ -1,5 +1,5 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { EdamamService } from '../edamam.service';
 import { TimetableService } from '../timetable.service';
 
@@ -29,7 +29,7 @@ export class RecipeComponent implements OnInit {
     caloriesDaily: 0
   };
 
-  constructor(private timetableService: TimetableService, private route: ActivatedRoute, private changeDetector: ChangeDetectorRef) {
+  constructor(private timetableService: TimetableService, private router: Router, private route: ActivatedRoute, private ngZone: NgZone ,private changeDetector: ChangeDetectorRef) {
 
     if (this.timetableService.dataLoaded) {
 
@@ -48,13 +48,6 @@ export class RecipeComponent implements OnInit {
   }
 
     this.timetableService.arrayUpdated.subscribe(status => {
-
-      // console.log('Selected day index: ' + this.route.snapshot.queryParams['selectedDayIndex']);
-      // const selectedDayWithRecipes = this.timetableService.getDayByIndex(+this.route.snapshot.queryParams.selectedDayIndex);
-
-      // //Find recipe from the dayWithRecipes object using the passed recipeID from params
-      // console.log('Recipe ID: ' + this.route.snapshot.queryParams['recipeID']);
-      // this.recipeDetails = this.findRecipeInRecipesArray(selectedDayWithRecipes, this.route.snapshot.queryParams['recipeID']);
 
       // If the params change whilst user is on recipe page (e.g. if they refresh)
       this.route.queryParams.subscribe((params: Params) => {
@@ -127,5 +120,12 @@ export class RecipeComponent implements OnInit {
     return foundRecipe;
 
   }
+
+  // navigateToIntructions() {
+
+  //   // Use ngZone run to remove the silly 'did you forget to run ngZone' error which would break owlCarousel and not actually navigate to recipe page
+  //   this.ngZone.run(() => this.router.navigate(['instructions/'], { queryParams: { 'url': this.recipeDetails.url}})).then();
+
+  // }
 
 }

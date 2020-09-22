@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { RecursiveTemplateAstVisitor } from '@angular/compiler';
 import { HttpClient } from '@angular/common/http';
+import { IngredientDivider } from './ingredientDivider.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StorageService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private ingredientDivider: IngredientDivider) { }
 
   clearAll() {
 
@@ -382,6 +383,8 @@ export class StorageService {
 
     }
 
-   }
+  }
+
+
 
 }

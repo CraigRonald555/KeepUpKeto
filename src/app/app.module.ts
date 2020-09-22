@@ -16,6 +16,7 @@ import { TodaytableComponent } from './homepage/todaytable/todaytable.component'
 import { AddMealComponent } from './add-meal/add-meal.component';
 import { TimetableService } from './timetable.service';
 import { AccountService } from './account.service';
+import { IngredientDivider } from './ingredientDivider.service'
 
 import {HttpClientModule} from '@angular/common/http';
 import { LandingpageComponent } from './landingpage/landingpage.component';
@@ -26,6 +27,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { OwlModule } from 'ngx-owl-carousel';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RecipeComponent } from './recipe/recipe.component';
+import { InstructionsComponent } from './recipe/instructions/instructions.component';
+import { EdamamService } from './edamam.service';
+import { StorageService } from './storage.service';
 
 const appRoutes = [
 
@@ -33,8 +37,9 @@ const appRoutes = [
   { path: '', component: MainComponent, children: [
     { path: 'home', component: HomepageComponent},
     { path: 'timetable', component: TimetablepageComponent},
-    { path: 'recipes', component: RecipeComponent}
-  ] },
+    { path: 'recipes', component: RecipeComponent},
+    { path: 'instructions', component: InstructionsComponent }
+  ]},
   { path: 'landing', component: LandingpageComponent}
 
 ];
@@ -51,7 +56,8 @@ const appRoutes = [
     MainComponent,
     LoginpageComponent,
     SignupComponent,
-    RecipeComponent
+    RecipeComponent,
+    InstructionsComponent
   ],
   imports: [
     BrowserModule,
@@ -63,7 +69,7 @@ const appRoutes = [
     MatProgressSpinnerModule,
     BrowserAnimationsModule
   ],
-  providers: [TimetableService, AccountService],
+  providers: [TimetableService, AccountService, EdamamService, StorageService, IngredientDivider],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

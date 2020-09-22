@@ -1,3 +1,15 @@
+<div class="container">
+
+  <div class="col-sm-5"></div>
+
+  <div class="col-sm-2">
+    <mat-progress-spinner class="text-center" mode="indeterminate" *ngIf="!dataLoaded"></mat-progress-spinner>
+  </div>
+
+  <div class="col-sm-5"></div>
+
+</div>
+
 <div class="container" style="background: #f3f5f9; padding-bottom: 100px" *ngIf='dataLoaded'>
 
   <div class="row">
@@ -9,54 +21,59 @@
 
   </div>
 
-  <div class="container">
 
-    <div class="row">
+  <div class="row">
 
-      <div class="col-sm-4">
-        <h3>Ingredients</h3>
-        <p *ngFor="let ingredient of recipeDetails.ingredients">
-          {{ingredient}}
-        </p>
-      </div>
-
-      <div class="col-sm-4">
-
-        <h3>Nutrition</h3>
-
-        <h6>Carbs</h6>
-        <div class="progress p1">
-          <div class="progress-bar " role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="10" [style.width]="progressBars.carbsPercentage + '%'"></div>
-        </div>
-        <p>{{progressBars.carbsTotal}}g of your {{progressBars.carbsDaily}}g daily carbs</p>
-
-        <h6>Protein</h6>
-        <div class="progress p2">
-          <div class="progress-bar" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="10" [style.width]="progressBars.proteinPercentage + '%'"></div>
-        </div>
-        <p>{{progressBars.proteinTotal}}g of your {{progressBars.proteinDaily}}g daily protein</p>
-
-        <h6>Fat</h6>
-        <div class="progress p3">
-          <div class="progress-bar" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="10" [style.width]="progressBars.fatPercentage + '%'"></div>
-        </div>
-        <p>{{progressBars.fatTotal}}g of your {{progressBars.fatDaily}}g daily fat</p>
-
-        <h6>Calories</h6>
-        <div class="progress p4">
-          <div class="progress-bar" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="10" [style.width]="progressBars.caloriesPercentage + '%'"></div>
-        </div>
-        <p>{{progressBars.caloriesTotal}} of your {{progressBars.caloriesDaily}} daily calories</p>
-
-
-        <!-- <h3>Nutrition</h3>
-        <p>Calories: {{recipeDetails.calories}}</p>
-        <p>Carbs: {{recipeDetails.carbs}}</p>
-        <p>Protein: {{recipeDetails.protein}}</p>
-        <p>Fat: {{recipeDetails.fat}}</p> -->
-      </div>
+    <!-- Blank col to center the two main cols -->
+    <div class="col-sm-2">
 
     </div>
+
+    <div class="col-sm-4">
+      <h3>Ingredients</h3>
+      <p *ngFor="let ingredient of recipeDetails.ingredients">
+        {{ingredient}}
+      </p>
+      <div class="text-center">
+        <h3>Instructions</h3>
+        <a [href]="recipeDetails.url" target="_blank">
+          <div class="btn btn-primary">View Instructions</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="col-sm-4">
+
+      <h3>Nutrition</h3>
+
+      <h6>Carbs</h6>
+      <div class="progress p1">
+        <div class="progress-bar " role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="10" [style.width]="progressBars.carbsPercentage + '%'"></div>
+      </div>
+      <p>{{progressBars.carbsTotal}}g of your {{progressBars.carbsDaily}}g daily carbs</p>
+
+      <h6>Protein</h6>
+      <div class="progress p2">
+        <div class="progress-bar" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="10" [style.width]="progressBars.proteinPercentage + '%'"></div>
+      </div>
+      <p>{{progressBars.proteinTotal}}g of your {{progressBars.proteinDaily}}g daily protein</p>
+
+      <h6>Fat</h6>
+      <div class="progress p3">
+        <div class="progress-bar" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="10" [style.width]="progressBars.fatPercentage + '%'"></div>
+      </div>
+      <p>{{progressBars.fatTotal}}g of your {{progressBars.fatDaily}}g daily fat</p>
+
+      <h6>Calories</h6>
+      <div class="progress p4">
+        <div class="progress-bar" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="10" [style.width]="progressBars.caloriesPercentage + '%'"></div>
+      </div>
+      <p>{{progressBars.caloriesTotal}} of your {{progressBars.caloriesDaily}} daily calories</p>
+
+    </div>
+
+    <!-- Blank col to center the two main cols -->
+    <div class="col-sm-2"></div>
 
   </div>
 
