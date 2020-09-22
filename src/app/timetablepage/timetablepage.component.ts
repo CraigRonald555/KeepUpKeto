@@ -287,7 +287,7 @@ export class TimetablepageComponent implements AfterViewInit {
 
     this.allRecipes = this.timetableService.getAllRecipes();
     this.todayRecipes = this.timetableService.getTodayRecipes();
-    // this.updateProgress();
+    this.updateProgress();
 
     this.changeDetector.detectChanges();
 
