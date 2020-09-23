@@ -204,7 +204,7 @@ export class TimetablepageComponent implements AfterViewInit {
   constructor(public timetableService: TimetableService, private edamamService: EdamamService, private router: Router, private changeDetector: ChangeDetectorRef, private ngZone: NgZone ) {
 
     this.selectedRecipeType = this.recipeTypes[0];
-    window.localStorage.clear();
+    // window.localStorage.clear();
 
     timetableService.arrayUpdated.subscribe(status => {
 
