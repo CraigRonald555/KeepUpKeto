@@ -434,14 +434,14 @@ export class TimetableService {
 
       const dayIsUpToDate = this.storageService.checkDayIsUpToDate(currentDay);
 
-      if (!dayIsUpToDate) {
+      // if (!dayIsUpToDate) {
 
         console.log(`${currentDay} is not up-to-date`);
         await this.auth.updateLocalStorageFromFirebase(this.accountService.getUserID(), currentDay); // This method fills storage
         this.storageService.setDayIsUpToDate(currentDay, true);
         console.log(this.storageService.getDayFromStorage(currentDay));
 
-      }
+      // }
 
     }
 
