@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { IngredientDivider } from './ingredientDivider.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EdamamService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private ingredientDivider: IngredientDivider) { }
 
   async searchForRecipes(recipeDetails, ingredient, maxResults) {
 
@@ -34,17 +35,41 @@ export class EdamamService {
 
         const currentRecipe = recipes[i]['recipe'];
 
+        const servings = currentRecipe.yield;
+
+        let newIngredientsArray = [];
+        let originalIngredientArray = currentRecipe['ingredientLines'];
+
+        console.log(originalIngredientArray);
+
+        for (let i = 0; i < originalIngredientArray.length; i++) {
+
+          let ingredientLine = originalIngredientArray[i];
+
+          ingredientLine = this.ingredientDivider.convertAll(servings, ingredientLine);
+
+          // ingredientLine = this.ingredientDivider.divideStringByServings(servings, ingredientLine);
+          // console.log(`After divideStringByServings: ${ingredientLine}`);
+
+          // ingredientLine = this.ingredientDivider.addDecimalsToFractions(ingredientLine);
+          // console.log(`After addDecimalsToFractions: ${ingredientLine}`);
+
+          newIngredientsArray.push(ingredientLine);
+
+        }
+
         recipeToBePushed = {
 
           recipeID: currentRecipe.uri.substring(currentRecipe.uri.indexOf('_') + 1, currentRecipe.uri.length),
           name: currentRecipe.label,
           url: currentRecipe.url,
-          image: currentRecipe.image,
           uri: currentRecipe.uri,
-          carbs: Math.round(currentRecipe['totalNutrients'].CHOCDF.quantity / currentRecipe.yield * 10) / 10,
-          protein: Math.round(currentRecipe['totalNutrients'].PROCNT.quantity  / currentRecipe.yield * 10) / 10,
-          fat: Math.round(currentRecipe['totalNutrients'].FAT.quantity / currentRecipe.yield * 10) / 10,
-          calories: Math.round(currentRecipe.calories / currentRecipe.yield * 10) / 10,
+          image: currentRecipe.image,
+          carbs: Math.round(currentRecipe['totalNutrients'].CHOCDF.quantity / servings * 10) / 10,
+          protein: Math.round(currentRecipe['totalNutrients'].PROCNT.quantity  / servings * 10) / 10,
+          fat: Math.round(currentRecipe['totalNutrients'].FAT.quantity / servings * 10) / 10,
+          calories: Math.round(currentRecipe.calories / servings * 10) / 10,
+          ingredients: newIngredientsArray
 
         };
 

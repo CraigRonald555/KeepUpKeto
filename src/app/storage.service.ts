@@ -140,6 +140,11 @@ export class StorageService {
 
   }
 
+  async removeRecipesNotInFirebase(dayName, recipesInFirebase) {
+
+
+  }
+
   async addRecipesFromFirebase(dayName, recipesInFirebase) {
 
     console.log(`${dayName}'s recipe IDs: `);
@@ -178,12 +183,21 @@ export class StorageService {
 
             const servings = result['yield'];
 
-            let ingredientsArray = [];
-            result['ingredientLines'].forEach(ingredientObject => {
+            let newIngredientsArray = [];
+            let originalIngredientArray = result['ingredientLines'];
 
-              ingredientsArray.push(ingredientObject);
+            for (let i = 0; i < originalIngredientArray.length; i++) {
 
-            });
+              let ingredientLine = originalIngredientArray[i];
+
+              ingredientLine = this.ingredientDivider.convertAll(servings, ingredientLine);
+
+              // ingredientLine = this.ingredientDivider.divideStringByServings(servings, ingredientLine);
+              // ingredientLine = this.ingredientDivider.addDecimalsToFractions(ingredientLine);
+
+              newIngredientsArray.push(ingredientLine);
+
+            }
 
             const recipeToAdd = {
               recipeID: currentRecipeID,
@@ -196,7 +210,7 @@ export class StorageService {
               carbs: result['totalNutrients'].CHOCDF.quantity / servings,
               protein: result['totalNutrients'].PROCNT.quantity  / servings,
               fat: result['totalNutrients'].FAT.quantity / servings,
-              ingredients: ingredientsArray,
+              ingredients: newIngredientsArray,
               isKetoFriendly: true, // Recipe is not keto friendly
               notKetoFriendlyReason: '' // Recipe is not keto friendly reason
             };

@@ -7,16 +7,17 @@ import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { environment } from '../environments/environment';
+import { GoogleChartsModule } from 'angular-google-charts';
 
 import { AppComponent } from './app.component';
 import { HomepageComponent } from './homepage/homepage.component';
 import { TimetablepageComponent } from './timetablepage/timetablepage.component';
-import { ProgressComponent } from './homepage/progress/progress.component';
+import { WelcomeComponent } from './homepage/welcome/welcome.component';
 import { TodaytableComponent } from './homepage/todaytable/todaytable.component';
 import { AddMealComponent } from './add-meal/add-meal.component';
 import { TimetableService } from './timetable.service';
 import { AccountService } from './account.service';
-import { IngredientDivider } from './ingredientDivider.service'
+import { IngredientDivider } from './ingredientDivider.service';
 
 import {HttpClientModule} from '@angular/common/http';
 import { LandingpageComponent } from './landingpage/landingpage.component';
@@ -30,6 +31,7 @@ import { RecipeComponent } from './recipe/recipe.component';
 import { InstructionsComponent } from './recipe/instructions/instructions.component';
 import { EdamamService } from './edamam.service';
 import { StorageService } from './storage.service';
+import { ProgressComponent } from './progress/progress.component';
 
 const appRoutes = [
 
@@ -38,7 +40,8 @@ const appRoutes = [
     { path: 'home', component: HomepageComponent},
     { path: 'timetable', component: TimetablepageComponent},
     { path: 'recipes', component: RecipeComponent},
-    { path: 'instructions', component: InstructionsComponent }
+    { path: 'instructions', component: InstructionsComponent },
+    { path: 'progress', component: ProgressComponent}
   ]},
   { path: 'landing', component: LandingpageComponent}
 
@@ -49,7 +52,7 @@ const appRoutes = [
     AppComponent,
     HomepageComponent,
     TimetablepageComponent,
-    ProgressComponent,
+    WelcomeComponent,
     TodaytableComponent,
     AddMealComponent,
     LandingpageComponent,
@@ -57,7 +60,8 @@ const appRoutes = [
     LoginpageComponent,
     SignupComponent,
     RecipeComponent,
-    InstructionsComponent
+    InstructionsComponent,
+    ProgressComponent
   ],
   imports: [
     BrowserModule,
@@ -67,7 +71,8 @@ const appRoutes = [
     HttpClientModule,
     FormsModule,
     MatProgressSpinnerModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    GoogleChartsModule
   ],
   providers: [TimetableService, AccountService, EdamamService, StorageService, IngredientDivider],
   bootstrap: [AppComponent]
