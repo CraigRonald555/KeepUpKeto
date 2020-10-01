@@ -8,6 +8,7 @@ import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { environment } from '../environments/environment';
 import { GoogleChartsModule } from 'angular-google-charts';
+import { ChartsModule } from 'ng2-charts';
 
 import { AppComponent } from './app.component';
 import { HomepageComponent } from './homepage/homepage.component';
@@ -67,12 +68,13 @@ const appRoutes = [
     BrowserModule,
     OwlModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
-    RouterModule.forRoot(appRoutes, {onSameUrlNavigation: 'reload'}),
+    RouterModule.forRoot(appRoutes),
     HttpClientModule,
     FormsModule,
     MatProgressSpinnerModule,
     BrowserAnimationsModule,
-    GoogleChartsModule
+    GoogleChartsModule,
+    ChartsModule
   ],
   providers: [TimetableService, AccountService, EdamamService, StorageService, IngredientDivider],
   bootstrap: [AppComponent]

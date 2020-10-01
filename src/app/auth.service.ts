@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { User } from 'firebase';
 import { AngularFireDatabase } from '@angular/fire/database';
 import { StorageService } from './storage.service';
+import { string } from 'mathjs';
 
 @Injectable({
   providedIn: 'root'
@@ -184,6 +185,7 @@ export class AuthService {
 
   }
 
+  // Add the initial details the user signs up with
   async addMetrics(uid, name, ingredients, goals, sex, height, weight, dob, age) {
 
     await this.fbDB.database.ref('userData/' + uid).set({
@@ -195,6 +197,45 @@ export class AuthService {
       weightKG: weight,
       dateOfBirth: dob,
       age: age
+
+    }).catch(error => {
+
+      console.log(error);
+
+    });
+
+    // Add the weight initially entered by user into the user's progress table with today's date
+    let progress: {date: string, weight: number};
+
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    const yyyy = today.getFullYear();
+
+    const date = yyyy + '-' + mm + '-' + dd;
+
+    this.addWeightToUserProgress(uid, date, weight);
+
+  }
+
+  async addWeightToUserProgress(uid, date, weightKG) {
+
+    // Update the progress table
+    await this.fbDB.database.ref(`userData/${uid}/progress/${date}`).set({
+
+      'weightKG': weightKG
+
+
+    }).catch(error => {
+
+      console.log(error);
+
+    });
+
+    // Set the main weightKG associated with this user to the progress weight
+    await this.fbDB.database.ref(`userData`).child(`${uid}`).update({
+
+      'weightKG': weightKG
 
     }).catch(error => {
 

@@ -133,8 +133,6 @@ export class LandingpageComponent implements AfterViewInit {
 
     }).render(this.paypalElement.nativeElement);
 
-    console.log(navigator.userAgent);
-
   }
 
   assignUserMetrics() {
@@ -174,9 +172,6 @@ export class LandingpageComponent implements AfterViewInit {
 
     this.dateOfBirth = this.userMetricsForm.value.dateOfBirth;
     this.age = this.convertDOBtoAge(this.dateOfBirth);
-
-    console.log('Goals: ' + this.goalsText);
-    console.log('Goals: ' + this.sexText);
 
   }
 

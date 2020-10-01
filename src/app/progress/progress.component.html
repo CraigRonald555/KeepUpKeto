@@ -1,1 +1,70 @@
-<p>progress works!</p>
+<div class="container" style="background-color: #f3f5f9;">
+
+  <div class="row" style="padding: 15px">
+
+    <div class="col-7">
+      <h4>Your progress</h4>
+    </div>
+
+    <div class="col-5 text-right">
+      <select name="recipeType" id="recipeType" class="browser-default custom-select" [(ngModel)]='selectedHistoryOption' (ngModelChange)='retrieveProgressFromFirebase()'>
+        <option selected>Past month</option>
+        <option>Past three months</option>
+        <option>Past six months</option>
+        <option>Past year</option>
+      </select>
+    </div>
+
+  </div>
+
+  <div class="row">
+
+    <div class="col-12">
+
+      <canvas #chartElRef baseChart
+        [datasets]="barChartData"
+        [labels]="barChartLabels"
+        [options]="barChartOptions"
+        [legend]="barChartLegend"
+        [chartType]="barChartType">
+    </canvas>
+
+    </div>
+
+  </div>
+
+  <div class="mb-5"></div>
+
+  <div class="row">
+
+    <div class="col-12">
+
+      <h4>Add weight</h4>
+
+    </div>
+
+  </div>
+
+  <div class="row">
+
+    <div class="col-12 text-center">
+
+      <form #addWeightForm='ngForm' ngNativeValidate>
+
+        <input type="number" name="weightKG" id="weightKG" class="form-control" placeholder="Kilograms" ngModel #weightKG='ngModel' minlength='1' required>
+        <div class="mb-3"></div>
+        <input type="date" name="date" id="date" class="form-control" [value]="getTodayDate()" ngModel #date='ngModel' required>
+
+        <div class="mb-3"></div>
+
+        <div class="btn btn-primary" (click)="addWeightToProgress()">
+          Save
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</div>
