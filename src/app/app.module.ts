@@ -33,6 +33,7 @@ import { InstructionsComponent } from './recipe/instructions/instructions.compon
 import { EdamamService } from './edamam.service';
 import { StorageService } from './storage.service';
 import { ProgressComponent } from './progress/progress.component';
+import { TimetableweeklypageComponent } from './timetableweeklypage/timetableweeklypage.component';
 
 const appRoutes = [
 
@@ -62,7 +63,8 @@ const appRoutes = [
     SignupComponent,
     RecipeComponent,
     InstructionsComponent,
-    ProgressComponent
+    ProgressComponent,
+    TimetableweeklypageComponent
   ],
   imports: [
     BrowserModule,

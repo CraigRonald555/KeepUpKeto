@@ -21,13 +21,15 @@
 
     <div class="col-12">
 
-      <canvas #chartElRef baseChart
+      <canvas #myChart id="myChart" width="400" height="200"></canvas>
+
+      <!-- <canvas baseChart
         [datasets]="barChartData"
         [labels]="barChartLabels"
         [options]="barChartOptions"
         [legend]="barChartLegend"
         [chartType]="barChartType">
-    </canvas>
+      </canvas> -->
 
     </div>
 
@@ -53,13 +55,18 @@
 
         <input type="number" name="weightKG" id="weightKG" class="form-control" placeholder="Kilograms" ngModel #weightKG='ngModel' minlength='1' required>
         <div class="mb-3"></div>
-        <input type="date" name="date" id="date" class="form-control" [value]="getTodayDate()" ngModel #date='ngModel' required>
+        <!-- ngModel #date='ngModel' -->
+        <input type="date" name="date" id="date" class="form-control" [(ngModel)]='todayDate' required>
 
         <div class="mb-3"></div>
 
-        <div class="btn btn-primary" (click)="addWeightToProgress()">
+        <button class="btn btn-primary" (click)="addWeightToProgress()">
           Save
-        </div>
+        </button>
+
+        <p class="help-block" style="color: red" *ngIf='formError'>
+          Please enter valid values before trying to submit
+        </p>
 
       </form>
 

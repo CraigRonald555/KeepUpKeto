@@ -232,16 +232,67 @@ export class AuthService {
 
     });
 
-    // Set the main weightKG associated with this user to the progress weight
+    // Retrieve the most recent weight in the user's record
+    const mostRecentWeight = await this.getMostRecentWeight(uid);
+    // Set the main weightKG associated with this user to the most recent weight
     await this.fbDB.database.ref(`userData`).child(`${uid}`).update({
 
-      'weightKG': weightKG
+      'weightKG': mostRecentWeight
 
     }).catch(error => {
 
       console.log(error);
 
     });
+
+    console.log(`${mostRecentWeight} - added to ${uid} weightKG value (most recent)`);
+
+  }
+
+  async getMostRecentWeight(uid) {
+
+    // These are set when when looping through the progress
+    let mostRecentWeight;
+    let mostRecentDate;
+
+    const allProgress = await this.readDataFromFirebase(`userData/${uid}/progress`);
+
+    // Loop through the dates in allProgress
+    let loopIndex = 0;
+    for (let currentDate in allProgress) {
+
+      // Skip if current element is a prototype key
+      if (!allProgress.hasOwnProperty(currentDate)) { continue; }
+
+      // Set the current weight and date at this point in the loop
+      const currentWeight = allProgress[currentDate].weightKG;
+      const convertedCurrentDate = new Date(currentDate);
+
+      // If loop index is zero then we already know the first object is the most recent so far
+      if (loopIndex === 0) {
+
+        mostRecentWeight = currentWeight;
+        mostRecentDate = convertedCurrentDate;
+
+        // If we're past the first iteration of the loop
+      } else {
+
+        // If the current date is greater than the most recent date
+        if (convertedCurrentDate > mostRecentDate) {
+
+          // Set the most recent values to the current object in the array
+          mostRecentWeight = currentWeight;
+          mostRecentDate = convertedCurrentDate;
+
+        }
+
+      }
+
+      loopIndex++;
+
+    }
+
+    return mostRecentWeight;
 
   }
 

@@ -1,4 +1,5 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { formatDate } from '@angular/common';
 // import { Chart } from 'chart.js';
 import { NgForm } from '@angular/forms';
 import { AccountService } from '../account.service';
@@ -24,10 +25,14 @@ export class ProgressComponent implements OnInit {
   //   {data: [107], label: new Date(2020, 2, 4)}
   // ];
 
+
+  myChart;
+
   selectedHistoryOption = 'Past month';
 
   @ViewChild('addWeightForm') addWeightForm: NgForm;
-  @ViewChild('chartElRef') chart: Chart;
+  todayDate = this.getTodayDate();
+  formError = false;
 
   barChartType = 'line';
   barChartLegend = true;
@@ -68,10 +73,13 @@ export class ProgressComponent implements OnInit {
 
     this.accountService.accountDetailsUpdated.subscribe(status => {
 
-      this.addWeightForm.controls['date'].setValue(this.getTodayDate());
+      // this.addWeightForm.controls['date'].setValue(this.getTodayDate());
       this.retrieveProgressFromFirebase();
+      console.log(this.addWeightForm);
 
     });
+
+    this.retrieveProgressFromFirebase();
 
   }
 
@@ -79,12 +87,16 @@ export class ProgressComponent implements OnInit {
 
     console.log(this.selectedHistoryOption);
 
+    // Reset the arrays associated with the graph so we don't get duplicate values when the table refreshes
     this.dataKGArray = [];
     this.dataLBArray = [];
     this.labelsArray = [];
 
+    console.log('Array emptied');
+
+    // Retrieve the progress from the
     const allProgress = await this.authService.readDataFromFirebase(`userData/${this.accountService.getUserID()}/progress`);
-    let retrieveDateUpTo = new Date();
+    let retrieveDateUpTo: Date = new Date();
 
     console.log(allProgress);
 
@@ -92,6 +104,7 @@ export class ProgressComponent implements OnInit {
 
       case this.selectedHistoryOption === "Past month":
         retrieveDateUpTo.setMonth(retrieveDateUpTo.getMonth() - 1);
+
         break;
 
       case this.selectedHistoryOption === "Past three months":
@@ -108,8 +121,7 @@ export class ProgressComponent implements OnInit {
 
     }
 
-    console.log(retrieveDateUpTo);
-
+    // Read all the dates from Firebase into labelsArray and dataKGArray
     for (let currentDate in allProgress) {
 
       // Skip if current element is a prototype key
@@ -127,7 +139,88 @@ export class ProgressComponent implements OnInit {
       this.labelsArray.push(convertedDate);
       this.dataKGArray.push(currentWeight);
 
-      this.chart.update();
+
+    }
+
+    this.removeElementsOutOfDateRange(retrieveDateUpTo, this.labelsArray, this.dataKGArray);
+    // this.removeElementsOutOfDateRange(retrieveDateUpTo);
+
+    // Set the chart data values to the corresponding array
+    this.myChart.data.datasets[0].data = this.dataKGArray;
+    this.myChart.data.labels = this.labelsArray;
+
+    // Update chart
+    this.myChart.update();
+    // this.changeDetector.detectChanges();
+
+    console.log(this.labelsArray);
+    console.log(this.dataKGArray);
+
+    // console.log(this.myChart);
+
+  }
+
+  // removeElementsOutOfDateRange(earliestDate) {
+
+  //   // Loop through the labelDates array which contains the dates when the weights were recorded
+  //   for (let i = this.labelsArray.length-1; i >= 0; i--) {
+
+  //     // Get current label date in loop
+  //     const currentLabelDate = this.labelsArray[i];
+
+  //     console.log(`${i} - Earliest date: ${formatDate(earliestDate, 'yyyy-MM-dd', 'en_GB')} | Current label date: ${formatDate(currentLabelDate, 'yyyy-MM-dd', 'en_GB')}`);
+
+  //     // If the earliest date is greater than the current label date
+  //     if (formatDate(earliestDate, 'yyyy-MM-dd', 'en_GB') >= formatDate(currentLabelDate, 'yyyy-MM-dd', 'en_GB')) {
+
+  //       console.log(`${formatDate(currentLabelDate, 'yyyy-MM-dd', 'en_GB')} removed from array`);
+
+  //       // Remove the label date from array
+  //       this.labelsArray.splice(i, 1);
+  //       this.dataKGArray.splice(i, 1);
+
+  //     }
+
+  //   }
+
+  // }
+
+  removeElementsOutOfDateRange(earliestDate, labelDates, ...valueArrays) {
+
+    console.log('Begin removing unnecessary dates');
+
+    const labelDatesLength = labelDates.length;
+    console.log(`labelDates length: ${labelDatesLength}`);
+    console.log(labelDates);
+
+    // Loop through the labelDates array which contains the dates when the weights were recorded
+    for (let i = labelDates.length - 1; i >= 0; i--) {
+
+      // Get current label date in loop
+      const currentLabelDate = labelDates[i];
+
+      console.log(`Earliest date: ${formatDate(earliestDate, 'yyyy-MM-dd', 'en_GB')} | Current label date: ${formatDate(currentLabelDate, 'yyyy-MM-dd', 'en_GB')}`);
+
+      // If the earliest date is greater than the current label date
+      if (earliestDate >= currentLabelDate) {
+
+        console.log(`${formatDate(currentLabelDate, 'yyyy-MM-dd', 'en_GB')} removed from array`);
+
+        // Remove the label date from array
+        labelDates.splice(i, 1);
+
+        // Loop through the array of values (weightKG and weightLBs)
+        for (let j = 0; j < valueArrays.length; j++) {
+
+          // Select current values array
+          const currentValuesArr = valueArrays[j];
+
+          // Remove the corresponding value associated with date
+          currentValuesArr.splice(i, 1);
+
+        }
+
+      }
 
     }
 
@@ -135,13 +228,36 @@ export class ProgressComponent implements OnInit {
 
   addWeightToProgress() {
 
-    const date = this.addWeightForm.value.date;
-    const weight = this.addWeightForm.value.weightKG;
+    this.addWeightForm.statusChanges.subscribe(status => {
 
-    console.log(date + "\n" + weight);
+      if (status === 'VALID') {
 
-    this.authService.addWeightToUserProgress(this.accountService.getUserID(), date, weight);
-    this.retrieveProgressFromFirebase();
+        this.formError = false;
+        console.log('Valid');
+
+      } else {
+
+        console.log('Invalid');
+
+      }
+
+    });
+
+    if (this.addWeightForm.valid) {
+
+      const date = this.addWeightForm.value.date;
+      const weight = this.addWeightForm.value.weightKG;
+
+      console.log(date + "\n" + weight);
+
+      this.authService.addWeightToUserProgress(this.accountService.getUserID(), date, weight);
+      this.retrieveProgressFromFirebase();
+
+    } else {
+
+      this.formError = true;
+
+    }
 
   }
 
@@ -156,7 +272,49 @@ export class ProgressComponent implements OnInit {
 
   }
 
+  initialiseChart() {
+
+    let canvas: HTMLCanvasElement = <HTMLCanvasElement> document.getElementById('myChart');
+    let ctx = canvas.getContext('2d');
+
+    this.myChart = new Chart(ctx, {
+
+      type: 'line',
+      data: {
+        labels: this.labelsArray,
+        datasets: [{
+          label: 'WeightKG',
+          data: this.dataKGArray
+        }]
+      },
+      options: {
+        scales: {
+          xAxes: [{
+            type: 'time',
+            time: {
+              displayFormats: {
+                'millisecond': 'MMM DD',
+                'second': 'MMM DD',
+                'minute': 'MMM DD',
+                'hour': 'MMM DD',
+                'day': 'MMM DD',
+                'week': 'MMM DD',
+                'month': 'MMM DD',
+                'quarter': 'MMM DD',
+                'year': 'MMM DD',
+              }
+            }
+          }],
+        }
+      }
+
+    });
+
+  }
+
   ngOnInit(): void {
+
+    this.initialiseChart();
 
   }
 
