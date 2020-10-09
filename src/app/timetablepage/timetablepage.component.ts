@@ -145,6 +145,7 @@ export class TimetablepageComponent implements AfterViewInit {
     }
 
     this.owlElement.reInit();
+    console.log(this.owlElement);
     // this.owlElement.refresh();
 
     // this.itemsLoaded = true;

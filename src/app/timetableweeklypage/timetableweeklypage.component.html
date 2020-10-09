@@ -1,1 +1,96 @@
-<p>timetableweeklypage works!</p>
+<div class="container" style="background: #f3f5f9; padding-bottom: 100px;">
+
+  <div class="row">
+
+    <div class="col-6">
+
+      <button class="btn btn-primary" (click)="generate()">
+        Generate
+      </button>
+
+    </div>
+
+    <div class="col-6">
+
+      <button class="btn btn-default" (click)="clearAll()">
+        Clear
+      </button>
+
+    </div>
+
+  </div>
+
+  <ng-container *ngFor="let dayWithRecipes of allRecipes; let i = index">
+
+    <div class="row">
+
+      <div class="col-12 col-sm-12">
+        <h3>{{dayWithRecipes.day}}</h3>
+      </div>
+
+    </div>
+
+    <div class="mb-3"></div>
+
+    <owl-carousel [options]="mySlideOptions" [items]="myCarouselItems" [carouselClasses]="['owl-carousel', 'owl-theme']" #owlElement>
+      <div class="recipe" *ngFor="let recipe of mySlideItems[i]; let j = index">
+
+        <div [class]="recipe.recipeTypeHTML" (dblclick)="navigateToRecipe(recipe.recipeID)">
+          <div class="row">
+              <div class="col-12">
+                <div class="clickable" style='position: fixed; right: 20px' (click)="this.timetableService.removeRecipeByObject(dayWithRecipes, j)">
+                  <i class="material-icons" style="color: white">close</i>
+                </div>
+                <img src="./assets/img/{{recipe.recipeTypeHTML}}_main.png" alt="" class="inner_img">
+                <div class="inner_text">
+                  <h3>{{recipe.recipeType}}</h3>
+                  <h4>{{recipe.name}}</h4>
+                  <h4>{{recipe.calories}} kcal</h4>
+                </div>
+              </div>
+
+          </div>
+        </div>
+      </div>
+    </owl-carousel>
+
+    <div class="row">
+
+      <div class="col-3 col-sm-3">
+        <h6>Carbs</h6>
+        <div class="progress p1">
+          <div class="progress-bar " role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="10" [style.width]="progressBars[i].carbsPercentage + '%'"></div>
+        </div>
+        <p>{{progressBars[i].carbsRemaining}}g left</p>
+      </div>
+
+      <div class="col-3 col-sm-3">
+        <h6>Protein</h6>
+        <div class="progress p2">
+          <div class="progress-bar" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="10" [style.width]="progressBars[i].proteinPercentage + '%'"></div>
+        </div>
+        <p>{{progressBars[i].proteinRemaining}}g left</p>
+      </div>
+
+      <div class="col-3 col-sm-3">
+        <h6>Fat</h6>
+        <div class="progress p3">
+          <div class="progress-bar" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="10" [style.width]="progressBars[i].fatPercentage + '%'"></div>
+        </div>
+        <p>{{progressBars[i].fatRemaining}}g left</p>
+      </div>
+
+      <div class="col-3 col-sm-3">
+        <h6>Calories</h6>
+        <div class="progress p4">
+          <div class="progress-bar" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="10" [style.width]="progressBars[i].caloriesPercentage + '%'"></div>
+        </div>
+        <p>{{progressBars[i].caloriesRemaining}}g left</p>
+      </div>
+
+    </div>
+
+  </ng-container>
+
+
+</div>

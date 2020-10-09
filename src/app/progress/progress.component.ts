@@ -75,7 +75,6 @@ export class ProgressComponent implements OnInit {
 
       // this.addWeightForm.controls['date'].setValue(this.getTodayDate());
       this.retrieveProgressFromFirebase();
-      console.log(this.addWeightForm);
 
     });
 

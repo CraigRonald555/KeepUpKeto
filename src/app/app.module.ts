@@ -41,6 +41,7 @@ const appRoutes = [
   { path: '', component: MainComponent, children: [
     { path: 'home', component: HomepageComponent},
     { path: 'timetable', component: TimetablepageComponent},
+    { path: 'timetable/weekly', component: TimetableweeklypageComponent},
     { path: 'recipes', component: RecipeComponent},
     { path: 'instructions', component: InstructionsComponent },
     { path: 'progress', component: ProgressComponent}
