@@ -1,0 +1,70 @@
+<div class="container">
+
+  <ng-container *ngFor="let day of allRecipes; let i = index">
+
+    <div [ngClass]="{'day-selected' : day.checkBox, 'day' : !day.checkBox}">
+      <div class="name pull-left" style="padding-top: 7px">
+        <i class='material-icons'>arrow_drop_down</i> {{day.day}}
+      </div>
+
+      <div class="text-right">
+        <div class="form-check">
+          <label class="form-check-label">
+            <input class="form-check-input" type="checkbox" value="" [checked]="day.checkBox" (click)="switchDayCheckBox(i)">
+            <span class="form-check-sign">
+              <span class="check"></span>
+            </span>
+          </label>
+        </div>
+      </div>
+
+    </div>
+
+    <ng-container *ngFor="let recipe of day.recipes; let j = index">
+
+      <div [ngClass]="{'day-recipe-selected' : recipe.checkBox, 'day-recipe' : !recipe.checkBox}">
+        <div class="name pull-left" style="padding-top: 7px">
+          <i class='material-icons'>arrow_drop_down</i> {{ recipe.name }} Ingredients
+        </div>
+
+
+        <div class="text-right">
+          <div class="form-check" style="padding-right: 10px">
+            <label class="form-check-label">
+              <input class="form-check-input" type="checkbox" value="" [checked]="recipe.checkBox" (click)="switchRecipeCheckBox(i, j)">
+              <span class="form-check-sign">
+                <span class="check"></span>
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <ng-container *ngFor="let ingredient of recipe.displayIngredients; let k = index">
+
+        <div [ngClass]="{'day-recipe-ingredient-selected' : ingredient.checkBox, 'day-recipe-ingredient' : !ingredient.checkBox}">
+          <div class="pull-left" style="padding-top: 7px">
+            {{ingredient.name}}
+          </div>
+
+          <div class="text-right">
+            <div class="form-check" style="padding-right: 10px">
+              <label class="form-check-label">
+                <input class="form-check-input" type="checkbox" value="" [checked]="ingredient.checkBox" (click)="switchIngredientCheckBox(i, j, k)">
+                <span class="form-check-sign">
+                  <span class="check"></span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+
+      </ng-container>
+
+    </ng-container>
+
+  </ng-container>
+
+  <button class="btn btn-primary" (click)="addRecipeToWhisk()">Add Recipe</button>
+</div>

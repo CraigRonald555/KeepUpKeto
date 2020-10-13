@@ -1,0 +1,64 @@
+.day {
+
+  background-color: rgb(141, 141, 141);
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+  padding-right: 10px;
+  height: 40px;
+  color: white;
+
+}
+
+.day-selected {
+
+  background-color: purple;
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+  padding-right: 10px;
+  height: 40px;
+  color: white;
+
+}
+
+
+
+.name {
+
+  display: flex;
+  align-items: center;
+
+}
+
+.day-recipe {
+
+  background-color: rgb(141, 141, 141, 0.5);
+  color: white;
+  padding-left: 25px;
+  height: 40px;
+
+}
+
+.day-recipe-selected {
+
+  background-color: rgba(128, 0, 128, 0.50);
+  color: white;
+  padding-left: 25px;
+  height: 40px;
+
+}
+
+.day-recipe-ingredient {
+
+  background-color: rgb(141, 141, 141, 0.25);
+  height: 40px;
+  padding-left: 50px;
+
+}
+
+.day-recipe-ingredient-selected {
+
+  background-color: rgba(128, 0, 128, 0.25);
+  height: 40px;
+  padding-left: 50px;
+
+}

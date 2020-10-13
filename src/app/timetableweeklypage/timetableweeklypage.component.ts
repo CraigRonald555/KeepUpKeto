@@ -154,9 +154,9 @@ export class TimetableweeklypageComponent implements AfterViewInit {
 
   }
 
-  navigateToRecipe(recipeID) {
+  navigateToRecipe(recipeID, dayIndex) {
 
-    this.selectedDayIndex = this.timetableService.getDayIndexByName(this.timetableService.getTodayName());
+    this.selectedDayIndex = dayIndex;
 
     // Use ngZone run to remove the silly 'did you forget to run ngZone' error which would break owlCarousel and not actually navigate to recipe page
     this.ngZone.run(() => this.router.navigate(['recipes/'], { queryParams: { 'selectedDayIndex': this.selectedDayIndex, 'recipeID': recipeID }})).then();

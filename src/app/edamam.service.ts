@@ -48,12 +48,6 @@ export class EdamamService {
 
           ingredientLine = this.ingredientDivider.convertAll(servings, ingredientLine);
 
-          // ingredientLine = this.ingredientDivider.divideStringByServings(servings, ingredientLine);
-          // console.log(`After divideStringByServings: ${ingredientLine}`);
-
-          // ingredientLine = this.ingredientDivider.addDecimalsToFractions(ingredientLine);
-          // console.log(`After addDecimalsToFractions: ${ingredientLine}`);
-
           newIngredientsArray.push(ingredientLine);
 
         }
@@ -73,7 +67,7 @@ export class EdamamService {
 
         };
 
-        console.log(recipeToBePushed);
+        // console.log(recipeToBePushed);
         allRecipes.push(recipeToBePushed);
 
       }
@@ -108,23 +102,25 @@ export class EdamamService {
     let returnRecipe;
     let randomRecipeNo;
 
-    let recipeForDay: {
-      recipeID: string,
-      recipeType: string,
-      name: string,
-      image: string,
-      url: string,
-      uri: string,
-      calories: number,
-      carbs: number,
-      protein: number,
-      fat: number,
-      isKetoFriendly: boolean,
-      notKetoFriendlyReason: string
-  };
+    let recipeForDay;
+
+  //   let recipeForDay: {
+  //     recipeID: string,
+  //     recipeType: string,
+  //     name: string,
+  //     image: string,
+  //     url: string,
+  //     uri: string,
+  //     calories: number,
+  //     carbs: number,
+  //     protein: number,
+  //     fat: number,
+  //     ingredients:
+  // };
 
     console.log('Reached searchForRecipes');
 
+    //
     const from = 0;
     let to = from + 5;
 
@@ -143,11 +139,10 @@ export class EdamamService {
 
     await this.http.get(requestURL).toPromise().then(async result => {
 
-
-      console.log(result);
+      // Retrieve the array of recipes
       const recipes = await result['hits'];
 
-      //console.log(recipes);
+      // SHOULD BE ABLE TO REASSIGN 'FROM' VARIABLE TO RECIPES.LENGTH
 
       // Randomly select between the from and to values
       randomRecipeNo = Math.round((Math.random() + from) * (to-1));
@@ -157,7 +152,7 @@ export class EdamamService {
 
         // If there's less recipes than the actually random selected
         if (result['count'] <= to) {
-          console.log('Count less than 5');
+          console.log('Results returned less than 5');
           to = result['count'] - 1;
           randomRecipeNo = Math.round((Math.random() + from) * (to));
           console.log(`${randomRecipeNo} after change`);
@@ -168,7 +163,21 @@ export class EdamamService {
         //Use this to get the servings
         const servings = returnRecipe['yield'];
 
-        recipeForDay = { recipeID: returnRecipe.uri.substring(returnRecipe.uri.indexOf('_') + 1, returnRecipe.uri.length),
+        let newIngredientsArray = [];
+        let originalIngredientArray = returnRecipe['ingredientLines'];
+
+        for (let i = 0; i < originalIngredientArray.length; i++) {
+
+          let ingredientLine = originalIngredientArray[i];
+
+          ingredientLine = this.ingredientDivider.convertAll(servings, ingredientLine);
+
+          newIngredientsArray.push(ingredientLine);
+
+        }
+
+        recipeForDay = {
+          recipeID: returnRecipe.uri.substring(returnRecipe.uri.indexOf('_') + 1, returnRecipe.uri.length),
           recipeType: recipeDetails.recipeType,
           name: returnRecipe.label,
           url: returnRecipe.url,
@@ -177,10 +186,18 @@ export class EdamamService {
           protein: returnRecipe['totalNutrients'].PROCNT.quantity  / servings,
           fat: returnRecipe['totalNutrients'].FAT.quantity / servings,
           calories: returnRecipe.calories / servings,
-          isKetoFriendly: true,
-          notKetoFriendlyReason: '',
-          image: ''
+          image: returnRecipe.image,
+          ingredients: newIngredientsArray
         };
+
+        console.log(`New recipe added`);
+        console.log(`Name: ${returnRecipe.label}`);
+        console.log(`Image: ${returnRecipe.image}`);
+        console.log(`Calories: ${returnRecipe.calories / servings}`);
+        console.log(`Carbs: ${returnRecipe['totalNutrients'].CHOCDF.quantity / servings}`);
+        console.log(`Protein: ${returnRecipe['totalNutrients'].PROCNT.quantity / servings}`);
+        console.log(`Fat: ${returnRecipe['totalNutrients'].FAT.quantity / servings}`);
+
       }
     });
 

@@ -34,6 +34,7 @@ import { EdamamService } from './edamam.service';
 import { StorageService } from './storage.service';
 import { ProgressComponent } from './progress/progress.component';
 import { TimetableweeklypageComponent } from './timetableweeklypage/timetableweeklypage.component';
+import { ShoppinglistpageComponent } from './shoppinglistpage/shoppinglistpage.component';
 
 const appRoutes = [
 
@@ -44,7 +45,8 @@ const appRoutes = [
     { path: 'timetable/weekly', component: TimetableweeklypageComponent},
     { path: 'recipes', component: RecipeComponent},
     { path: 'instructions', component: InstructionsComponent },
-    { path: 'progress', component: ProgressComponent}
+    { path: 'progress', component: ProgressComponent},
+    { path: 'shopping-list', component: ShoppinglistpageComponent}
   ]},
   { path: 'landing', component: LandingpageComponent}
 
@@ -65,7 +67,8 @@ const appRoutes = [
     RecipeComponent,
     InstructionsComponent,
     ProgressComponent,
-    TimetableweeklypageComponent
+    TimetableweeklypageComponent,
+    ShoppinglistpageComponent
   ],
   imports: [
     BrowserModule,

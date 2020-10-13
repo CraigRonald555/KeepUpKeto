@@ -20,6 +20,7 @@
 
   </div>
 
+  <!-- 'i' represents the index of the day in allRecipes, 'j' represents the index of the recipe in the day's recipes array -->
   <ng-container *ngFor="let dayWithRecipes of allRecipes; let i = index">
 
     <div class="row">
@@ -35,7 +36,7 @@
     <owl-carousel [options]="mySlideOptions" [items]="myCarouselItems" [carouselClasses]="['owl-carousel', 'owl-theme']" #owlElement>
       <div class="recipe" *ngFor="let recipe of mySlideItems[i]; let j = index">
 
-        <div [class]="recipe.recipeTypeHTML" (dblclick)="navigateToRecipe(recipe.recipeID)">
+        <div [class]="recipe.recipeTypeHTML" (dblclick)="navigateToRecipe(recipe.recipeID, i)">
           <div class="row">
               <div class="col-12">
                 <div class="clickable" style='position: fixed; right: 20px' (click)="this.timetableService.removeRecipeByObject(dayWithRecipes, j)">
