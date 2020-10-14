@@ -13,6 +13,14 @@ export class ShoppinglistpageComponent implements AfterViewInit {
   dayCheckBox = false;
 
   allRecipes;
+  shoppingList: {
+    day: string,
+    recipes: {
+      ingredients: {
+        ingredientName: string
+      }[]
+    }[]
+  }[] = [];
 
   // allRecipes: {
   //   day: string,
@@ -113,31 +121,142 @@ export class ShoppinglistpageComponent implements AfterViewInit {
 
   switchDayCheckBox(dayIndex) {
 
+    // Retrieve current day and switch its checkBox
     const dayWithRecipes = this.allRecipes[dayIndex];
     dayWithRecipes.checkBox = !dayWithRecipes.checkBox;
 
-    // this.dayCheckBox = !this.dayCheckBox;
+    // If selected day's checkbox was set to true
+    if (dayWithRecipes.checkBox === true) {
+
+      // Retrieve all ingredients for the recipe
+      const allRecipesFromDay = dayWithRecipes.recipes;
+
+      // Loop through each recipe belonging to day and set checkboxes to true
+      for (let i = 0; i < allRecipesFromDay.length; i++) {
+
+        allRecipesFromDay[i].checkBox = true;
+
+        // Loop through each ingredient belonging to current recipe and set checkBoxes to true
+        for (let j = 0; j < allRecipesFromDay[i].displayIngredients.length; j++) {
+
+          allRecipesFromDay[i].displayIngredients[j].checkBox = true;
+
+        }
+
+      }
+
+      // If selected day's check was set to false
+    } else {
+
+      // Retrieve all ingredients for the recipe
+      const allRecipesFromDay = dayWithRecipes.recipes;
+
+      // Loop through each ingredient
+      for (let i = 0; i < allRecipesFromDay.length; i++) {
+
+        // Retrieve the checkbox for the current ingredient and set it to false
+        allRecipesFromDay[i].checkBox = false;
+
+        // Loop through each ingredient belonging to current recipe and set checkBoxes to false
+        for (let j = 0; j < allRecipesFromDay[i].displayIngredients.length; j++) {
+
+          allRecipesFromDay[i].displayIngredients[j].checkBox = false;
+
+        }
+
+      }
+
+    }
+
     this.changeDetector.detectChanges();
 
   }
 
   switchRecipeCheckBox(dayIndex, recipeIndex) {
 
+    // Retrieve current recipe and switch its checkBox
     const recipeFromDay = this.allRecipes[dayIndex].recipes[recipeIndex];
     recipeFromDay.checkBox = !recipeFromDay.checkBox;
+
+    // If the recipe's checkBox was set to true
+    if (recipeFromDay.checkBox === true) {
+
+      // Set the day which the recipe belong to, to true
+      this.allRecipes[dayIndex].checkBox = true;
+
+      // Retrieve all ingredients for the recipe
+      const allIngredientsFromRecipe = recipeFromDay.displayIngredients;
+
+      // Loop through each ingredient
+      for (let i = 0; i < allIngredientsFromRecipe.length; i++) {
+
+        // Retrieve the checkbox for the current ingredient and set it to true
+        allIngredientsFromRecipe[i].checkBox = true;
+
+      }
+
+      // If the recipes' checkBox was set to false
+    } else {
+
+      // Retrieve all ingredients for the recipe
+      const allIngredientsFromRecipe = recipeFromDay.displayIngredients;
+
+      // If at least one recipe hasn't been checked
+      if (!this.checkAtleastOneBoxTicked(this.allRecipes[dayIndex].recipes)) {
+
+        // Set the day which the recipe belong to, to false
+        this.allRecipes[dayIndex].checkBox = false;
+
+      }
+
+      // Loop through each ingredient
+      for (let i = 0; i < allIngredientsFromRecipe.length; i++) {
+
+        // Retrieve the checkbox for the current ingredient and set it to false
+        allIngredientsFromRecipe[i].checkBox = false;
+
+      }
+
+    }
+
     this.changeDetector.detectChanges();
 
   }
 
   switchIngredientCheckBox(dayIndex, recipeIndex, ingredientIndex) {
 
-    // let ingredientFromRecipeFromDay: {name: string, checkBox: boolean} = {
-    //   name: this.allRecipes[dayIndex].recipes[recipeIndex].ingredients[ingredientIndex].name,
-    //   checkBox: !this.allRecipes[dayIndex].recipes[recipeIndex].ingredients[ingredientIndex].checkBox
-    // };
+    const dayWithRecipes = this.allRecipes[dayIndex];
+    const recipeFromDay = this.allRecipes[dayIndex].recipes[recipeIndex];
 
     let ingredientFromRecipeFromDay = this.allRecipes[dayIndex].recipes[recipeIndex].displayIngredients[ingredientIndex];
     ingredientFromRecipeFromDay.checkBox = !ingredientFromRecipeFromDay.checkBox;
+
+    // If at least one box from the ingredients is ticked
+    if (this.checkAtleastOneBoxTicked(this.allRecipes[dayIndex].recipes[recipeIndex].displayIngredients)) {
+
+      // Set the day & recipe checkboxes to true
+      dayWithRecipes.checkBox = true;
+      recipeFromDay.checkBox = true;
+
+      // If no ingredient boxes are ticked
+    } else {
+
+      // Set recipe checkbox to false
+      recipeFromDay.checkBox = false;
+
+      // If there's at least one box from the day's recipes ticked
+      if (this.checkAtleastOneBoxTicked(dayWithRecipes.recipes)) {
+
+        // Set day checkbox to true
+        dayWithRecipes.checkBox = true;
+
+        // If there's no recipes ticked
+      } else {
+        // Set day checkbox to false
+        dayWithRecipes.checkBox = false;
+      }
+
+    }
 
     console.log(ingredientFromRecipeFromDay.checkBox);
 
@@ -145,11 +264,70 @@ export class ShoppinglistpageComponent implements AfterViewInit {
 
   }
 
-  addRecipeToWhisk() {
+  checkAtleastOneBoxTicked(array) {
+
+    console.log(array);
+
+    let oneBoxTicked = false;
+
+    for (let i = 0; i < array.length; i++) {
+
+      const currentElement = array[i].checkBox;
+
+      if (currentElement === true) {
+        oneBoxTicked = true;
+      }
+
+    }
+
+    console.log(`oneBoxTicked: ${oneBoxTicked}`);
+
+    return oneBoxTicked;
+
+  }
+
+  addIngredientsToWhisk() {
+
+    const shoppingListArray = [];
+
+    // Loop through days
+    for (let i = 0; i < this.allRecipes.length; i++) {
+
+      const currentRecipesFromDay = this.allRecipes[i].recipes;
+
+      // Loop through recipes from day
+      for (let j = 0; j < currentRecipesFromDay.length; j++) {
+
+        const currentIngredientsFromRecipes = currentRecipesFromDay[j].displayIngredients;
+
+        // Loop through displayIngredients from recipe
+        for (let k = 0; k < currentIngredientsFromRecipes.length; k++) {
+
+          const currentIngredient = currentIngredientsFromRecipes[k];
+
+          if (currentIngredient.checkBox === true) {
+
+            shoppingListArray.push(currentIngredient.name);
+
+          }
+
+        }
+
+      }
+
+    }
+
+    // const half = Math.ceil(shoppingListArray.length / 2);
+
+    // const firstHalfShoppingList = shoppingListArray.splice(0, half);
+    // const secondHalfShoppingList = shoppingListArray.splice(-half);
 
     whisk.queue.push(function() {
-      whisk.shoppingList.addProductsToList({
-        products: ["½ ounce dried morel mushrooms","5 tablespoons unsalted butter, divided","6 ounces chicken livers","1 medium onion, finely chopped","Kosher salt and freshly ground black pepper","6 cups low-sodium chicken broth","1½ cups cracked rye berries or regular rye berries, barley, or buckwheat","¼ cup finely chopped fresh tarragon"]
+      whisk.shoppingList.addProductsToBasket({
+        products: shoppingListArray,
+        onlineCheckout: {
+          defaultRetailer: 'GB:Tesco'
+        }
       });
     });
 

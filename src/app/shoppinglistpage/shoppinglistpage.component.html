@@ -1,4 +1,6 @@
-<div class="container">
+<button class="btn btn-rose" (click)="addIngredientsToWhisk()" style="position: fixed; right: 50px; bottom: 120px; z-index: 5000">Checkout</button>
+
+<div class="container" style="padding-bottom: 100px">
 
   <ng-container *ngFor="let day of allRecipes; let i = index">
 
@@ -66,5 +68,4 @@
 
   </ng-container>
 
-  <button class="btn btn-primary" (click)="addRecipeToWhisk()">Add Recipe</button>
 </div>
