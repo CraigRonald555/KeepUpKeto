@@ -317,17 +317,28 @@ export class ShoppinglistpageComponent implements AfterViewInit {
 
     }
 
-    // const half = Math.ceil(shoppingListArray.length / 2);
+    const half = Math.ceil(shoppingListArray.length / 2);
 
-    // const firstHalfShoppingList = shoppingListArray.splice(0, half);
-    // const secondHalfShoppingList = shoppingListArray.splice(-half);
+    const firstHalfShoppingList = shoppingListArray.splice(0, half);
+    const secondHalfShoppingList = shoppingListArray.splice(-half);
 
     whisk.queue.push(function() {
-      whisk.shoppingList.addProductsToBasket({
-        products: shoppingListArray,
-        onlineCheckout: {
-          defaultRetailer: 'GB:Tesco'
-        }
+      whisk.shoppingList.addProductsToList({
+        products: firstHalfShoppingList,
+      });
+    });
+
+    setTimeout(this.pushPartOfArrayIntoWhisk, 5000, secondHalfShoppingList);
+
+  }
+
+  pushPartOfArrayIntoWhisk(ingredientsArray) {
+
+    console.log('Timer test');
+
+    whisk.queue.push(function() {
+      whisk.shoppingList.addProductsToList({
+        products: ingredientsArray,
       });
     });
 
