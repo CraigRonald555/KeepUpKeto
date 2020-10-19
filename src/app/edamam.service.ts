@@ -205,4 +205,53 @@ export class EdamamService {
 
   }
 
+  async getRecipeByEdamamID(edamamRecipeID, recipeType) {
+
+    // Make call to edamam API to retrieve the url, uri, calories, carbs, protein etc.
+    const requestURL = 'https://api.edamam.com/search?app_id=4dad360d&app_key=5d6c41eeeb543f362a3b108c597193bd&r=http%3A%2F%2Fwww.edamam.com%2Fontologies%2Fedamam.owl%23recipe_' + edamamRecipeID;
+
+    console.log('Request to Edamam for recipe details sent');
+
+    let result = await this.http.get(requestURL).toPromise();
+
+    result = result[0];
+
+    const servings = result['yield'];
+
+    let newIngredientsArray = [];
+    let originalIngredientArray = result['ingredientLines'];
+
+    for (let i = 0; i < originalIngredientArray.length; i++) {
+
+      let ingredientLine = originalIngredientArray[i];
+
+      ingredientLine = this.ingredientDivider.convertAll(servings, ingredientLine);
+
+      newIngredientsArray.push(ingredientLine);
+
+    }
+
+    const recipeToAdd = {
+      recipeID: edamamRecipeID,
+      recipeType: recipeType,
+      name: result['label'],
+      image: result['image'],
+      url: result['url'],
+      uri: result['uri'],
+      calories: result['calories'] / servings,
+      carbs: result['totalNutrients'].CHOCDF.quantity / servings,
+      protein: result['totalNutrients'].PROCNT.quantity  / servings,
+      fat: result['totalNutrients'].FAT.quantity / servings,
+      ingredients: newIngredientsArray,
+      isKetoFriendly: true, // Recipe is not keto friendly
+      notKetoFriendlyReason: '' // Recipe is not keto friendly reason
+    };
+
+    console.log('Recipe retrieved from getRecipeByEdamamID(): ');
+    console.log(recipeToAdd);
+
+    return recipeToAdd;
+
+  }
+
 }

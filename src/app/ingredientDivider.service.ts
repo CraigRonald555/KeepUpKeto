@@ -32,19 +32,19 @@ export class IngredientDivider {
 
   convertAll(servings, stringWithIngredients) {
 
-    console.log(`Initial ingredient: ${stringWithIngredients}`);
-    console.log(`Servings: ${servings}`);
+    // console.log(`Initial ingredient: ${stringWithIngredients}`);
+    // console.log(`Servings: ${servings}`);
 
     stringWithIngredients = this.divideStringByServings(servings, stringWithIngredients);
-    console.log(`After dividing by servings: ${stringWithIngredients}`);
+    // console.log(`After dividing by servings: ${stringWithIngredients}`);
 
     stringWithIngredients = this.addDecimalsToFractions(stringWithIngredients);
-    console.log(`After adding decimals/ints to close fractions: ${stringWithIngredients}`);
+    // console.log(`After adding decimals/ints to close fractions: ${stringWithIngredients}`);
 
     stringWithIngredients = this.convertDecimalsToFraction(stringWithIngredients);
-    console.log(`After converting decimals to fraction: ${stringWithIngredients}`);
+    // console.log(`After converting decimals to fraction: ${stringWithIngredients}`);
 
-    console.log(" ");
+    // console.log(" ");
 
     return stringWithIngredients;
 
@@ -83,18 +83,16 @@ export class IngredientDivider {
 
       if (elementContainsDecimal) {
 
-        console.log(`${currentElement} is a decimal`);
+        // console.log(`${currentElement} is a decimal`);
 
         // Round to two decimal places
         currentElement = Math.round(currentElement * 100) / 100;
 
         // Only convert decimals less than one, otherwise we'll get improper fractions
         if (parseFloat(currentElement) < 1.00) {
-          console.log(`${currentElement} is less than one`);
+          // console.log(`${currentElement} is less than one`);
           decimalArray[i] = this.convertRatio(this.math.fraction(currentElement));
         }
-
-        // console.log(decimalArray[i]);
 
       }
 
@@ -127,8 +125,6 @@ export class IngredientDivider {
         const decimalAddFraction = this.convertRatio(this.math.add(this.math.fraction(decimal),this.math.fraction(fraction)));
         decimalProceedsOrPreceedsFractionArray[i] = decimalAddFraction;
 
-        // console.log(`Result of adding decimal to fraction: ${decimalAddFraction}`);
-
       }
 
     }
@@ -154,14 +150,10 @@ export class IngredientDivider {
 
             const numerator = currentElement.substring(0, currentElement.indexOf('/'));
             const denominator = currentElement.substring(currentElement.indexOf('/') + 1, currentElement.length);
-            // console.log(`Numerator: ${numerator}`);
-            // console.log(`Denominator: ${denominator}`);
 
             const fractionAsNumberDividedByServings = (numerator / denominator) / servings;
-            // console.log(`Fraction as number after dividing by two: ${fractionAsNumberDividedByServings}`);
 
             const fractionDividedByServings = this.convertRatio(this.math.fraction(fractionAsNumberDividedByServings));
-            // console.log(`Fraction after divided by servings: ${fractionDividedByServings}`);
 
             splitByFractionOrNumber[i] = fractionDividedByServings;
 

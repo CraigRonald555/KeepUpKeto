@@ -539,7 +539,7 @@ export class AuthService {
           });
 
           // Add recipe to storage as well
-          this.storageService.addRecipeToDay(dayName, recipe);
+          await this.storageService.addRecipeToDay(dayName, recipe.recipeID, recipe.recipeType);
 
           recipeExistsInStorage = true;
           recipeExistsInFirebase = true;
@@ -553,7 +553,7 @@ export class AuthService {
           // Check if recipe also exists in storage
           if (!this.storageService.checkRecipeIsInStorage(dayName, recipe)) {
 
-            this.storageService.addRecipeToDay(dayName, recipe);
+            await this.storageService.addRecipeToDay(dayName, recipe.recipeID, recipe.recipeType);
             recipeExistsInStorage = true;
 
           }
@@ -563,7 +563,7 @@ export class AuthService {
       } else {
 
         this.addDayToTimetable(uid, dayName);
-        this.storageService.addDayToStorage(dayName);
+        await this.storageService.addDayToStorage(dayName);
 
       }
 
