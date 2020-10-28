@@ -84,6 +84,8 @@ export class TimetablepageComponent implements AfterViewInit {
   // Add food modal
   @ViewChild('closeAddFoodModal') public closeAddFoodModal: ElementRef;
   nutrientsReturned = -1; // -1 = false, 0 = searching, 1 = returned
+  quantityDisplay;
+  measureTypeDisplay;
 
   // Search food modal
   @ViewChild('searchForFoodsForm') searchForFoodsForm;
@@ -253,9 +255,12 @@ export class TimetablepageComponent implements AfterViewInit {
 
       console.log(this.selectedFood.foodId);
       console.log(this.edamamService.getMeasureURL(this.selectedMeasureType));
-      console.log(measureForm.value.quantity);
+      console.log(measureForm);
 
       this.nutrientsReturned = 0;
+
+      this.quantityDisplay = measureForm.value.quantity;
+      this.measureTypeDisplay = this.selectedMeasureType;
 
       const returnNutrients = await this.edamamService.getFoodNutrients
         (this.selectedFood.foodId,
@@ -270,6 +275,8 @@ export class TimetablepageComponent implements AfterViewInit {
       this.nutrientsReturned = 1;
 
       console.log(returnNutrients);
+
+      this.changeDetector.detectChanges();
 
     }
 
