@@ -262,10 +262,10 @@ export class TimetablepageComponent implements AfterViewInit {
         this.edamamService.getMeasureURL(this.selectedMeasureType),
         measureForm.value.quantity);
 
-        this.selectedFood.calories = returnNutrients.calories;
-        this.selectedFood.carbs = returnNutrients.carbs;
-        this.selectedFood.protein = returnNutrients.protein;
-        this.selectedFood.fat = returnNutrients.fat;
+      this.selectedFood.calories = returnNutrients.calories;
+      this.selectedFood.carbs = returnNutrients.carbs;
+      this.selectedFood.protein = returnNutrients.protein;
+      this.selectedFood.fat = returnNutrients.fat;
 
       this.nutrientsReturned = 1;
 

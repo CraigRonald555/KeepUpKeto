@@ -91,7 +91,7 @@
 
     <div class="col-6 col-sm-6">
       <h3>{{this.timetableService.getTodayName()}}</h3>
-      <div class="clickable" data-toggle="modal" data-target="#exampleModal" (click)='selectedDayIndex = this.timetableService.getDayIndexByName(this.timetableService.getTodayName())'>
+      <div class="clickable" data-toggle="modal" data-target="#mainModal" (click)='selectedDayIndex = this.timetableService.getDayIndexByName(this.timetableService.getTodayName())'>
         Add recipe to today
       </div>
     </div>
@@ -131,11 +131,11 @@
 
 </div>
 
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="mainModal" tabindex="-1" role="dialog" aria-labelledby="mainModal" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <div class="modal-title" id="exampleModalLabel" *ngIf="addRecipeButtonsContentSwitch === 'buttons'">Select from the options below</div>
+        <div class="modal-title" id="mainModalLabel" *ngIf="addRecipeButtonsContentSwitch === 'buttons'">Select from the options below</div>
 
         <button type="button" class="btn btn-default btn-round" (click)="addRecipeButtonsContentSwitch = 'buttons'" *ngIf="addRecipeButtonsContentSwitch === 'content'">
           <i class="material-icons">keyboard_arrow_left</i>Back
@@ -395,7 +395,7 @@
 
                         <div class="mb-3"></div>
 
-                        <button rel="tooltip" class="btn btn-default btn-round pull-right" data-toggle="modal" data-target="#selectFood" (click)="selectFood(pageNumber-1, j)">
+                        <button rel="tooltip" class="btn btn-default btn-round pull-right" data-toggle="modal" data-target="#setNutrients" (click)="selectFood(pageNumber-1, j)">
                           Set quantity
                           <!-- <i class="material-icons">add</i> -->
                         </button>
@@ -451,12 +451,12 @@
   </div>
 </div>
 
-<div class="modal fade" id="selectFood" tabindex="-1" role="dialog" aria-labelledby="selectFood" aria-hidden="true">
+<div class="modal fade" id="setNutrients" tabindex="-1" role="dialog" aria-labelledby="setNutrients" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
 
-        <button type="button" class="btn btn-default btn-round" (click)="switchBackToMainModal()" data-toggle="modal" data-target="#exampleModal">
+        <button type="button" class="btn btn-default btn-round" (click)="switchBackToMainModal()" data-toggle="modal" data-target="#mainModal">
           <i class="material-icons">keyboard_arrow_left</i>Back
         </button>
 
@@ -518,8 +518,8 @@
 
                     <div class="input-group-prepend" style='padding-right:10px;'>
 
-                      <select name="measureType" id="measureType" class="browser-default custom-select mb-3" (click)="updateFoodNutrients(measureForm)" [(ngModel)]="selectedMeasureType">
-                        <option (click)="updateFoodNutrients(measureForm)" *ngFor="let type of selectedFood.measures" [ngValue]="type.label">{{type.label}}</option>
+                      <select name="measureType" id="measureType" class="browser-default custom-select mb-3" (change)="updateFoodNutrients(measureForm)" [(ngModel)]="selectedMeasureType">
+                        <option *ngFor="let type of selectedFood.measures" [ngValue]="type.label">{{type.label}}</option>
                       </select>
 
                     </div>
@@ -534,7 +534,7 @@
 
               <div class="mb-3"></div>
 
-              <button rel="tooltip" class="btn btn-success btn-round pull-right" data-toggle="modal" data-target="#selectFood" (click)="addFood()">
+              <button rel="tooltip" class="btn btn-success btn-round pull-right" data-toggle="modal" (click)="addFood()">
                 <i class="material-icons">add</i> Add to plan
               </button>
 
