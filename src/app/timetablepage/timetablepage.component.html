@@ -518,8 +518,8 @@
 
                     <div class="input-group-prepend" style='padding-right:10px;'>
 
-                      <select name="measureType" id="measureType" class="browser-default custom-select mb-3" [(ngModel)]="selectedMeasureType">
-                        <option *ngFor="let type of selectedFood.measures" [ngValue]="type.label">{{type.label}}</option>
+                      <select name="measureType" id="measureType" class="browser-default custom-select mb-3" (click)="updateFoodNutrients(measureForm)" [(ngModel)]="selectedMeasureType">
+                        <option (click)="updateFoodNutrients(measureForm)" *ngFor="let type of selectedFood.measures" [ngValue]="type.label">{{type.label}}</option>
                       </select>
 
                     </div>

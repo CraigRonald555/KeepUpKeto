@@ -12,6 +12,10 @@
 
 }
 
+.modal {
+  overflow-y:auto;
+}
+
 .btn-default:hover {
 
   background-color: #EA1E63;

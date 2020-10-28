@@ -248,25 +248,30 @@ export class TimetablepageComponent implements AfterViewInit {
 
   async updateFoodNutrients(measureForm: NgForm) {
 
-    console.log(this.selectedFood.foodId);
-    console.log(this.edamamService.getMeasureURL(this.selectedMeasureType));
-    console.log(measureForm.value.quantity);
+    // Make sure there's a value in the quantity textbox before searching for nutrients
+    if (measureForm.value.quantity !== null && measureForm.value.quantity > 0) {
 
-    this.nutrientsReturned = 0;
+      console.log(this.selectedFood.foodId);
+      console.log(this.edamamService.getMeasureURL(this.selectedMeasureType));
+      console.log(measureForm.value.quantity);
 
-    const returnNutrients = await this.edamamService.getFoodNutrients
-      (this.selectedFood.foodId,
-      this.edamamService.getMeasureURL(this.selectedMeasureType),
-      measureForm.value.quantity);
+      this.nutrientsReturned = 0;
 
-      this.selectedFood.calories = returnNutrients.calories;
-      this.selectedFood.carbs = returnNutrients.carbs;
-      this.selectedFood.protein = returnNutrients.protein;
-      this.selectedFood.fat = returnNutrients.fat;
+      const returnNutrients = await this.edamamService.getFoodNutrients
+        (this.selectedFood.foodId,
+        this.edamamService.getMeasureURL(this.selectedMeasureType),
+        measureForm.value.quantity);
 
-    this.nutrientsReturned = 1;
+        this.selectedFood.calories = returnNutrients.calories;
+        this.selectedFood.carbs = returnNutrients.carbs;
+        this.selectedFood.protein = returnNutrients.protein;
+        this.selectedFood.fat = returnNutrients.fat;
 
-    console.log(returnNutrients);
+      this.nutrientsReturned = 1;
+
+      console.log(returnNutrients);
+
+    }
 
   }
 
