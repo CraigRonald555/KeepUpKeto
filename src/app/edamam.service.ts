@@ -9,6 +9,202 @@ export class EdamamService {
 
   constructor(private http: HttpClient, private ingredientDivider: IngredientDivider) { }
 
+  getMeasureURL(measureType) {
+
+    let measureURL = '';
+
+    switch (true) {
+
+      case measureType === 'Ounce':
+        measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_ounce';
+        break;
+      case measureType === 'Gram':
+        measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_gram';
+        break;
+      case measureType === 'Pound':
+        measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_pound';
+        break;
+      case measureType === 'Kilogram':
+        measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_kilogram';
+        break;
+      case measureType === 'Pinch':
+        measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_pinch';
+        break;
+      case measureType === 'Liter':
+        measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_liter';
+        break;
+      case measureType === 'Fluid ounce':
+        measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_fluid_ounce';
+        break;
+      case measureType === 'Gallon':
+        measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_gallon';
+        break;
+      case measureType === 'Pint':
+        measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_pint';
+        break;
+      case measureType === 'Quart':
+        measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_quart';
+        break;
+      case measureType === 'Milliliter':
+        measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_milliliter';
+        break;
+      case measureType === 'Drop':
+        measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_drop';
+        break;
+      case measureType === 'Cup':
+        measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_cup';
+        break;
+      case measureType === 'Tablespoon':
+        measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_tablespoon';
+        break;
+      case measureType === 'Teaspoon':
+        measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_teaspoon';
+        break;
+
+    }
+
+    return measureURL;
+
+  }
+
+  async getFoodNutrients(foodId, measureURL, quantity) {
+
+    let returnNutrients = {
+      calories: 0,
+      carbs: 0,
+      protein: 0,
+      fat: 0
+    };
+
+    const postIngredients = {
+
+      "ingredients": [
+        {
+          "quantity": quantity,
+          "measureURI": measureURL,
+          "foodId": foodId
+        }
+      ]
+    };
+
+    const postURL = `https://api.edamam.com/api/food-database/v2/nutrients?app_id=196941c8&app_key=1cd2c180f1873ed2d3388d3df478d174`;
+
+    try {
+
+      await this.http.post(postURL, postIngredients).toPromise().then(async result => {
+
+        // Check if the ENERC_KCAL exists in totalNutrients
+        if (result['totalNutrients'].hasOwnProperty('ENERC_KCAL')) {
+
+          returnNutrients.calories = Math.round(result['totalNutrients']['ENERC_KCAL']['quantity'] * 10) / 10;
+
+        } else { returnNutrients.calories = 0; }
+
+        // Check if the CHOCDF exists in totalNutrients
+        if (result['totalNutrients'].hasOwnProperty('CHOCDF')) {
+
+          returnNutrients.carbs = Math.round(result['totalNutrients']['CHOCDF']['quantity'] * 10) / 10;
+
+        } else { returnNutrients.carbs = 0; }
+
+        // Check if the PROCNT exists in totalNutrients
+        if (result['totalNutrients'].hasOwnProperty('PROCNT')) {
+
+          returnNutrients.protein = Math.round(result['totalNutrients']['PROCNT']['quantity'] * 10) / 10;
+
+        } else { returnNutrients.protein = 0; }
+
+        // Check if the FAT exists in totalNutrients
+        if (result['totalNutrients'].hasOwnProperty('FAT')) {
+
+          returnNutrients.fat = Math.round(result['totalNutrients']['FAT']['quantity'] * 10) / 10;
+
+        } else { returnNutrients.fat = 0; }
+
+        console.log(result);
+
+      });
+
+    } catch (error) {
+
+      console.log(error);
+
+    }
+
+    return returnNutrients;
+
+  }
+
+  async searchForFoods(food) {
+
+    const allFoods = [];
+    const returnFoods = [];
+    let foodToBePushedToReturnFoods;
+
+    const requestURL = `https://api.edamam.com/api/food-database/v2/parser?ingr=${food}&app_id=196941c8&app_key=1cd2c180f1873ed2d3388d3df478d174`;
+
+    await this.http.get(requestURL).toPromise().then(async result => {
+
+      console.log(result);
+
+      const foods = result['hints'];
+
+      for (let i = 0; i < foods.length; i++) {
+
+        const currentFoodDetails = foods[i]['food'];
+        const currentMeasures = foods[i]['measures'];
+
+        // console.log(currentFoodDetails);
+
+        // const nutrients100g = await this.getFoodNutrients(currentFoodDetails['foodId'], "http://www.edamam.com/ontologies/edamam.owl#Measure_gram", 100);
+
+        foodToBePushedToReturnFoods = {
+
+          foodId: currentFoodDetails['foodId'],
+          name: currentFoodDetails['label'],
+          image: currentFoodDetails['image'],
+          // calories: nutrients100g.calories,
+          // carbs: nutrients100g.carbs,
+          // fat: nutrients100g.fat,
+          // protein: nutrients100g.protein,
+          calories: Math.round(currentFoodDetails['nutrients']['ENERC_KCAL'] * 10) / 10,
+          carbs: Math.round(currentFoodDetails['nutrients']['CHOCDF'] * 10) / 10,
+          fat: Math.round(currentFoodDetails['nutrients']['FAT'] * 10) / 10,
+          protein: Math.round(currentFoodDetails['nutrients']['PROCNT'] * 10) / 10,
+          measures: currentMeasures
+
+        };
+
+        allFoods.push(foodToBePushedToReturnFoods);
+
+      }
+
+      console.log(foodToBePushedToReturnFoods);
+
+    });
+
+    // More than 10 results so we need to split the array into a datatype more suitable for pagination (double array)
+    if (allFoods.length > 10 ) {
+
+      const requiredPages = Math.floor(allFoods.length / 10);
+
+      for (let i = 0, j = 0; i < requiredPages; i++) {
+
+        returnFoods[i] = allFoods.slice(j, j + 9);
+        j = j + 10;
+
+      }
+
+    } else {
+
+      returnFoods[0] = allFoods;
+
+    }
+
+    return returnFoods;
+
+  }
+
   async searchForRecipes(recipeDetails, ingredient, maxResults) {
 
     const allRecipes = [];

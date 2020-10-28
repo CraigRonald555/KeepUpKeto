@@ -4,11 +4,13 @@
 
     <div class="col-6 col-sm-6" style="padding-left: 30px">
 
-      <h4>Your Meal Plan</h4>
+      <h4>My Meal Plan</h4>
 
       <div class="row">
 
-        <div class="col-md-12" style='border-left: 2px solid #bac9ff'>
+        <div class="profilepic" style="height: 150px"></div>
+
+        <!-- <div class="col-md-12" style='border-left: 2px solid #bac9ff'>
           <h6>Eaten</h6>
           <p><img src='assets/img/eat.png' /> 300 kcal</p>
         </div>
@@ -22,7 +24,7 @@
         <div class="col-md-12" style='border-left: 2px solid #ffb9ce'>
           <h6>Burned</h6>
           <p><img src='assets/img/burn.png' /> 200 kcal</p>
-        </div>
+        </div> -->
 
       </div>
 
@@ -139,7 +141,7 @@
           <i class="material-icons">keyboard_arrow_left</i>Back
         </button>
 
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="addRecipeButtonsContentSwitch = 'buttons'; showHelp = false">
+        <button #closeMainModal type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="addRecipeButtonsContentSwitch = 'buttons'; showHelp = false">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -149,14 +151,14 @@
 
           <button (click)='retrieveRemainingNutrients()' type="button" class='btn btn-default addFoodBlock' (click)="addRecipeButtonsContentSwitch = 'content'; addRecipeOption = 0; showHelp = false">Search for Recipes</button>
           <button type="button" class='btn btn-default addFoodBlock' (click)="addRecipeButtonsContentSwitch = 'content'; addRecipeOption = 1; showHelp = false">Search for Specific Food</button>
-          <button type="button" class='btn btn-default addFoodBlock' (click)="addRecipeButtonsContentSwitch = 'content'; addRecipeOption = 2; showHelp = false">Add a Custom Recipe</button>
+          <!-- <button type="button" class='btn btn-default addFoodBlock' (click)="addRecipeButtonsContentSwitch = 'content'; addRecipeOption = 2; showHelp = false">Add a Custom Recipe</button> -->
           <button type="button" class='btn btn-default addFoodBlock' (click)="addRecipeButtonsContentSwitch = 'content'; addRecipeOption = 3; showHelp = false">Add from my Favourites</button>
           <br/>
           <p class='clickableText' (click)='showHelp = !showHelp'>Not sure which option to click?</p>
           <div class='help' *ngIf='showHelp'>
             <p><b>Search for Recipes</b> - Find recipes for your recipe plan, search for recipes from our database based on ingredients, time to cook, and more.</p>
             <p><b>Search for Specific Food</b> - Find specific, more individual foods which aren't included in recipes, for example, add those tasty dark chocolate treats which don't appear in the recipes</p>
-            <p><b>Add a Custom Recipe</b> - Have your own recipe you'd like to add to your recipe plan? This option will allow you to add it</p>
+            <!-- <p><b>Add a Custom Recipe</b> - Have your own recipe you'd like to add to your recipe plan? This option will allow you to add it</p> -->
             <p><b>Add from my Favourites</b> - Already have recipes saved in your favourite list? Retrieve them here and add them to your recipe plan</p>
           </div>
 
@@ -249,13 +251,13 @@
 
             </form>
 
-            <mat-progress-spinner class="text-center" mode="indeterminate" *ngIf="resultsReturned === 0"></mat-progress-spinner>
+            <mat-progress-spinner class="text-center" mode="indeterminate" *ngIf="recipeResultsReturned === 0"></mat-progress-spinner>
 
-            <div id="results" style="margin-top: 75px" *ngIf="resultsReturned === 1">
+            <div id="results" style="margin-top: 75px" *ngIf="recipeResultsReturned === 1">
               <hr>
               <h4>Results</h4>
 
-              <div class="card" *ngFor="let result of searchResults[pageNumber-1]; let j = index;">
+              <div class="card" *ngFor="let result of recipeSearchResults[pageNumber-1]; let j = index;">
 
                 <div class="card-body">
                   <h6 class="card-title">
@@ -327,21 +329,219 @@
           </ng-container>
 
           <ng-container *ngIf="addRecipeOption === 1">
-            Search for food...
+
+            <form #searchForFoodsForm='ngForm' ngNativeValidate>
+
+              <div class="row">
+
+                <div class="col-12">
+
+                  <div class="form-group">
+
+                    <div class="input-group">
+
+                      <div class="input-group-prepend" style='padding-right:10px;'>
+
+                        <select name="recipeType" id="recipeType" class="browser-default custom-select mb-3" [(ngModel)]="selectedRecipeType">
+                          <option *ngFor="let type of recipeTypes" [ngValue]="type">{{type}}</option>
+                        </select>
+
+                      </div>
+
+                      <input type="text" name="food" id="food" placeholder="Food" class="form-control" ngModel #food="ngModel" required>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+              <button class="btn btn-primary pull-right" (click)="searchForFoods()">Search</button>
+
+            </form>
+
+            <mat-progress-spinner class="text-center" mode="indeterminate" *ngIf="foodResultsReturned === 0"></mat-progress-spinner>
+
+            <div id="resultsFood" style="margin-top: 75px" *ngIf="foodResultsReturned === 1">
+
+              <hr>
+              <h4>Results</h4>
+
+              <div class="card" *ngFor="let result of foodSearchResults[foodPageNumber-1]; let j = index;">
+
+                <div class="card-body">
+                  <h6 class="card-title">
+                    {{result.name}}
+                  </h6>
+                </div>
+
+                <div class="card-footer">
+
+                  <div class="row">
+
+                    <div class="col-3">
+
+                      <img src="{{result.image}}" height=100 width=100 />
+
+                    </div>
+
+                    <div class="col-9">
+
+                      <div id="addFood" style="padding-left: 10px">
+
+                        <p>Calories: {{ result.calories }} | Carbs: {{ result.carbs }}g | Fat: {{ result.fat }}g | Protein: {{ result.protein }}g</p>
+
+                        <div class="mb-3"></div>
+
+                        <button rel="tooltip" class="btn btn-default btn-round pull-right" data-toggle="modal" data-target="#selectFood" (click)="selectFood(pageNumber-1, j)">
+                          Set quantity
+                          <!-- <i class="material-icons">add</i> -->
+                        </button>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </ng-container>
-          <ng-container *ngIf="addRecipeOption === 2">
-            Add a custom recipe...
-          </ng-container>
+
+          <!-- <ng-container *ngIf="addRecipeOption === 2">
+
+            <form #addCustomRecipeForm='ngForm' ngNativeValidate>
+
+              <div class="row">
+
+                <div class="col-12">
+
+                  <div class="form-group">
+                    <label for="name">Recipe name</label>
+                    <div class="input-group">
+                      <input type="text" class="form-control" required>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="name">Ingredients (separate with comma)</label>
+                    <div class="input-group">
+                      <input type="text" class="form-control" required>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </form>
+
+          </ng-container> -->
+
+
           <ng-container *ngIf="addRecipeOption === 3">
             Add from favourite recipes
           </ng-container>
 
         </ng-container>
       </div>
-      <!-- <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div> -->
+
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="selectFood" tabindex="-1" role="dialog" aria-labelledby="selectFood" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <button type="button" class="btn btn-default btn-round" (click)="switchBackToMainModal()" data-toggle="modal" data-target="#exampleModal">
+          <i class="material-icons">keyboard_arrow_left</i>Back
+        </button>
+
+        <button #closeAddFoodModal type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        {{ selectedFood.name }}
+
+      </div>
+      <div class="modal-footer">
+        <div class="row">
+
+          <div class="col-5">
+
+            <img src="{{selectedFood.image}}" height=175 width=175 />
+
+          </div>
+
+          <div class="col-7">
+
+            <div id="addFood" style="padding-left: 10px">
+
+              <div id="beforeNutrientsFound" *ngIf="nutrientsReturned === -1">
+
+                <h4>Per 100 Grams</h4>
+
+                <p>
+                  Calories: {{ selectedFood.calories }} <br/>
+                  Carbs: {{ selectedFood.carbs }}g <br/>
+                  Fat: {{ selectedFood.fat }}g <br/>
+                  Protein: {{ selectedFood.protein }}g
+                </p>
+
+              </div>
+
+              <mat-progress-spinner class="text-center" mode="indeterminate" *ngIf="nutrientsReturned === 0"></mat-progress-spinner>
+
+              <div id="afterNutrientsFound" *ngIf="nutrientsReturned === 1">
+
+                <h4>Per {{ measureForm.value.quantity }} {{ this.selectedMeasureType }}s</h4>
+
+                <p>
+                  Calories: {{ selectedFood.calories }} <br/>
+                  Carbs: {{ selectedFood.carbs }}g <br/>
+                  Fat: {{ selectedFood.fat }}g <br/>
+                  Protein: {{ selectedFood.protein }}g
+                </p>
+
+              </div>
+
+              <form #measureForm='ngForm'>
+
+                <div class="form-group">
+
+                  <div class="input-group">
+
+                    <div class="input-group-prepend" style='padding-right:10px;'>
+
+                      <select name="measureType" id="measureType" class="browser-default custom-select mb-3" [(ngModel)]="selectedMeasureType">
+                        <option *ngFor="let type of selectedFood.measures" [ngValue]="type.label">{{type.label}}</option>
+                      </select>
+
+                    </div>
+
+                    <input type="number" name="quantity" placeholder="Quantity" class="form-control" ngModel #quantity="ngModel" required (blur)="updateFoodNutrients(measureForm)">
+
+                  </div>
+
+                </div>
+
+              </form>
+
+              <div class="mb-3"></div>
+
+              <button rel="tooltip" class="btn btn-success btn-round pull-right" data-toggle="modal" data-target="#selectFood" (click)="addFood()">
+                <i class="material-icons">add</i> Add to plan
+              </button>
+
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

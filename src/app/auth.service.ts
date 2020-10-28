@@ -324,7 +324,7 @@ export class AuthService {
 
         show: true,
         noOfRecipes: 0,
-        recipes: []
+        edamamRecipes: []
 
       }).catch(error => {
 
@@ -338,11 +338,11 @@ export class AuthService {
 
   async checkDayMatchesBetweenStorageAndFirebase(uid, dayName) {
 
-    // Store the recipes from Storage for the given dayName
-    const recipesInStorage = this.storageService.getDayFromStorage(dayName).recipes;
+    // Retrieve the recipes from Storage for the given dayName
+    const recipesInStorage = this.storageService.getDayFromStorage(dayName).edamamRecipes;
 
-    // Store the recipes from Firebase for the given dayName
-    const recipesInFirebase = await this.readDataFromFirebase(`timetables/${uid}/${dayName}/recipes`);
+    // Retrieve the recipes from Firebase for the given dayName
+    const recipesInFirebase = await this.readDataFromFirebase(`timetables/${uid}/${dayName}/edamamRecipes`);
 
     // Before we can check the length of recipesInFirebase, we should check it's not equal to null otherwise we'll get an error
     if (recipesInFirebase !== null) {
@@ -467,11 +467,11 @@ export class AuthService {
         console.log('User has the day which the recipe is intended for in Firebase');
 
         // Check recipe intended to be removed exists in the day
-        if (await this.checkReferenceExists(`timetables/${uid}/${dayName}/recipes/${recipe.recipeID}`) === true) {
+        if (await this.checkReferenceExists(`timetables/${uid}/${dayName}/edamamRecipes/${recipe.recipeID}`) === true) {
 
           console.log('Recipe to be removed exists');
 
-          await this.fbDB.database.ref(`timetables/${uid}/${dayName}/recipes/${recipe.recipeID}`).remove().catch(error => {
+          await this.fbDB.database.ref(`timetables/${uid}/${dayName}/edamamRecipes/${recipe.recipeID}`).remove().catch(error => {
 
             console.log(error);
 
@@ -521,12 +521,12 @@ export class AuthService {
         console.log('User has the day which the recipe is intended for in Firebase');
 
         // Check doesn't recipe doesn't exists in the day the recipe is intended for
-        if (await this.checkReferenceExists(`timetables/${uid}/${dayName}/recipes/${recipe.recipeID}`) === false) {
+        if (await this.checkReferenceExists(`timetables/${uid}/${dayName}/edamamRecipes/${recipe.recipeID}`) === false) {
 
           console.log('Recipe doesnt exist in timetable');
 
           // add recipe to firebase
-          await this.fbDB.database.ref(`timetables/${uid}/${dayName}/recipes/${recipe.recipeID}`).set({
+          await this.fbDB.database.ref(`timetables/${uid}/${dayName}/edamamRecipes/${recipe.recipeID}`).set({
 
             recipeType: recipe.recipeType,
             name: recipe.name,
@@ -591,12 +591,12 @@ export class AuthService {
      */
 
     // Check if recipeID exists in Firebase recipes
-    await this.fbDB.database.ref('recipes/' + recipeID).once('value').then(async snapshot => {
+    await this.fbDB.database.ref('edamamRecipes/' + recipeID).once('value').then(async snapshot => {
 
       // If it doesn't exist then write the recipe into recipes
       if (!snapshot.exists()) {
 
-        await this.fbDB.database.ref('recipes/' + recipeID).set({
+        await this.fbDB.database.ref('edamamRecipes/' + recipeID).set({
           isEdamam: true,
           title: title,
           imageURL: imageURL
@@ -626,11 +626,11 @@ export class AuthService {
 
       if (await this.checkReferenceExists(`timetables/${uid}/${currentDay}`)) {
 
-        const recipesInFirebase = await this.readDataFromFirebase(`timetables/${uid}/${currentDay}/recipes`);
+        const recipesInFirebase = await this.readDataFromFirebase(`timetables/${uid}/${currentDay}/edamamRecipes`);
 
         for (const recipeID in recipesInFirebase) {
 
-          this.fbDB.database.ref(`timetables/${uid}/${currentDay}/recipes/${recipeID}`).remove();
+          this.fbDB.database.ref(`timetables/${uid}/${currentDay}/edamamRecipes/${recipeID}`).remove();
 
         }
       }
@@ -651,12 +651,12 @@ export class AuthService {
       this.storageService.addDayToStorage(dayName);
 
       // Need the show and recipes array from Firebase, first check recipes exist
-      if (await this.checkReferenceExists(`timetables/${uid}/${dayName}/recipes`)) {
+      if (await this.checkReferenceExists(`timetables/${uid}/${dayName}/edamamRecipes`)) {
 
         console.log(`${dayName}'s recipes exist in Firebase`);
 
         // Retrieve list of Firebase recipes for this currentDay
-        const recipesInFirebase = await this.readDataFromFirebase(`timetables/${uid}/${dayName}/recipes`);
+        const recipesInFirebase = await this.readDataFromFirebase(`timetables/${uid}/${dayName}/edamamRecipes`);
 
         await this.storageService.addRecipesFromFirebase(dayName, recipesInFirebase);
 

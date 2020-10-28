@@ -35,7 +35,7 @@ export class RecipeComponent {
 
       // Retrieve recipe details
 
-      const selectedDayWithRecipes = this.timetableService.getDayByIndex(+this.route.snapshot.queryParams.selectedDayIndex).recipes;
+      const selectedDayWithRecipes = this.timetableService.getDayByIndex(+this.route.snapshot.queryParams.selectedDayIndex).edamamRecipes;
       console.log(selectedDayWithRecipes);
 
       this.recipeDetails = this.findRecipeInRecipesArray(selectedDayWithRecipes, this.route.snapshot.queryParams['recipeID']);
@@ -55,7 +55,7 @@ export class RecipeComponent {
       this.route.queryParams.subscribe((params: Params) => {
 
         // Convert selectedDayIndex back to integer using '+' before the variable
-        const selectedDayWithRecipes = this.timetableService.getDayByIndex(+params['selectedDayIndex']).recipes;
+        const selectedDayWithRecipes = this.timetableService.getDayByIndex(+params['selectedDayIndex']).edamamRecipes;
 
         console.log(selectedDayWithRecipes);
 

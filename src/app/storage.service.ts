@@ -111,7 +111,7 @@ export class StorageService {
       const dayWithRecipes = this.getDayFromStorage(dayName);
 
       // A fancy way of checking if the passed recipe exists in the dayWithRecipes recipes array.
-      recipeExists = dayWithRecipes.recipes.filter(recipe => recipe.recipeID === recipeID).length > 0 ? true : false;
+      recipeExists = dayWithRecipes.edamamRecipes.filter(recipe => recipe.recipeID === recipeID).length > 0 ? true : false;
 
     }
 
@@ -131,7 +131,7 @@ export class StorageService {
         day: dayName,
         show: true,
         isUpToDate: false,
-        recipes: []
+        edamamRecipes: []
       };
 
       // Push day name as the key and the dayWithRecipes as the value
@@ -157,14 +157,14 @@ export class StorageService {
       const emptyRecipes = [];
 
       const dayInStorage = this.getDayFromStorage(dayName);
-      const oldRecipes = dayInStorage.recipes;
+      const oldRecipes = dayInStorage.edamamRecipes;
 
       // If recipes exists in dayInStorage
       if (!(oldRecipes === undefined || oldRecipes === null)) {
 
         console.log(`There are currently recipes in storage for ${dayName}`);
 
-        dayInStorage.recipes = emptyRecipes;
+        dayInStorage.edamamRecipes = emptyRecipes;
         window.localStorage.setItem(dayName, JSON.stringify(dayInStorage));
 
       }
@@ -184,7 +184,7 @@ export class StorageService {
       const dayInStorage = this.getDayFromStorage(dayName);
 
       // Remove recipe from a day
-      dayInStorage.recipes = dayInStorage.recipes.filter(recipe => recipe.recipeID !== recipeID);
+      dayInStorage.edamamRecipes = dayInStorage.edamamRecipes.filter(recipe => recipe.recipeID !== recipeID);
       window.localStorage.setItem(dayName, JSON.stringify(dayInStorage));
 
     }
@@ -498,7 +498,7 @@ export class StorageService {
 
           // Get the recipe's day object from storage & add the recipe to the recipes' array
           const dayWithRecipes = JSON.parse(window.localStorage.getItem(dayName));
-          dayWithRecipes.recipes.push(recipeToAdd);
+          dayWithRecipes.edamamRecipes.push(recipeToAdd);
           window.localStorage.setItem(dayName, JSON.stringify(dayWithRecipes));
 
         } catch (error) {
@@ -527,7 +527,7 @@ export class StorageService {
 
         // Get the recipe's day object from storage & add the recipe to the recipes' array
         const dayWithRecipes = JSON.parse(window.localStorage.getItem(dayName));
-        dayWithRecipes.recipes.push(recipeToAdd);
+        dayWithRecipes.edamamRecipes.push(recipeToAdd);
         window.localStorage.setItem(dayName, JSON.stringify(dayWithRecipes));
 
       } catch (error) {

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ElementRef, ViewChild, Renderer2, Inject, AfterViewInit, NgZone } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ElementRef, ViewChild, Renderer2, Inject, AfterViewInit, NgZone, QueryList } from '@angular/core';
 import { TimetableService } from '../timetable.service';
 import { EdamamService } from '../edamam.service';
 import { NgForm } from '@angular/forms';
@@ -57,7 +57,7 @@ export class TimetablepageComponent implements AfterViewInit {
     fatRemaining: number,
     totalCalories: number,
     caloriesRemaining: number,
-    recipes: {
+    edamamRecipes: {
       recipeID: string,
       recipeType: string,
       name: string,
@@ -81,15 +81,29 @@ export class TimetablepageComponent implements AfterViewInit {
   useRecommended = true;
   remainingNutrients;
 
+  // Add food modal
+  @ViewChild('closeAddFoodModal') public closeAddFoodModal: ElementRef;
+  nutrientsReturned = -1; // -1 = false, 0 = searching, 1 = returned
+
+  // Search food modal
+  @ViewChild('searchForFoodsForm') searchForFoodsForm;
+  foodResultsReturned = -1; // -1 = false, 0 = searching, 1 = returned
+  foodPageNumber = 1;
+  foodSearchResults = [];
+  selectedMeasureType;
+  selectedFood = {foodId: '', name: '', image: '', calories: 0, carbs: 0, protein: 0, fat: 0, measures: []};
+  @ViewChild('closeMainModal') public closeMainModal: ElementRef;
+
+  // Search recipe modal
   @ViewChild('searchForRecipesForm') searchForRecipesForm;
   searchFormError = false;
   recipeTypes = ['Select your recipe', 'Breakfast', 'Lunch', 'Dinner', 'Snack'];
   selectedRecipeType;
-  searchResults = [];
+  recipeSearchResults = [];
   pageNumber = 1;
   maxResults = 50;
   maxPage = Math.floor(this.maxResults / 10);
-  resultsReturned = -1; // -1 = false, 0 = searching, 1 = returned
+  recipeResultsReturned = -1; // -1 = false, 0 = searching, 1 = returned
 
   progressBars = {
     carbsPercentage: 0,
@@ -139,6 +153,13 @@ export class TimetablepageComponent implements AfterViewInit {
 
       const currentRecipe = recipes[i];
       currentRecipe.recipeTypeHTML = currentRecipe.recipeType.toLowerCase();
+
+      // Remove any numbers (mainly for meal plans which include 'Snack 1' & 'Snack 2') as this messes up the carousel css class which uses
+      // this variable to grab the snack image
+      currentRecipe.recipeTypeHTML = currentRecipe.recipeTypeHTML.replace(/[0-9]/g, '');
+      currentRecipe.recipeTypeHTML = currentRecipe.recipeTypeHTML.trim();
+
+      console.log(`recipeType = ${currentRecipe.recipeType.toLowerCase()} | recipeTypeHTML: ${currentRecipe.recipeTypeHTML}`);
       currentRecipe.isRecipe = true;
       this.mySlideItems.push(currentRecipe);
 
@@ -220,6 +241,64 @@ export class TimetablepageComponent implements AfterViewInit {
 
   }
 
+  addFood() {
+
+
+  }
+
+  async updateFoodNutrients(measureForm: NgForm) {
+
+    console.log(this.selectedFood.foodId);
+    console.log(this.edamamService.getMeasureURL(this.selectedMeasureType));
+    console.log(measureForm.value.quantity);
+
+    this.nutrientsReturned = 0;
+
+    const returnNutrients = await this.edamamService.getFoodNutrients
+      (this.selectedFood.foodId,
+      this.edamamService.getMeasureURL(this.selectedMeasureType),
+      measureForm.value.quantity);
+
+      this.selectedFood.calories = returnNutrients.calories;
+      this.selectedFood.carbs = returnNutrients.carbs;
+      this.selectedFood.protein = returnNutrients.protein;
+      this.selectedFood.fat = returnNutrients.fat;
+
+    this.nutrientsReturned = 1;
+
+    console.log(returnNutrients);
+
+  }
+
+  switchBackToMainModal() {
+
+    this.closeAddFoodModal.nativeElement.click();
+
+  }
+
+  async selectFood(foodRecipesi, foodRecipesj) {
+
+    this.closeMainModal.nativeElement.click();
+
+    this.selectedFood = this.foodSearchResults[foodRecipesi][foodRecipesj];
+    this.selectedMeasureType = this.selectedFood.measures[0].label;
+
+    console.log(this.selectedFood);
+
+  }
+
+  async searchForFoods() {
+
+    // const measureFormsArray = this.measureForms.toArray();
+
+    this.foodResultsReturned = 0;
+    this.foodSearchResults = await this.edamamService.searchForFoods(this.searchForFoodsForm.value.food);
+    this.maxPage = this.foodSearchResults.length;
+    this.foodResultsReturned = 1;
+    console.log(`${this.maxPage}`);
+
+  }
+
   async searchForRecipes() {
 
     this.searchForRecipesForm.statusChanges.subscribe(status => {
@@ -254,10 +333,10 @@ export class TimetablepageComponent implements AfterViewInit {
       };
 
       // Set to 0 as this value means the results are being searched for
-      this.resultsReturned = 0;
-      this.searchResults = await this.edamamService.searchForRecipes(recipeDetails, this.searchForRecipesForm.value.ingredient, this.maxResults);
-      this.maxPage = this.searchResults.length;
-      this.resultsReturned = 1;
+      this.recipeResultsReturned = 0;
+      this.recipeSearchResults = await this.edamamService.searchForRecipes(recipeDetails, this.searchForRecipesForm.value.ingredient, this.maxResults);
+      this.maxPage = this.recipeSearchResults.length;
+      this.recipeResultsReturned = 1;
       console.log(`${this.maxPage}`);
 
       // The form isn't valid or the recipe type hasn't been selected
@@ -272,7 +351,7 @@ export class TimetablepageComponent implements AfterViewInit {
 
   addRecipeFromSearch(searchRecipesi, searchRecipesj) {
 
-    const recipeToAdd = this.searchResults[searchRecipesi][searchRecipesj];
+    const recipeToAdd = this.recipeSearchResults[searchRecipesi][searchRecipesj];
     recipeToAdd.recipeType = this.selectedRecipeType;
     console.log(recipeToAdd);
     console.log(this.selectedDayIndex);
@@ -292,7 +371,7 @@ export class TimetablepageComponent implements AfterViewInit {
 
   updateProgress() {
 
-    this.addRecipesToTodayCarousel(this.todayRecipes.recipes);
+    this.addRecipesToTodayCarousel(this.todayRecipes.edamamRecipes);
 
     console.log(`Daily Carbs: ${this.timetableService.dailyCarbs}`);
     console.log(`Used Carbs ${this.todayRecipes.totalCarbs}`);

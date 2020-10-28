@@ -23,7 +23,8 @@ export class TimetableService {
     noOfRecipes: number,
     isKetoFriendly: boolean, // Day is not keto friendly
     notKetoFriendlyReason: string, // Day is not keto friendly reason
-    recipes: {
+    edamamFoods
+    edamamRecipes: {
       recipeID: string,
       recipeType: string,
       name: string,
@@ -99,26 +100,6 @@ export class TimetableService {
 
   }
 
-  // activateDayChangeListeners() {
-
-
-  //   this.auth.mondayChanged.subscribe(async snapshotValue => {
-  //     console.log('Change has been detected in Timetable for Monday');
-  //     console.log(snapshotValue);
-  //     await this.checkStorage();
-  //     this.storageService.setDayIsUpToDate('Monday', true);
-
-  //   });
-
-  //   this.auth.tuesdayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Tueday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Tuesday', true); });
-  //   this.auth.wednesdayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Wednesday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Wednesday', true); });
-  //   this.auth.thursdayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Thursday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Thursday', true); });
-  //   this.auth.fridayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Friday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Friday', true); });
-  //   this.auth.saturdayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Saturday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Saturday', true); });
-  //   this.auth.sundayChanged.subscribe(async snapshotValue => {console.log('Change has been detected in Timetable for Sunday'); console.log(snapshotValue); await this.checkStorage(); this.storageService.setDayIsUpToDate('Sunday', true); });
-
-  // }
-
   getAllRecipes(): any {
 
     return this.allRecipes;
@@ -142,7 +123,7 @@ export class TimetableService {
       fatRemaining: number,
       totalCalories: number,
       caloriesRemaining: number,
-      recipes: {
+      edamamRecipes: {
         recipeID: string,
         recipeType: string,
         name: string,
@@ -221,7 +202,7 @@ export class TimetableService {
 
         // Add recipe to dayWithRecipes
         const dayWithRecipes = this.getDayByIndex(index);
-        dayWithRecipes.recipes.push(recipe);
+        dayWithRecipes.edamamRecipes.push(recipe);
 
         // Write recipe to localStorage and Firebase
         this.writeRecipeToStorage(dayWithRecipes.day, recipe);
@@ -240,7 +221,7 @@ export class TimetableService {
 
     }
 
-  addRecipesToDay(index: number, recipes: {
+  addRecipesToDay(index: number, edamamRecipes: {
       recipeID: string
       recipeType: string,
       name: string,
@@ -253,7 +234,7 @@ export class TimetableService {
   ) {
 
       const dayWithRecipes = this.getDayByIndex(index);
-      dayWithRecipes.recipes.push(...recipes);
+      dayWithRecipes.edamamRecipes.push(...edamamRecipes);
       // dayWithRecipes.noOfRecipes += recipes.length;
 
       this.updateWeeklyTotals();
@@ -263,7 +244,7 @@ export class TimetableService {
        * Check the day is suitable by passing it to:
        * checkDayIsSuitable - will update variables in the day's object (in allRecipes array) if it's not suitable
        */
-      this.checkRecipeIsSuitable(...recipes);
+      this.checkRecipeIsSuitable(...edamamRecipes);
       this.checkDayIsSuitable(this.getDayByIndex(index));
       this.arrayUpdated.emit('Array Updated');
 
@@ -276,10 +257,10 @@ export class TimetableService {
     const dayObject = this.getDayByIndex(dayIndex);
     this.storageService.setDayIsUpToDate(dayObject.day, 'false');
 
-    await this.auth.removeRecipeFromUserTimetable(this.accountService.getUserID(), dayObject.day, dayObject.recipes[recipeIndex]);
+    await this.auth.removeRecipeFromUserTimetable(this.accountService.getUserID(), dayObject.day, dayObject.edamamRecipes[recipeIndex]);
 
     const dayWithRecipes = this.getDayByIndex(dayIndex);
-    dayWithRecipes.recipes.splice(recipeIndex, 1);
+    dayWithRecipes.edamamRecipes.splice(recipeIndex, 1);
     // dayWithRecipes.noOfRecipes--;
 
     this.updateWeeklyTotals();
@@ -299,7 +280,7 @@ export class TimetableService {
       fatRemaining: number,
       totalCalories: number,
       caloriesRemaining: number,
-      recipes: {
+      edamamRecipes: {
         recipeID: string,
         recipeType: string,
         name: string,
@@ -315,9 +296,9 @@ export class TimetableService {
       console.log(`Recipe removed by object`);
 
       this.storageService.setDayIsUpToDate(dayObject.day, 'false');
-      await this.auth.removeRecipeFromUserTimetable(this.accountService.getUserID(), dayObject.day, dayObject.recipes[recipeIndex]);
+      await this.auth.removeRecipeFromUserTimetable(this.accountService.getUserID(), dayObject.day, dayObject.edamamRecipes[recipeIndex]);
 
-      dayObject.recipes.splice(recipeIndex, 1);
+      dayObject.edamamRecipes.splice(recipeIndex, 1);
       // dayObject.noOfRecipes--;
 
       this.updateWeeklyTotals();
@@ -360,7 +341,7 @@ export class TimetableService {
       // Loop through each recipe in the day
       try {
 
-        dayElement.recipes.forEach(recipeElement => {
+        dayElement.edamamRecipes.forEach(recipeElement => {
 
           // Add each of the recipe's nutrients totals to the total nutrients for the day
           totalCalsForDay = totalCalsForDay + recipeElement.calories;
@@ -420,16 +401,12 @@ export class TimetableService {
 
     console.log(`checkStorage() reached`);
 
+    // Loop throughout each day in the week
     for (let i = 0; i < days.length; i++) {
-
       const currentDay = days[i];
 
+      // This method checks if the recipe IDs in Firebase are the same as the ones in the localStorage for the current day
       await this.auth.checkDayMatchesBetweenStorageAndFirebase(this.accountService.getUserID(), currentDay);
-      /* Add a method in auth which loops through each recipe in the user's storages day's recipes array
-       * Declare a variable to true before the while loop begins called 'firebaseAndStorageMatch = true'
-       * If during the loop, a recipeID is not detected in the user's Firebase day's recipes array, then set the dayIsUpToDate value to false for that day in storage
-       *
-       */
 
       const dayIsUpToDate = this.storageService.checkDayIsUpToDate(currentDay);
 
@@ -457,6 +434,7 @@ export class TimetableService {
 
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
+    // Loop through each object in localStorage
     for (let i = 0; i < window.localStorage.length; i++) {
 
       const currentKeyName = window.localStorage.key(i);
@@ -755,7 +733,7 @@ export class TimetableService {
    */
   getRecipePlanStructure(currentDay: any) {
 
-      const noOfRecipes = currentDay.recipes.length;
+      const noOfRecipes = currentDay.edamamRecipes.length;
 
       // This reciplePlan object will be used to store the determined recipeType, caloriePercentage, fatPercentage, proteinPercentage
       // and carbsPercentage for each recipe.
@@ -885,7 +863,7 @@ export class TimetableService {
         let includeLunch = true;
         let includeDinner = true;
 
-        currentDay.recipes.forEach(element => {
+        currentDay.edamamRecipes.forEach(element => {
 
           if (element.recipeType === 'Breakfast') {
 

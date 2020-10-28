@@ -2,6 +2,8 @@
 
 <div class="container" style="padding-bottom: 100px">
 
+  <h3>Shopping List</h3>
+
   <ng-container *ngFor="let day of allRecipes; let i = index">
 
     <div [ngClass]="{'day-selected' : day.checkBox, 'day' : !day.checkBox}">
@@ -22,7 +24,7 @@
 
     </div>
 
-    <ng-container *ngFor="let recipe of day.recipes; let j = index">
+    <ng-container *ngFor="let recipe of day.edamamRecipes; let j = index">
 
       <div [ngClass]="{'day-recipe-selected' : recipe.checkBox, 'day-recipe' : !recipe.checkBox}">
         <div class="name pull-left" style="padding-top: 7px">

@@ -24,7 +24,7 @@ export class TimetableweeklypageComponent implements AfterViewInit {
     caloriesRemaining: number,
     // isKetoFriendly: boolean, // Day is not keto friendly
     // notKetoFriendlyReason: string, // Day is not keto friendly reason
-    recipes: {
+    edamamRecipes: {
       recipeID: string,
       recipeType: string,
       name: string,
@@ -62,7 +62,6 @@ export class TimetableweeklypageComponent implements AfterViewInit {
   myCarouselItems = [];
   mySlideItems = [[]];
 
-  @ViewChild('owlElement') owlElement: OwlCarousel;
   @ViewChildren('owlElement') owlElements: QueryList<OwlCarousel>;
   selectedDayIndex;
 
@@ -111,7 +110,7 @@ export class TimetableweeklypageComponent implements AfterViewInit {
 
       const currentDayWithRecipes = this.allRecipes[i];
 
-      this.addRecipesToTodayCarousel(i, currentDayWithRecipes.recipes);
+      this.addRecipesToTodayCarousel(i, currentDayWithRecipes.edamamRecipes);
 
       this.progressBars[i] = {
         carbsPercentage: (currentDayWithRecipes.totalCarbs / this.timetableService.dailyCarbs) * 100,
@@ -140,6 +139,12 @@ export class TimetableweeklypageComponent implements AfterViewInit {
 
       const currentRecipe = recipes[i];
       currentRecipe.recipeTypeHTML = currentRecipe.recipeType.toLowerCase();
+
+      // Remove any numbers (mainly for meal plans which include 'Snack 1' & 'Snack 2') as this messes up the carousel css class which uses
+      // this variable to grab the snack image
+      currentRecipe.recipeTypeHTML = currentRecipe.recipeTypeHTML.replace(/[0-9]/g, '');
+      currentRecipe.recipeTypeHTML = currentRecipe.recipeTypeHTML.trim();
+
       currentRecipe.isRecipe = true;
       this.mySlideItems[dayIndex].push(currentRecipe);
 
@@ -148,7 +153,7 @@ export class TimetableweeklypageComponent implements AfterViewInit {
     try {
       const owlElementsArray = this.owlElements.toArray();
       owlElementsArray[dayIndex].reInit();
-    } catch(error) {
+    } catch (error) {
       console.log(error);
     }
 

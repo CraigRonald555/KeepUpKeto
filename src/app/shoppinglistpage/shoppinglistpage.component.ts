@@ -15,7 +15,7 @@ export class ShoppinglistpageComponent implements AfterViewInit {
   allRecipes;
   shoppingList: {
     day: string,
-    recipes: {
+    edamamRecipes: {
       ingredients: {
         ingredientName: string
       }[]
@@ -84,12 +84,12 @@ export class ShoppinglistpageComponent implements AfterViewInit {
       for (let i = 0; i < this.allRecipes.length; i++) {
 
         const dayWithRecipes = this.allRecipes[i];
-        const recipes = dayWithRecipes.recipes;
+        const edamamRecipes = dayWithRecipes.edamamRecipes;
         dayWithRecipes.checkBox = false;
 
-        for (let j = 0; j < recipes.length; j++) {
+        for (let j = 0; j < edamamRecipes.length; j++) {
 
-          const currentRecipe = recipes[j];
+          const currentRecipe = edamamRecipes[j];
           currentRecipe.checkBox = false;
 
           // Initialise new array for this recipe's ingredients (for display)
@@ -129,7 +129,7 @@ export class ShoppinglistpageComponent implements AfterViewInit {
     if (dayWithRecipes.checkBox === true) {
 
       // Retrieve all ingredients for the recipe
-      const allRecipesFromDay = dayWithRecipes.recipes;
+      const allRecipesFromDay = dayWithRecipes.edamamRecipes;
 
       // Loop through each recipe belonging to day and set checkboxes to true
       for (let i = 0; i < allRecipesFromDay.length; i++) {
@@ -149,7 +149,7 @@ export class ShoppinglistpageComponent implements AfterViewInit {
     } else {
 
       // Retrieve all ingredients for the recipe
-      const allRecipesFromDay = dayWithRecipes.recipes;
+      const allRecipesFromDay = dayWithRecipes.edamamRecipes;
 
       // Loop through each ingredient
       for (let i = 0; i < allRecipesFromDay.length; i++) {
@@ -175,7 +175,7 @@ export class ShoppinglistpageComponent implements AfterViewInit {
   switchRecipeCheckBox(dayIndex, recipeIndex) {
 
     // Retrieve current recipe and switch its checkBox
-    const recipeFromDay = this.allRecipes[dayIndex].recipes[recipeIndex];
+    const recipeFromDay = this.allRecipes[dayIndex].edamamRecipes[recipeIndex];
     recipeFromDay.checkBox = !recipeFromDay.checkBox;
 
     // If the recipe's checkBox was set to true
@@ -202,7 +202,7 @@ export class ShoppinglistpageComponent implements AfterViewInit {
       const allIngredientsFromRecipe = recipeFromDay.displayIngredients;
 
       // If at least one recipe hasn't been checked
-      if (!this.checkAtleastOneBoxTicked(this.allRecipes[dayIndex].recipes)) {
+      if (!this.checkAtleastOneBoxTicked(this.allRecipes[dayIndex].edamamRecipes)) {
 
         // Set the day which the recipe belong to, to false
         this.allRecipes[dayIndex].checkBox = false;
@@ -226,13 +226,13 @@ export class ShoppinglistpageComponent implements AfterViewInit {
   switchIngredientCheckBox(dayIndex, recipeIndex, ingredientIndex) {
 
     const dayWithRecipes = this.allRecipes[dayIndex];
-    const recipeFromDay = this.allRecipes[dayIndex].recipes[recipeIndex];
+    const recipeFromDay = this.allRecipes[dayIndex].edamamRecipes[recipeIndex];
 
-    let ingredientFromRecipeFromDay = this.allRecipes[dayIndex].recipes[recipeIndex].displayIngredients[ingredientIndex];
+    let ingredientFromRecipeFromDay = this.allRecipes[dayIndex].edamamRecipes[recipeIndex].displayIngredients[ingredientIndex];
     ingredientFromRecipeFromDay.checkBox = !ingredientFromRecipeFromDay.checkBox;
 
     // If at least one box from the ingredients is ticked
-    if (this.checkAtleastOneBoxTicked(this.allRecipes[dayIndex].recipes[recipeIndex].displayIngredients)) {
+    if (this.checkAtleastOneBoxTicked(this.allRecipes[dayIndex].edamamRecipes[recipeIndex].displayIngredients)) {
 
       // Set the day & recipe checkboxes to true
       dayWithRecipes.checkBox = true;
@@ -245,7 +245,7 @@ export class ShoppinglistpageComponent implements AfterViewInit {
       recipeFromDay.checkBox = false;
 
       // If there's at least one box from the day's recipes ticked
-      if (this.checkAtleastOneBoxTicked(dayWithRecipes.recipes)) {
+      if (this.checkAtleastOneBoxTicked(dayWithRecipes.edamamRecipes)) {
 
         // Set day checkbox to true
         dayWithRecipes.checkBox = true;
@@ -293,7 +293,7 @@ export class ShoppinglistpageComponent implements AfterViewInit {
     // Loop through days
     for (let i = 0; i < this.allRecipes.length; i++) {
 
-      const currentRecipesFromDay = this.allRecipes[i].recipes;
+      const currentRecipesFromDay = this.allRecipes[i].edamamRecipes;
 
       // Loop through recipes from day
       for (let j = 0; j < currentRecipesFromDay.length; j++) {

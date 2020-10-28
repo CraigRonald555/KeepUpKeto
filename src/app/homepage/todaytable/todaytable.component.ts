@@ -13,7 +13,7 @@ export class TodaytableComponent implements OnInit {
     day: string,
     show: boolean,
     caloriesRemaining: number,
-    recipes: {
+    edamamRecipes: {
       recipeType: string,
       name: string,
       image: string,
