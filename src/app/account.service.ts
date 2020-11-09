@@ -94,85 +94,83 @@ export class AccountService {
 
   }
 
-  calculateDailyCalories() {
-
-    // Mifflin St. Joer formula
-
-    if (this.accountDetails.sex === 'Male') {
-
-      this.accountDetails.dailyCalories = 10 * this.accountDetails.weight + 6.25 * this.accountDetails.height
-                                          - 5 * this.accountDetails.age + 5;
-
-    } else if (this.accountDetails.sex === 'Female') {
-
-      this.accountDetails.dailyCalories = 10 * this.accountDetails.weight + 6.25 * this.accountDetails.height
-                                          - 5 * this.accountDetails.age - 161;
-
-    }
-
-  }
-
   calculateMacros() {
 
+    // Nutrient percentages based on: https://www.hsph.harvard.edu/nutritionsource/healthy-weight/diet-reviews/ketogenic-diet/
     const carbsPercentage = 0.1;
-    const proteinPercentage = 0.3;
-    const fatPercentage = 0.6;
+    const proteinPercentage = 0.2;
+    const fatPercentage = 0.7;
 
     let calories;
 
+    // If user selected to lose one pound a week
     if (this.accountDetails.goals === 'loseOne') {
+
 
       if (this.accountDetails.sex === 'Male') {
 
+        // Equation if male
         calories = (10 * this.accountDetails.weight + 6.25 * this.accountDetails.height - 5 * this.accountDetails.age + 5);
 
       } else if (this.accountDetails.sex === 'Female') {
 
+        // Equation if female
         calories = (10 * this.accountDetails.weight + 6.25 * this.accountDetails.height - 5 * this.accountDetails.age - 161);
 
       }
 
-      this.accountDetails.dailyCalories = Math.round((calories)  * 10) / 10;
+      // These equations are generic and are applied whether male or female
+      this.accountDetails.dailyCalories = Math.round((calories) * 10) / 10;
       this.accountDetails.dailyCalories = this.accountDetails.dailyCalories - 500;
-      //calories = calories - 500;
-      //this.goalCalories = Math.round((calories)  * 10) / 10;
 
+    // If user selected to maintain weight
     } else if (this.accountDetails.goals === 'maintain') {
 
       if (this.accountDetails.sex === 'Male') {
 
+        // Equation if male
         calories = (10 * this.accountDetails.weight + 6.25 * this.accountDetails.height - 5 * this.accountDetails.age + 5);
 
       } else if (this.accountDetails.sex === 'Female') {
 
+        // Equation if female
         calories = (10 * this.accountDetails.weight + 6.25 * this.accountDetails.height - 5 * this.accountDetails.age - 161);
 
       }
 
-      this.accountDetails.dailyCalories = Math.round((calories)  * 10) / 10;
+      // This equation is generic and is applied whether male or female
+      this.accountDetails.dailyCalories = Math.round((calories) * 10) / 10;
 
+    // If users wants to gain one pound a week
     } else {
 
       if (this.accountDetails.sex === 'Male') {
 
+        // Equation if male
         calories = (10 * this.accountDetails.weight + 6.25 * this.accountDetails.height - 5 * this.accountDetails.age + 5);
 
       } else if (this.accountDetails.sex === 'Female') {
 
+        // Equation if female
         calories = (10 * this.accountDetails.weight + 6.25 * this.accountDetails.height - 5 * this.accountDetails.age - 161);
 
       }
 
+      // These equations are generic and are applied whether male or female
       this.accountDetails.dailyCalories = Math.round((calories)  * 10) / 10;
-      this.accountDetails.dailyCalories = this.accountDetails.dailyCalories - 500;
-      //calories = calories + 500;
-      //this.goalCalories = Math.round((calories) * 10) / 10;
+      this.accountDetails.dailyCalories = this.accountDetails.dailyCalories + 500;
 
     }
 
-    this.accountDetails.macros.carbs =  Math.round(((this.accountDetails.dailyCalories * carbsPercentage) / 4) * 10) / 10;
-    this.accountDetails.macros.protein = Math.round(((this.accountDetails.dailyCalories * proteinPercentage) / 4) * 10) / 10;
-    this.accountDetails.macros.fat = Math.round(((this.accountDetails.dailyCalories * fatPercentage) / 9) * 10) / 10;
+
+    this.accountDetails.macros.carbs =  Math.round((this.accountDetails.dailyCalories * carbsPercentage) / 4);
+    this.accountDetails.macros.protein = Math.round((this.accountDetails.dailyCalories * proteinPercentage) / 4);
+    this.accountDetails.macros.fat = Math.round((this.accountDetails.dailyCalories * fatPercentage) / 9);
+
+    console.log(`Required dailyCalories: ${this.accountDetails.dailyCalories}`);
+    console.log(`Required carbs: ${this.accountDetails.macros.carbs}`);
+    console.log(`Required protein: ${this.accountDetails.macros.protein}`);
+    console.log(`Required fat: ${this.accountDetails.macros.fat}`);
 
     //this.timetableService.setGenerateValues(calories, carbs, fat, protein, ingredients);
 

@@ -16,9 +16,10 @@
   overflow-y:auto;
 }
 
-.btn-default:hover {
-
-  background-color: #EA1E63;
+.btn-align {
+  padding: 6px 12px;
+  line-height: 1.42857143;
+  vertical-align: middle;
 
 }
 

@@ -72,11 +72,17 @@ export class TimetablepageComponent implements AfterViewInit {
 
   selectedDayIndex = -1;
 
-  addRecipeOption = 0;
-  addRecipeButtonsContentSwitch = 'buttons';
+  // Determines what is being shown in the Modal Box
+  formStep = 0;
+  @ViewChild('closeMainModalButton') public closeMainModalButton: ElementRef; // Used to close Main Modal programtically
 
+  // Search for Recipes, Foods options etc. page
   showHelp = false;
 
+  // Select meal type (breafast, snack, lunch, dinner)
+  selectedMealType; // Breakfast, Snack, Lunch, Dinner
+
+  // Search for Recipes
   searchForRecipesAdvanced = false;
   useRecommended = true;
   remainingNutrients;
@@ -89,23 +95,21 @@ export class TimetablepageComponent implements AfterViewInit {
 
   // Search food modal
   @ViewChild('searchForFoodsForm') searchForFoodsForm;
+  searchFoodFormError = false;
   foodResultsReturned = -1; // -1 = false, 0 = searching, 1 = returned
   foodPageNumber = 1;
   foodSearchResults = [];
   selectedMeasureType;
-  selectedFood = {foodId: '', name: '', image: '', calories: 0, carbs: 0, protein: 0, fat: 0, measures: []};
-  @ViewChild('closeMainModal') public closeMainModal: ElementRef;
+  selectedFood = {foodId: '', name: '', image: '', calories: 0, carbs: 0, protein: 0, fat: 0, measures: []}; // Used for Add Food Modal
 
   // Search recipe modal
   @ViewChild('searchForRecipesForm') searchForRecipesForm;
   searchFormError = false;
-  recipeTypes = ['Select your recipe', 'Breakfast', 'Lunch', 'Dinner', 'Snack'];
-  selectedRecipeType;
+  recipeResultsReturned = -1; // -1 = false, 0 = searching, 1 = returned
   recipeSearchResults = [];
   pageNumber = 1;
   maxResults = 50;
   maxPage = Math.floor(this.maxResults / 10);
-  recipeResultsReturned = -1; // -1 = false, 0 = searching, 1 = returned
 
   progressBars = {
     carbsPercentage: 0,
@@ -217,17 +221,8 @@ export class TimetablepageComponent implements AfterViewInit {
 
   }
 
-  printUseRecommended() {
-
-    console.log("Use recommended: " + this.useRecommended);
-
-  }
-
-  ////////////////////////////////////////////////
-
   constructor(public timetableService: TimetableService, private edamamService: EdamamService, private router: Router, private changeDetector: ChangeDetectorRef, private ngZone: NgZone ) {
 
-    this.selectedRecipeType = this.recipeTypes[0];
     // window.localStorage.clear();
 
     timetableService.arrayUpdated.subscribe(status => {
@@ -282,6 +277,46 @@ export class TimetablepageComponent implements AfterViewInit {
 
   }
 
+  goBackMainModal() {
+
+    // As the form steps greater than 2 still proceed step 2, we have to go back to step 2 whenever someone goes back from a step greater than 2
+    switch (true) {
+
+      case this.formStep <= 2:
+        this.formStep = this.formStep - 1;
+        break;
+
+      case this.formStep >= 3:
+        this.formStep = 2;
+
+        // Reset the search variables
+        this.recipeResultsReturned = -1;
+        this.recipeSearchResults = [];
+        this.foodResultsReturned = -1;
+        this.foodSearchResults = [];
+
+        break;
+
+    }
+
+  }
+
+  closeMainModal() {
+
+    // Reset form variables
+
+    this.showHelp = false;
+    this.formStep = 0;
+
+    // Reset the search variables
+    this.recipeResultsReturned = -1;
+    this.recipeSearchResults = [];
+    this.foodResultsReturned = -1;
+    this.foodSearchResults = [];
+
+
+  }
+
   switchBackToMainModal() {
 
     this.closeAddFoodModal.nativeElement.click();
@@ -290,7 +325,7 @@ export class TimetablepageComponent implements AfterViewInit {
 
   async selectFood(foodRecipesi, foodRecipesj) {
 
-    this.closeMainModal.nativeElement.click();
+    this.closeMainModalButton.nativeElement.click();
 
     this.selectedFood = this.foodSearchResults[foodRecipesi][foodRecipesj];
     this.selectedMeasureType = this.selectedFood.measures[0].label;
@@ -311,26 +346,25 @@ export class TimetablepageComponent implements AfterViewInit {
 
   }
 
+  // Executed when user performs search for recipes
   async searchForRecipes() {
 
     this.searchForRecipesForm.statusChanges.subscribe(status => {
 
-      if (status === 'VALID' && this.selectedRecipeType !== this.recipeTypes[0]) {
+      if (status === 'VALID') {
 
         this.searchFormError = false;
-        console.log('Search form changed to valid, selectedRecipeType = ' + this.selectedRecipeType);
 
       } else {
 
         this.searchFormError = true;
-        console.log('Search form changed is invalid, selectedRecipeType = ' + this.selectedRecipeType);
 
       }
 
     });
 
-    // If every value of the form has something in it and the selectedRecipeType is not the default value
-    if (this.searchForRecipesForm.valid && this.selectedRecipeType !== this.recipeTypes[0]) {
+    // If every form is valid
+    if (this.searchForRecipesForm.valid) {
 
       this.searchFormError = false;
 
@@ -364,7 +398,7 @@ export class TimetablepageComponent implements AfterViewInit {
   addRecipeFromSearch(searchRecipesi, searchRecipesj) {
 
     const recipeToAdd = this.recipeSearchResults[searchRecipesi][searchRecipesj];
-    recipeToAdd.recipeType = this.selectedRecipeType;
+    recipeToAdd.recipeType = this.selectedMealType;
     console.log(recipeToAdd);
     console.log(this.selectedDayIndex);
     this.timetableService.addRecipeToDay(this.selectedDayIndex, recipeToAdd);
@@ -417,6 +451,8 @@ export class TimetablepageComponent implements AfterViewInit {
   }
 
   generateTimetable() {
+
+    console.log("Started generating");
 
     this.timetableService.generate();
 
