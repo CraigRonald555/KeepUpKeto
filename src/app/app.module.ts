@@ -74,7 +74,7 @@ const appRoutes = [
     BrowserModule,
     OwlModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
-    RouterModule.forRoot(appRoutes),
+    RouterModule.forRoot(appRoutes, {scrollPositionRestoration: 'enabled'}),
     HttpClientModule,
     FormsModule,
     MatProgressSpinnerModule,
