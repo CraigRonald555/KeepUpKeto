@@ -55,11 +55,22 @@
   font-family: "Gilroy", sans-serif;
   font-weight: bold;
   color: #232055;
+  line-height: normal;
 
 }
 
-img{
+.big-img{
   width: 100%;
+}
+
+@media screen and (min-width: 400px) {
+
+  .landing-header {
+
+    font-size: 24px;
+
+  }
+
 }
 
 
