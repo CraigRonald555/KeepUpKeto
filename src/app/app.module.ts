@@ -38,9 +38,9 @@ import { ShoppinglistpageComponent } from './shoppinglistpage/shoppinglistpage.c
 
 const appRoutes = [
 
-  {path: '', redirectTo: 'home', pathMatch: 'full'},
+  {path: '', redirectTo: 'landing', pathMatch: 'full'},
   { path: '', component: MainComponent, children: [
-    { path: 'home', component: HomepageComponent},
+    { path: 'landing', component: HomepageComponent},
     { path: 'timetable', component: TimetablepageComponent},
     { path: 'timetable/weekly', component: TimetableweeklypageComponent},
     { path: 'recipes', component: RecipeComponent},
