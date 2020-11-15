@@ -120,7 +120,7 @@ export class AccountService {
       }
 
       // These equations are generic and are applied whether male or female
-      this.accountDetails.dailyCalories = Math.round((calories) * 10) / 10;
+      this.accountDetails.dailyCalories = Math.round(calories);
       this.accountDetails.dailyCalories = this.accountDetails.dailyCalories - 500;
 
     // If user selected to maintain weight
@@ -139,7 +139,7 @@ export class AccountService {
       }
 
       // This equation is generic and is applied whether male or female
-      this.accountDetails.dailyCalories = Math.round((calories) * 10) / 10;
+      this.accountDetails.dailyCalories = Math.round(calories);
 
     // If users wants to gain one pound a week
     } else {
@@ -157,7 +157,7 @@ export class AccountService {
       }
 
       // These equations are generic and are applied whether male or female
-      this.accountDetails.dailyCalories = Math.round((calories)  * 10) / 10;
+      this.accountDetails.dailyCalories = Math.round(calories);
       this.accountDetails.dailyCalories = this.accountDetails.dailyCalories + 500;
 
     }

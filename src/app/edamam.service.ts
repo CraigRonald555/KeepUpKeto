@@ -171,7 +171,13 @@ export class EdamamService {
           carbs: Math.round(currentFoodDetails['nutrients']['CHOCDF'] * 10) / 10,
           fat: Math.round(currentFoodDetails['nutrients']['FAT'] * 10) / 10,
           protein: Math.round(currentFoodDetails['nutrients']['PROCNT'] * 10) / 10,
-          measures: currentMeasures
+          measures: currentMeasures,
+          defaultMeasure: 'Grams',
+          defaultQuantity: 100,
+          defaultCalories: Math.round(currentFoodDetails['nutrients']['ENERC_KCAL'] * 10) / 10,
+          defaultCarbs: Math.round(currentFoodDetails['nutrients']['CHOCDF'] * 10) / 10,
+          defaultFat: Math.round(currentFoodDetails['nutrients']['FAT'] * 10) / 10,
+          defaultProtein: Math.round(currentFoodDetails['nutrients']['PROCNT'] * 10) / 10,
 
         };
 

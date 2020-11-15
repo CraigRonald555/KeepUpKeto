@@ -143,6 +143,54 @@ export class StorageService {
 
   async removeRecipesNotInFirebase(dayName, recipesInFirebase) {
 
+    // Get all the recipes from storage
+    // Loop through each recipe's recipeID
+    // Check if recipeID is in recipesInFirebase
+    // If not remove it from storage
+
+    const dayExists = this.checkDayIsInStorage(dayName);
+
+    if (dayExists) {
+
+      // Get day's recipes from storage
+      const recipesInStorage = this.getDayFromStorage(dayName).recipes;
+
+      // Loop through each recipe in storage
+      for (let i = 0; i < recipesInStorage.length; i++) {
+
+        // Store storage recipe id
+        const currentStorageRecipeID = recipesInStorage[i].recipeID;
+
+        // Use this to detect whether the recipe in storage is also found in Firebase array
+        let recipeFound = false;
+
+        // Loop through the recipeIDs in the Firebase object
+        for (const currentFirebaseRecipeID in recipesInFirebase) {
+
+          // If recipe in storage is in firebase array, set recipeFound to true
+          if (currentFirebaseRecipeID === currentStorageRecipeID) {
+            recipeFound = true;
+          }
+
+        }
+
+        // If recipe wasn't found during the loop above
+        if (!recipeFound) {
+
+          // Remove recipe from storage
+          this.removeRecipeFromDay(dayName, currentStorageRecipeID);
+
+        }
+
+      }
+
+      // If day doesn't exist in storage
+    } else {
+
+      // Do nothing?
+
+    }
+
 
   }
 

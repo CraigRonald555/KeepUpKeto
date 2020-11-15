@@ -100,7 +100,7 @@ export class TimetablepageComponent implements AfterViewInit {
   foodPageNumber = 1;
   foodSearchResults = [];
   selectedMeasureType;
-  selectedFood = {foodId: '', name: '', image: '', calories: 0, carbs: 0, protein: 0, fat: 0, measures: []}; // Used for Add Food Modal
+  selectedFood = {foodId: '', name: '', image: '', calories: 0, carbs: 0, protein: 0, fat: 0, measures: [], defaultMeasure: 'Grams', defaultQuantity: 100, defaultCalories: 0, defaultCarbs: 0, defaultFat: 0, defaultProtein: 0}; // Used for Add Food Modal
 
   // Search recipe modal
   @ViewChild('searchForRecipesForm') searchForRecipesForm;
@@ -254,6 +254,9 @@ export class TimetablepageComponent implements AfterViewInit {
 
       this.nutrientsReturned = 0;
 
+      // this.selectedFood.defaultMeasure = this.selectedMeasureType;
+      // this.selectedFood.defaultQuantity = measureForm.value.quantity;
+
       this.quantityDisplay = measureForm.value.quantity;
       this.measureTypeDisplay = this.selectedMeasureType;
 
@@ -282,6 +285,15 @@ export class TimetablepageComponent implements AfterViewInit {
     // As the form steps greater than 2 still proceed step 2, we have to go back to step 2 whenever someone goes back from a step greater than 2
     switch (true) {
 
+      // If we're on the addFood (nutrients) step
+      case this.formStep === 4.1:
+        // Go back to search for foods step
+        this.nutrientsReturned = -1;
+        this.formStep = 4;
+        console.log('Gone back to formStep 4');
+        break;
+
+
       case this.formStep <= 2:
         this.formStep = this.formStep - 1;
         break;
@@ -301,18 +313,22 @@ export class TimetablepageComponent implements AfterViewInit {
 
   }
 
-  closeMainModal() {
+  closeMainModal(saveState) {
 
-    // Reset form variables
+    // saveState is passed so we can also close the mainModal without losing the state
+    if (!saveState) {
 
-    this.showHelp = false;
-    this.formStep = 0;
+      // Reset form variables
+      this.showHelp = false;
+      this.formStep = 0;
 
-    // Reset the search variables
-    this.recipeResultsReturned = -1;
-    this.recipeSearchResults = [];
-    this.foodResultsReturned = -1;
-    this.foodSearchResults = [];
+      // Reset the search variables
+      this.recipeResultsReturned = -1;
+      this.recipeSearchResults = [];
+      this.foodResultsReturned = -1;
+      this.foodSearchResults = [];
+
+    }
 
 
   }
@@ -325,7 +341,7 @@ export class TimetablepageComponent implements AfterViewInit {
 
   async selectFood(foodRecipesi, foodRecipesj) {
 
-    this.closeMainModalButton.nativeElement.click();
+    // this.closeMainModalButton.nativeElement.click();
 
     this.selectedFood = this.foodSearchResults[foodRecipesi][foodRecipesj];
     this.selectedMeasureType = this.selectedFood.measures[0].label;
@@ -336,13 +352,35 @@ export class TimetablepageComponent implements AfterViewInit {
 
   async searchForFoods() {
 
-    // const measureFormsArray = this.measureForms.toArray();
+    this.searchForFoodsForm.statusChanges.subscribe(status => {
 
-    this.foodResultsReturned = 0;
-    this.foodSearchResults = await this.edamamService.searchForFoods(this.searchForFoodsForm.value.food);
-    this.maxPage = this.foodSearchResults.length;
-    this.foodResultsReturned = 1;
-    console.log(`${this.maxPage}`);
+      if (status === 'VALID') {
+
+        this.searchFoodFormError = false;
+
+      } else {
+
+        this.searchFoodFormError = true;
+
+      }
+
+    });
+
+    // If every form input is valid
+    if (this.searchForFoodsForm.valid) {
+
+      this.foodResultsReturned = 0;
+      this.foodSearchResults = await this.edamamService.searchForFoods(this.searchForFoodsForm.value.food);
+      this.maxPage = this.foodSearchResults.length;
+      this.foodResultsReturned = 1;
+      console.log(`${this.maxPage}`);
+
+    } else {
+
+      // Set the form error value to true to show the help bleck
+      this.searchFoodFormError = true;
+
+    }
 
   }
 
@@ -363,7 +401,7 @@ export class TimetablepageComponent implements AfterViewInit {
 
     });
 
-    // If every form is valid
+    // If every form input is valid
     if (this.searchForRecipesForm.valid) {
 
       this.searchFormError = false;

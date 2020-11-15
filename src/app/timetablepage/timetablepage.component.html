@@ -153,7 +153,7 @@
 
         </p>
 
-        <button #closeMainModalButton type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closeMainModal()">
+        <button #closeMainModalButton type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closeMainModal(false)">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -290,7 +290,7 @@
                 </div>
 
                 <button type="button" class="btn btn-primary pull-right" (click)='searchForRecipes()'>Search</button>
-                <span class="help-block" *ngIf='searchFormError'>Please make sure you have entered a value for all the boxes above before searching</span>
+                <span class="help-block" *ngIf='searchFormError'>Please make sure you have entered an ingredient name above before searching</span>
 
               </form>
 
@@ -392,8 +392,6 @@
 
                     <input type="text" name="food" id="food" placeholder="Enter food name..." class="form-control" ngModel #food="ngModel" required>
 
-                    <span class="help-block" *ngIf='searchFoodFormError'>Please make sure you have entered a value for all the boxes above before searching</span>
-
                   </div>
 
                 </div>
@@ -403,6 +401,7 @@
             </div>
 
             <button class="btn btn-primary pull-right" (click)="searchForFoods()">Search</button>
+            <span class="help-block" *ngIf='searchFoodFormError'>Please make sure you have entered a food name before searching</span>
 
           </form>
 
@@ -435,18 +434,101 @@
 
                     <div id="addFood" style="padding-left: 10px">
 
-                      <p>Calories: {{ result.calories }} | Carbs: {{ result.carbs }}g | Fat: {{ result.fat }}g | Protein: {{ result.protein }}g</p>
+                      <p>Calories: {{ result.defaultCalories }} | Carbs: {{ result.defaultCarbs }}g | Fat: {{ result.defaultFat }}g | Protein: {{ result.defaultProtein }}g</p>
 
                       <div class="mb-3"></div>
 
-                      <button rel="tooltip" class="btn btn-default btn-round pull-right" data-toggle="modal" data-target="#setNutrients" (click)="selectFood(pageNumber-1, j)">
+                      <button class="btn btn-default btn-round pull-right" (click)="formStep = 4.1 ;selectFood(pageNumber-1, j)">
                         Set quantity
                       </button>
+
+                      <!-- <button rel="tooltip" class="btn btn-default btn-round pull-right" data-toggle="modal" data-target="#setNutrients" (click)="selectFood(pageNumber-1, j)">
+                        Set quantity
+                      </button> -->
 
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+
+        </ng-container>
+
+        <ng-container *ngIf="formStep === 4.1">
+
+          <h3>{{ selectedFood.name }}</h3>
+
+          <div class="row" style="display: flex;">
+
+            <div class="col-6">
+
+              <img src="{{selectedFood.image}}" style="width: 100%;" />
+
+            </div>
+
+            <div class="col-6">
+
+              <div id="addFood" style="padding-left: 10px">
+
+                <div id="beforeNutrientsFound" *ngIf="nutrientsReturned === -1">
+
+                  <h4>Per {{ selectedFood.defaultQuantity }} {{ selectedFood.defaultMeasure }}</h4>
+
+                  <p>
+                    Calories: {{ selectedFood.defaultCalories }} <br/>
+                    Carbs: {{ selectedFood.defaultCarbs }}g <br/>
+                    Fat: {{ selectedFood.defaultFat }}g <br/>
+                    Protein: {{ selectedFood.defaultProtein }}g
+                  </p>
+
+                </div>
+
+                <mat-progress-spinner class="text-center" mode="indeterminate" *ngIf="nutrientsReturned === 0"></mat-progress-spinner>
+
+                <div id="afterNutrientsFound" *ngIf="nutrientsReturned === 1">
+
+                  <h4>Per {{ this.quantityDisplay }} {{ this.measureTypeDisplay }}s</h4>
+
+                  <p>
+                    Calories: {{ selectedFood.calories }} <br/>
+                    Carbs: {{ selectedFood.carbs }}g <br/>
+                    Fat: {{ selectedFood.fat }}g <br/>
+                    Protein: {{ selectedFood.protein }}g
+                  </p>
+
+                </div>
+
+                <form #measureForm='ngForm'>
+
+                  <!-- <div class="form-group">
+
+                    <div class="input-group"> -->
+
+                      <div class="input-group-prepend" style='padding-right:10px;'>
+
+                        <select name="measureType" id="measureType" class="browser-default custom-select mb-3" (change)="updateFoodNutrients(measureForm)" [(ngModel)]="selectedMeasureType">
+                          <option *ngFor="let type of selectedFood.measures" [ngValue]="type.label">{{type.label}}</option>
+                        </select>
+
+                      </div>
+
+                      <input type="number" name="quantity" placeholder="Quantity" class="form-control" ngModel required (blur)="updateFoodNutrients(measureForm)">
+
+                    <!-- </div>
+
+                  </div> -->
+
+                </form>
+
+                <div class="mb-3"></div>
+
+                <button rel="tooltip" class="btn btn-success btn-round pull-right" data-toggle="modal" (click)="addFood()">
+                  <i class="material-icons">add</i> Add to plan
+                </button>
+
+              </div>
+
             </div>
           </div>
 
@@ -468,7 +550,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="setNutrients" tabindex="-1" role="dialog" aria-labelledby="setNutrients" aria-hidden="true">
+<!-- <div class="modal fade" id="setNutrients" tabindex="-1" role="dialog" aria-labelledby="setNutrients" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -561,4 +643,4 @@
       </div>
     </div>
   </div>
-</div>
+</div> -->
