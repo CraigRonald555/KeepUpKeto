@@ -3,6 +3,7 @@
     <a routerLink="/">
       <img src="assets/img/KeepUpKeto.png"/>
     </a>
+    <p class='clickableText' data-toggle="modal" data-backdrop="static" data-target="#loginModel"><a style='color: #0079bf; font-family: arial; font-size: 12px'>Login</a></p>
   </div>
 </nav>
 
@@ -202,3 +203,81 @@
   </div>
 
 </div>
+
+<div class="modal fade" id="loginModel" tabindex="-1" role="dialog" aria-labelledby="loginModel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" *ngIf="loginStep === 0">Login</h5>
+        <h5 class="modal-title" *ngIf="loginStep === 1">Reset password</h5>
+        <button type="button" (click)='loginStep = 0' class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <form class='text-center' #loginForm='ngForm' (ngSubmit)='submitSignInDetails(loginForm)' ngNativeValidate [hidden]='loginStep !== 0'>
+
+          <div class="input-group mb-3">
+            <div class="input-group-append">
+              <span class="input-group-text"><i class="material-icons">email</i></span>
+            </div>
+            <input type="email" name="emailLogin" class="form-control" value="" placeholder="Email" ngModel #emailLogin='ngModel' required>
+          </div>
+          <p class="help-block" *ngIf='(!emailLogin.valid || emailLogin.value.length === 0) && emailLogin.touched'>
+            Please enter a valid email address
+          </p>
+
+          <div class="input-group mb-3">
+            <div class="input-group-append">
+              <span class="input-group-text"><i class="material-icons">lock</i></span>
+            </div>
+            <input type="password" name="passwordLogin" class="form-control" placeholder="Password" ngModel #passwordLogin='ngModel' required>
+          </div>
+          <p class="help-block" *ngIf='(!passwordLogin.valid || passwordLogin.value.length === 0) && passwordLogin.touched'>
+            Please enter in your password
+          </p>
+
+          <p class="help-block" *ngIf='loginAttemptFailed === true'>
+            Incorrect login details, please check you are typing in your details correctly
+          </p>
+
+          <p class="help-block" style="color: green" *ngIf='resetPasswordSuccess === true'>
+            An email has been sent to your email address to reset your password
+          </p>
+
+          <button type="submit" class="btn btn-primary">Login</button>
+          <p class="clickableText" (click)="loginStep = 1">Forgot password?</p>
+
+        </form>
+
+        <form class='text-center' #forgotPassword='ngForm' (ngSubmit)='submitResetPassword(forgotPassword)' ngNativeValidate [hidden]='loginStep !== 1'>
+
+          <div class="input-group mb-3">
+            <div class="input-group-append">
+              <span class="input-group-text"><i class="material-icons">email</i></span>
+            </div>
+            <input type="email" name="forgotEmail" id='forgotEmail' class="form-control" placeholder="Email" ngModel #forgotEmail='ngModel' required>
+          </div>
+          <p class="help-block" *ngIf='(!forgotEmail.valid || forgotEmail.value.length === 0) && forgotEmail.touched'>
+            Please enter a valid email address
+          </p>
+
+          <p class="help-block" *ngIf='resetPasswordError === true'>
+            We can't find that email in our system. Please check you've typed it in correctly.
+          </p>
+
+          <button type="submit" class="btn btn-primary">Reset password</button>
+
+          <p class="clickableText" (click)="loginStep = 0">Go back to login</p>
+
+        </form>
+
+	    </div>
+
+    </div>
+  </div>
+</div>
+
