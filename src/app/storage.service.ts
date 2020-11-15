@@ -143,17 +143,12 @@ export class StorageService {
 
   async removeRecipesNotInFirebase(dayName, recipesInFirebase) {
 
-    // Get all the recipes from storage
-    // Loop through each recipe's recipeID
-    // Check if recipeID is in recipesInFirebase
-    // If not remove it from storage
-
     const dayExists = this.checkDayIsInStorage(dayName);
 
     if (dayExists) {
 
       // Get day's recipes from storage
-      const recipesInStorage = this.getDayFromStorage(dayName).recipes;
+      const recipesInStorage = this.getDayFromStorage(dayName).edamamRecipes;
 
       // Loop through each recipe in storage
       for (let i = 0; i < recipesInStorage.length; i++) {
