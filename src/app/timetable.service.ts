@@ -23,7 +23,20 @@ export class TimetableService {
     noOfRecipes: number,
     isKetoFriendly: boolean, // Day is not keto friendly
     notKetoFriendlyReason: string, // Day is not keto friendly reason
-    edamamFoods
+    edamamFoods: {
+      foodID: string,
+      foodType: string,
+      name: string,
+      image: string,
+      measureType: string,
+      quantity: number,
+      calories: number,
+      carbs: number,
+      protein: number,
+      fat: number,
+      isKetoFriendly: boolean,
+      notKetoFriendlyReason: string
+    }[],
     edamamRecipes: {
       recipeID: string,
       recipeType: string,

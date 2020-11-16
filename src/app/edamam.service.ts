@@ -13,56 +13,6 @@ export class EdamamService {
 
     let measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_' + measureType.toLowerCase();
 
-    // switch (true) {
-
-    //   case measureType === 'Ounce':
-    //     measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_ounce';
-    //     break;
-    //   case measureType === 'Gram':
-    //     measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_gram';
-    //     break;
-    //   case measureType === 'Pound':
-    //     measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_pound';
-    //     break;
-    //   case measureType === 'Kilogram':
-    //     measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_kilogram';
-    //     break;
-    //   case measureType === 'Pinch':
-    //     measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_pinch';
-    //     break;
-    //   case measureType === 'Liter':
-    //     measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_liter';
-    //     break;
-    //   case measureType === 'Fluid ounce':
-    //     measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_fluid_ounce';
-    //     break;
-    //   case measureType === 'Gallon':
-    //     measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_gallon';
-    //     break;
-    //   case measureType === 'Pint':
-    //     measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_pint';
-    //     break;
-    //   case measureType === 'Quart':
-    //     measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_quart';
-    //     break;
-    //   case measureType === 'Milliliter':
-    //     measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_milliliter';
-    //     break;
-    //   case measureType === 'Drop':
-    //     measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_drop';
-    //     break;
-    //   case measureType === 'Cup':
-    //     measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_cup';
-    //     break;
-    //   case measureType === 'Tablespoon':
-    //     measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_tablespoon';
-    //     break;
-    //   case measureType === 'Teaspoon':
-    //     measureURL = 'http://www.edamam.com/ontologies/edamam.owl#Measure_teaspoon';
-    //     break;
-
-    // }
-
     return measureURL;
 
   }
