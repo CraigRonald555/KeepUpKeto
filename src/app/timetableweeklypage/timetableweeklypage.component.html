@@ -26,7 +26,7 @@
     <div class="row">
 
       <div class="col-12 col-sm-12">
-        <h3>{{dayWithRecipes.day}} <small>- {{dayWithRecipes.edamamRecipes.length}} recipes</small></h3>
+        <h3>{{dayWithRecipes.day}} <small>- {{dayWithRecipes.edamamRecipes.length + dayWithRecipes.edamamFoods.length}} meals</small></h3>
       </div>
 
     </div>
@@ -42,19 +42,19 @@
     </div>
 
     <owl-carousel [options]="mySlideOptions" [items]="myCarouselItems" [carouselClasses]="['owl-carousel', 'owl-theme']" #owlElement *ngIf="dayWithRecipes.edamamRecipes.length > 0">
-      <div class="recipe" *ngFor="let recipe of mySlideItems[i]; let j = index">
+      <div class="item" *ngFor="let item of mySlideItems[i]; let j = index">
 
-        <div [class]="recipe.recipeTypeHTML" (dblclick)="navigateToRecipe(recipe.recipeID, i)">
+        <div [class]="item.mealTypeHTML" (dblclick)="navigateToRecipe(item.genericID, i)">
           <div class="row">
               <div class="col-12">
-                <div class="clickable" style='position: fixed; right: 20px' (click)="this.timetableService.removeRecipeByObject(dayWithRecipes, j)">
+                <div class="clickable" style='position: fixed; right: 20px' (click)="this.removeMealFromDay(dayWithRecipes.day, item.edamamType, item.genericID);">
                   <i class="material-icons" style="color: white">close</i>
                 </div>
-                <img src="./assets/img/{{recipe.recipeTypeHTML}}_main.png" alt="" class="inner_img">
+                <img src="./assets/img/{{item.mealTypeHTML}}_main.png" alt="" class="inner_img">
                 <div class="inner_text">
-                  <h3>{{recipe.recipeType}}</h3>
-                  <h4>{{recipe.name}}</h4>
-                  <h4>{{recipe.calories}} kcal</h4>
+                  <h3>{{item.mealType}}</h3>
+                  <h4>{{item.name}}</h4>
+                  <h4>{{item.calories}} kcal</h4>
                 </div>
               </div>
 

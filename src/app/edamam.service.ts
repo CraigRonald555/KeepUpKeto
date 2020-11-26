@@ -44,7 +44,7 @@ export class EdamamService {
       await this.http.post(postURL, postIngredients).toPromise().then(async result => {
 
         // Check if the ENERC_KCAL exists in totalNutrients
-        if (result['totalNutrients'].hasOwnProperty('ENERC_KCAL')) {
+        if (await result['totalNutrients'].hasOwnProperty('ENERC_KCAL')) {
 
           returnNutrients.calories = Math.round(result['totalNutrients']['ENERC_KCAL']['quantity'] * 10) / 10;
 
@@ -99,24 +99,35 @@ export class EdamamService {
 
       const foods = result['hints'];
 
+      console.log(foods);
+
       for (let i = 0; i < foods.length; i++) {
 
         const currentFoodDetails = foods[i]['food'];
         const currentMeasures = foods[i]['measures'];
 
-        // console.log(currentFoodDetails);
+        let gramMeasure;
+        // Add 'Grams' to the start of the array by removing it and adding it to the 0th index
+        for (let j = currentMeasures.length - 1; j >= 0; j--) {
 
-        // const nutrients100g = await this.getFoodNutrients(currentFoodDetails['foodId'], "http://www.edamam.com/ontologies/edamam.owl#Measure_gram", 100);
+          const currentMeasurement = currentMeasures[j].label;
+          if (currentMeasurement === 'Gram') {
+            gramMeasure = currentMeasures[j];
+            currentMeasures.splice(j, 1);
+          }
+
+        }
+
+
+
+        currentMeasures.unshift(gramMeasure);
 
         foodToBePushedToReturnFoods = {
 
           foodId: currentFoodDetails['foodId'],
           name: currentFoodDetails['label'],
           image: currentFoodDetails['image'],
-          // calories: nutrients100g.calories,
-          // carbs: nutrients100g.carbs,
-          // fat: nutrients100g.fat,
-          // protein: nutrients100g.protein,
+          contents: currentFoodDetails['foodContentsLabel'].split('; '),
           calories: Math.round(currentFoodDetails['nutrients']['ENERC_KCAL'] * 10) / 10,
           carbs: Math.round(currentFoodDetails['nutrients']['CHOCDF'] * 10) / 10,
           fat: Math.round(currentFoodDetails['nutrients']['FAT'] * 10) / 10,

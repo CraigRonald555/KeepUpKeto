@@ -18,6 +18,7 @@ export class TimetablepageComponent implements AfterViewInit {
   showDaily = true;
   monShow = true;
 
+  // An array of all the recipes in the timetable
   allRecipes: {
     day: string,
     show: boolean,
@@ -29,20 +30,38 @@ export class TimetablepageComponent implements AfterViewInit {
     fatRemaining: number,
     totalCalories: number,
     caloriesRemaining: number,
-    // isKetoFriendly: boolean, // Day is not keto friendly
-    // notKetoFriendlyReason: string, // Day is not keto friendly reason
-    recipes: {
-      recipeID: string,
-      recipeType: string,
+    noOfRecipes: number,
+    isKetoFriendly: boolean, // Day is not keto friendly
+    notKetoFriendlyReason: string, // Day is not keto friendly reason
+    edamamFoods: {
+      foodID: string,
+      foodType: string,
       name: string,
       image: string,
+      contents: [],
+      measureType: string,
+      quantity: number,
       calories: number,
       carbs: number,
       protein: number,
       fat: number,
-      ingredients: []
-      // isKetoFriendly: boolean, // Recipe is not keto friendly
-      // notKetoFriendlyReason: string // Recipe is not keto friendly reason
+      isKetoFriendly: boolean,
+      notKetoFriendlyReason: string
+    }[],
+    edamamRecipes: {
+      recipeID: string,
+      recipeType: string,
+      name: string,
+      image: string,
+      url: string,
+      uri: string,
+      calories: number,
+      carbs: number,
+      protein: number,
+      fat: number,
+      ingredients: [],
+      isKetoFriendly: boolean, // Recipe is not keto friendly
+      notKetoFriendlyReason: string // Recipe is not keto friendly reason
     }[]
   }[];
 
@@ -57,6 +76,19 @@ export class TimetablepageComponent implements AfterViewInit {
     fatRemaining: number,
     totalCalories: number,
     caloriesRemaining: number,
+    edamamFoods: {
+      foodID: string,
+      foodType: string,
+      name: string,
+      image: string,
+      contents: [],
+      measureType: string,
+      quantity: number,
+      calories: number,
+      carbs: number,
+      protein: number,
+      fat: number
+    }[],
     edamamRecipes: {
       recipeID: string,
       recipeType: string,
@@ -90,8 +122,8 @@ export class TimetablepageComponent implements AfterViewInit {
   // Add food modal
   @ViewChild('closeAddFoodModal') public closeAddFoodModal: ElementRef;
   nutrientsReturned = -1; // -1 = false, 0 = searching, 1 = returned
-  quantityDisplay;
-  measureTypeDisplay;
+  quantityDisplay = 100;
+  measureTypeDisplay = 'Gram';
 
   // Search food modal
   @ViewChild('searchForFoodsForm') searchForFoodsForm;
@@ -100,7 +132,7 @@ export class TimetablepageComponent implements AfterViewInit {
   foodPageNumber = 1;
   foodSearchResults = [];
   selectedMeasureType;
-  selectedFood = {foodId: '', name: '', image: '', calories: 0, carbs: 0, protein: 0, fat: 0, measures: [], defaultMeasure: 'Grams', defaultQuantity: 100, defaultCalories: 0, defaultCarbs: 0, defaultFat: 0, defaultProtein: 0}; // Used for Add Food Modal
+  selectedFood = {foodId: '', foodType: '', name: '', image: '', contents: [], calories: 0, carbs: 0, protein: 0, fat: 0, measures: [], defaultMeasure: 'Grams', defaultQuantity: 100, defaultCalories: 0, defaultCarbs: 0, defaultFat: 0, defaultProtein: 0}; // Used for Add Food Modal
 
   // Search recipe modal
   @ViewChild('searchForRecipesForm') searchForRecipesForm;
@@ -122,60 +154,178 @@ export class TimetablepageComponent implements AfterViewInit {
     caloriesRemaining: 0
   };
 
-  itemsLoaded = false;
   mySlideItems = [];
   @ViewChild('owlElement') owlElement: OwlCarousel;
   myCarouselItems = [];
 
-  mySlideOptions = {margin: 5, dots: false, nav: false, responsive: {
-    0: {
-      items: 1,
-      autoplay: false,
-    },
-      361: {
-      items: 2,
-      autoplay: false,
-    },
-    600: {
-      items: 2,
-      autoplay: false,
-    },
-    680: {
-      items: 3,
-      autoplay: false,
-    },
-
-  }};
+  mySlideOptions = {margin: 5, dots: false, nav: false};
   // myCarouselOptions = {items: 3, dots: false, nav: true};
 
-  addRecipesToTodayCarousel(recipes) {
+  addMealsToTodayCarousel(recipes, foods) {
 
-    // this.itemsLoaded = false;
-    // this.owlElement.reInit();
-
+    // Reset the slide items
     this.mySlideItems = [];
+
+    // let mergedFoodsRecipes = recipes.concat(foods);
+    let mergedFoodsRecipes: {
+      genericID: string,
+      name: string,
+      image: string,
+      mealTypeHTML: string,
+      edamamType: string,
+      mealType: string,
+      calories: number,
+      carbs: number,
+      fat: number,
+      protein: number,
+
+      measureType: string,
+      quantity: number,
+
+      uri: string,
+      url: string,
+      ingredients: []
+    }[] = [];
 
     for (let i = 0; i < recipes.length; i++) {
 
       const currentRecipe = recipes[i];
-      currentRecipe.recipeTypeHTML = currentRecipe.recipeType.toLowerCase();
 
-      // Remove any numbers (mainly for meal plans which include 'Snack 1' & 'Snack 2') as this messes up the carousel css class which uses
-      // this variable to grab the snack image
-      currentRecipe.recipeTypeHTML = currentRecipe.recipeTypeHTML.replace(/[0-9]/g, '');
-      currentRecipe.recipeTypeHTML = currentRecipe.recipeTypeHTML.trim();
+      const mealToAdd: {
+        genericID: string,
+        name: string,
+        image: string,
+        mealTypeHTML: string,
+        edamamType: string,
+        mealType: string,
+        calories: number,
+        carbs: number,
+        fat: number,
+        protein: number,
 
-      console.log(`recipeType = ${currentRecipe.recipeType.toLowerCase()} | recipeTypeHTML: ${currentRecipe.recipeTypeHTML}`);
-      currentRecipe.isRecipe = true;
-      this.mySlideItems.push(currentRecipe);
+        measureType: string,
+        quantity: number,
+
+        uri: string,
+        url: string,
+        ingredients: []
+
+      } = {
+        genericID: currentRecipe.recipeID,
+        name: currentRecipe.name,
+        image: currentRecipe.image,
+        mealTypeHTML: currentRecipe.recipeType,
+        edamamType: 'recipe',
+        mealType: currentRecipe.recipeType,
+        calories: currentRecipe.calories,
+        carbs: currentRecipe.carbs,
+        fat: currentRecipe.fat,
+        protein: currentRecipe.protein,
+
+        measureType: undefined,
+        quantity: undefined,
+
+        uri: currentRecipe.uri,
+        url: currentRecipe.url,
+        ingredients: currentRecipe.ingredients
+
+      };
+
+      mergedFoodsRecipes.push(mealToAdd);
 
     }
 
-    this.owlElement.reInit();
-    console.log(this.owlElement);
-    // this.owlElement.refresh();
+    for (let i = 0; i < foods.length; i++) {
 
-    // this.itemsLoaded = true;
+      const currentFood = foods[i];
+
+      const mealToAdd: {
+        genericID: string,
+        name: string,
+        image: string,
+        mealTypeHTML: string,
+        edamamType: string,
+        mealType: string,
+        calories: number,
+        carbs: number,
+        fat: number,
+        protein: number,
+
+        measureType: string,
+        quantity: number,
+
+        uri: string,
+        url: string,
+        ingredients: []
+
+      } = {
+        genericID: currentFood.foodID,
+        name: currentFood.name,
+        image: currentFood.image,
+        mealTypeHTML: currentFood.foodType,
+        edamamType: 'food',
+        mealType: currentFood.foodType,
+        calories: currentFood.calories,
+        carbs: currentFood.carbs,
+        fat: currentFood.fat,
+        protein: currentFood.protein,
+
+        measureType: undefined,
+        quantity: undefined,
+
+        uri: currentFood.uri,
+        url: currentFood.url,
+        ingredients: currentFood.ingredients
+
+      };
+
+      mergedFoodsRecipes.push(mealToAdd);
+
+    }
+
+    console.log("mergedFoodsRecipes: ");
+    console.log(mergedFoodsRecipes);
+
+    // console.log('Merged recipes & foods in Carousel');
+    // console.log(mergedFoodsRecipes);
+
+    for (let i = 0; i < mergedFoodsRecipes.length; i++) {
+
+      const currentMeal = mergedFoodsRecipes[i];
+
+      // if (currentMeal.recipeType === undefined) {
+
+      //   currentMeal.mealType = currentMeal.foodType;
+      //   currentMeal.edamamType = 'food';
+      //   currentMeal.genericID = currentMeal.foodID;
+
+      // } else {
+
+      //   currentMeal.mealType = currentMeal.recipeType;
+      //   currentMeal.edamamType = 'recipe';
+      //   currentMeal.genericID = currentMeal.recipeID;
+
+      // }
+
+      currentMeal.mealTypeHTML = currentMeal.mealType.toLowerCase();
+
+      // Remove any numbers (mainly for meal plans which include 'Snack 1' & 'Snack 2') as this messes up the carousel css class which uses
+      // this variable to grab the snack image
+      currentMeal.mealTypeHTML = currentMeal.mealTypeHTML.replace(/[0-9]/g, '');
+      currentMeal.mealTypeHTML = currentMeal.mealTypeHTML.trim();
+
+      console.log(`mealType = ${currentMeal.mealType.toLowerCase()} | mealTypeHTML: ${currentMeal.mealTypeHTML}`);
+
+      console.log("Current meal before adding to array: ")
+      console.log(currentMeal);
+      this.mySlideItems.push(currentMeal);
+
+    }
+
+    // Renitialise the owlElement
+    this.owlElement.reInit();
+
+    console.log(this.owlElement);
 
   }
 
@@ -212,12 +362,21 @@ export class TimetablepageComponent implements AfterViewInit {
 
   }
 
-  navigateToRecipe(recipeID) {
+  navigateToMeal(genericID, edamamType) {
 
     this.selectedDayIndex = this.timetableService.getDayIndexByName(this.timetableService.getTodayName());
 
-    // Use ngZone run to remove the silly 'did you forget to run ngZone' error which would break owlCarousel and not actually navigate to recipe page
-    this.ngZone.run(() => this.router.navigate(['recipes/'], { queryParams: { 'selectedDayIndex': this.selectedDayIndex, 'recipeID': recipeID }})).then();
+    if (edamamType === 'recipe') {
+
+      // Use ngZone run to remove the silly 'did you forget to run ngZone' error which would break owlCarousel and not actually navigate to recipe page
+      this.ngZone.run(() => this.router.navigate(['recipes/'], { queryParams: { 'selectedDayIndex': this.selectedDayIndex, 'recipeID': genericID }})).then();
+
+    } else {
+
+        // Use ngZone run to remove the silly 'did you forget to run ngZone' error which would break owlCarousel and not actually navigate to recipe page
+        this.ngZone.run(() => this.router.navigate(['foods/'], { queryParams: { 'selectedDayIndex': this.selectedDayIndex, 'foodID': genericID }})).then();
+
+    }
 
   }
 
@@ -232,14 +391,19 @@ export class TimetablepageComponent implements AfterViewInit {
 
       this.updateProgress();
 
-      this.changeDetector.detectChanges();
+      try {
+        this.changeDetector.detectChanges();
+      } catch (error) {
+        console.log(error);
+      }
 
     });
 
   }
 
-  addFood() {
+  async removeMealFromDay(dayName, edamamType, mealID) {
 
+    await this.timetableService.removeRecipeByMealTypeAndID(dayName, edamamType, mealID);
 
   }
 
@@ -290,6 +454,7 @@ export class TimetablepageComponent implements AfterViewInit {
         // Go back to search for foods step
         this.nutrientsReturned = -1;
         this.formStep = 4;
+        this.quantityDisplay = 100;
         console.log('Gone back to formStep 4');
         break;
 
@@ -325,8 +490,11 @@ export class TimetablepageComponent implements AfterViewInit {
       // Reset the search variables
       this.recipeResultsReturned = -1;
       this.recipeSearchResults = [];
+
       this.foodResultsReturned = -1;
       this.foodSearchResults = [];
+      this.quantityDisplay = 100;
+      this.nutrientsReturned = -1;
 
     }
 
@@ -433,7 +601,7 @@ export class TimetablepageComponent implements AfterViewInit {
 
   }
 
-  addRecipeFromSearch(searchRecipesi, searchRecipesj) {
+  async addRecipeFromSearch(searchRecipesi, searchRecipesj) {
 
     const recipeToAdd = this.recipeSearchResults[searchRecipesi][searchRecipesj];
     recipeToAdd.recipeType = this.selectedMealType;
@@ -443,7 +611,31 @@ export class TimetablepageComponent implements AfterViewInit {
 
   }
 
+  async addFoodFromSearch() {
+
+    const foodToAdd = {
+      foodID: this.selectedFood.foodId,
+      foodType: this.selectedMealType,
+      name: this.selectedFood.name,
+      image: this.selectedFood.image,
+      contents: this.selectedFood.contents,
+      measureType: this.measureTypeDisplay,
+      quantity: this.quantityDisplay,
+      calories: this.selectedFood.calories,
+      carbs: this.selectedFood.carbs,
+      protein: this.selectedFood.protein,
+      fat: this.selectedFood.fat
+    };
+    console.log("Food to add: ");
+    console.log(foodToAdd);
+    console.log(this.selectedDayIndex);
+    await this.timetableService.addFoodToDay(this.selectedDayIndex, foodToAdd);
+
+  }
+
   ngAfterViewInit() {
+
+    console.log("ngAfterViewInit() executed");
 
     this.allRecipes = this.timetableService.getAllRecipes();
     this.todayRecipes = this.timetableService.getTodayRecipes();
@@ -455,16 +647,16 @@ export class TimetablepageComponent implements AfterViewInit {
 
   updateProgress() {
 
-    this.addRecipesToTodayCarousel(this.todayRecipes.edamamRecipes);
+    this.addMealsToTodayCarousel(this.todayRecipes.edamamRecipes, this.todayRecipes.edamamFoods);
 
-    console.log(`Daily Carbs: ${this.timetableService.dailyCarbs}`);
-    console.log(`Used Carbs ${this.todayRecipes.totalCarbs}`);
-    console.log(`Daily Protein: ${this.timetableService.dailyProtein}`);
-    console.log(`Used Protein ${this.todayRecipes.totalProtein}`);
-    console.log(`Daily Fat: ${this.timetableService.dailyFat}`);
-    console.log(`Used Fat ${this.todayRecipes.totalFat}`);
-    console.log(`Daily Calories: ${this.timetableService.dailyCalories}`);
-    console.log(`Used Calories: ${this.todayRecipes.totalCalories}`);
+    // console.log(`Daily Carbs: ${this.timetableService.dailyCarbs}`);
+    // console.log(`Used Carbs ${this.todayRecipes.totalCarbs}`);
+    // console.log(`Daily Protein: ${this.timetableService.dailyProtein}`);
+    // console.log(`Used Protein ${this.todayRecipes.totalProtein}`);
+    // console.log(`Daily Fat: ${this.timetableService.dailyFat}`);
+    // console.log(`Used Fat ${this.todayRecipes.totalFat}`);
+    // console.log(`Daily Calories: ${this.timetableService.dailyCalories}`);
+    // console.log(`Used Calories: ${this.todayRecipes.totalCalories}`);
 
     this.progressBars = {
       carbsPercentage: (this.todayRecipes.totalCarbs / this.timetableService.dailyCarbs) * 100,
@@ -477,8 +669,8 @@ export class TimetablepageComponent implements AfterViewInit {
       caloriesRemaining: Math.floor(this.todayRecipes.caloriesRemaining)
     };
 
-    console.log('Progress');
-    console.log(this.progressBars);
+    // console.log('Progress');
+    // console.log(this.progressBars);
 
   }
 

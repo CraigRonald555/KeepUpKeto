@@ -35,6 +35,7 @@ import { StorageService } from './storage.service';
 import { ProgressComponent } from './progress/progress.component';
 import { TimetableweeklypageComponent } from './timetableweeklypage/timetableweeklypage.component';
 import { ShoppinglistpageComponent } from './shoppinglistpage/shoppinglistpage.component';
+import { FoodComponent } from './food/food.component';
 
 const appRoutes = [
 
@@ -44,6 +45,7 @@ const appRoutes = [
     { path: 'timetable', component: TimetablepageComponent},
     { path: 'timetable/weekly', component: TimetableweeklypageComponent},
     { path: 'recipes', component: RecipeComponent},
+    { path: 'foods', component: FoodComponent},
     { path: 'instructions', component: InstructionsComponent },
     { path: 'progress', component: ProgressComponent},
     { path: 'shopping-list', component: ShoppinglistpageComponent}
@@ -68,7 +70,8 @@ const appRoutes = [
     InstructionsComponent,
     ProgressComponent,
     TimetableweeklypageComponent,
-    ShoppinglistpageComponent
+    ShoppinglistpageComponent,
+    FoodComponent
   ],
   imports: [
     BrowserModule,

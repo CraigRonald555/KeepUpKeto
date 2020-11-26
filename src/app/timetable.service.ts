@@ -28,6 +28,7 @@ export class TimetableService {
       foodType: string,
       name: string,
       image: string,
+      contents: [],
       measureType: string,
       quantity: number,
       calories: number,
@@ -136,18 +137,40 @@ export class TimetableService {
       fatRemaining: number,
       totalCalories: number,
       caloriesRemaining: number,
+      noOfRecipes: number,
+      isKetoFriendly: boolean, // Day is not keto friendly
+      notKetoFriendlyReason: string, // Day is not keto friendly reason
+      edamamFoods: {
+        foodID: string,
+        foodType: string,
+        name: string,
+        image: string,
+        contents: [],
+        measureType: string,
+        quantity: number,
+        calories: number,
+        carbs: number,
+        protein: number,
+        fat: number,
+        isKetoFriendly: boolean,
+        notKetoFriendlyReason: string
+      }[],
       edamamRecipes: {
         recipeID: string,
         recipeType: string,
         name: string,
         image: string,
+        url: string,
+        uri: string,
         calories: number,
         carbs: number,
         protein: number,
         fat: number,
-        ingredients: []
+        ingredients: [],
+        isKetoFriendly: boolean, // Recipe is not keto friendly
+        notKetoFriendlyReason: string // Recipe is not keto friendly reason
       }[]
-    }
+    };
 
     // Find today in the allRecipes array and save to todayRecipes
     this.allRecipes.forEach(element => {
@@ -201,7 +224,39 @@ export class TimetableService {
 
   }
 
-  addRecipeToDay(index: number, recipe: {
+  getMealIndexByID(mealArray, edamamType, mealID) {
+
+    let mealIndex = -1;
+
+    if (edamamType === 'recipe') {
+
+      for (let i = 0; i < mealArray.length; i++) {
+
+        const currentMeal = mealArray[i];
+        if (currentMeal.recipeID === mealID) {
+          mealIndex = i;
+        }
+
+      }
+
+    } else {
+
+      for (let i = 0; i < mealArray.length; i++) {
+
+        const currentMeal = mealArray[i];
+        if (currentMeal.foodID === mealID) {
+          mealIndex = i;
+        }
+
+      }
+
+    }
+
+    return mealIndex;
+
+  }
+
+  async addRecipeToDay(index: number, recipe: {
       recipeID: string,
       recipeType: string,
       name: string,
@@ -211,14 +266,15 @@ export class TimetableService {
       carbs: number,
       protein: number,
       fat: number,
-      ingredients: []}) {
+      ingredients: []}
+  ) {
 
         // Add recipe to dayWithRecipes
         const dayWithRecipes = this.getDayByIndex(index);
         dayWithRecipes.edamamRecipes.push(recipe);
 
         // Write recipe to localStorage and Firebase
-        this.writeRecipeToStorage(dayWithRecipes.day, recipe);
+        await this.auth.writeRecipeToUserTimetable(this.accountService.getUserID(), dayWithRecipes.day, recipe);
         // dayWithRecipes.noOfRecipes++;
 
         this.updateWeeklyTotals();
@@ -228,11 +284,38 @@ export class TimetableService {
          * Check the day is suitable by passing it to:
          * checkDayIsSuitable - will update variables in the day's object (in allRecipes array) if it's not suitable
          */
-        this.checkRecipeIsSuitable(recipe);
-        this.checkDayIsSuitable(this.getDayByIndex(index));
-        this.arrayUpdated.emit('Array Updated');
+        // this.checkRecipeIsSuitable(recipe);
+        // this.checkDayIsSuitable(this.getDayByIndex(index));
 
-    }
+  }
+
+  async addFoodToDay(index: number, food: {
+    foodID: string,
+    foodType: string,
+    name: string,
+    image: string,
+    contents: string[],
+    measureType: string,
+    quantity: number,
+    calories: number,
+    carbs: number,
+    protein: number,
+    fat: number
+  }) {
+
+      // Add food to dayWithRecipes
+      const dayWithRecipes = this.getDayByIndex(index);
+      dayWithRecipes.edamamFoods.push(food);
+
+      // Write food to localStorage and Firebase
+      await this.auth.writeFoodToUserTimetable(this.accountService.getUserID(), dayWithRecipes.day, food);
+
+      this.updateWeeklyTotals();
+
+      // this.checkRecipeIsSuitable(food);
+      // this.checkDayIsSuitable(this.getDayByIndex(index));
+
+  }
 
   addRecipesToDay(index: number, edamamRecipes: {
       recipeID: string
@@ -257,9 +340,8 @@ export class TimetableService {
        * Check the day is suitable by passing it to:
        * checkDayIsSuitable - will update variables in the day's object (in allRecipes array) if it's not suitable
        */
-      this.checkRecipeIsSuitable(...edamamRecipes);
-      this.checkDayIsSuitable(this.getDayByIndex(index));
-      this.arrayUpdated.emit('Array Updated');
+      // this.checkRecipeIsSuitable(...edamamRecipes);
+      // this.checkDayIsSuitable(this.getDayByIndex(index));
 
   }
 
@@ -277,7 +359,40 @@ export class TimetableService {
     // dayWithRecipes.noOfRecipes--;
 
     this.updateWeeklyTotals();
-    this.arrayUpdated.emit('Array updated');
+
+  }
+
+  async removeRecipeByMealTypeAndID(dayName, edamamType, mealID) {
+
+    this.storageService.setDayIsUpToDate(dayName, 'false');
+
+    // Remove from firebase and localStorage
+    await this.auth.removeMealFromUserTimetable(this.accountService.getUserID(), dayName, edamamType, mealID);
+
+    // Get day which holds meal to be removed
+    const dayIndex = this.getDayIndexByName(dayName);
+    const dayWithRecipes = this.getDayByIndex(dayIndex);
+
+    // Find the mealIndex in the corresponding array in the day
+    let mealIndex;
+    if (edamamType === 'recipe') {
+
+      mealIndex = this.getMealIndexByID(dayWithRecipes.edamamRecipes, edamamType, mealID);
+
+      // Remove the meal from edamamRecipes
+      dayWithRecipes.edamamRecipes.splice(mealIndex, 1);
+
+    } else {
+
+      mealIndex = this.getMealIndexByID(dayWithRecipes.edamamFoods, edamamType, mealID);
+
+      // Remove the meal from edamamFoods
+      dayWithRecipes.edamamFoods.splice(mealIndex, 1);
+
+    }
+
+    // Refresh
+    this.updateWeeklyTotals();
 
   }
 
@@ -315,7 +430,6 @@ export class TimetableService {
       // dayObject.noOfRecipes--;
 
       this.updateWeeklyTotals();
-      this.arrayUpdated.emit('Array updated');
 
   }
 
@@ -386,25 +500,66 @@ export class TimetableService {
         console.log(error);
       }
 
+      try {
+
+        dayElement.edamamFoods.forEach(foodElement => {
+
+          // Add each of the food's nutrients totals to the total nutrients for the day
+          totalCalsForDay = totalCalsForDay + foodElement.calories;
+          totalCarbsForDay = totalCarbsForDay + foodElement.carbs;
+          totalProteinForDay = totalProteinForDay + foodElement.protein;
+          totalFatForDay = totalFatForDay + foodElement.fat;
+
+          // While looping through each food, round the food's nutrient values to one decimal place
+
+          foodElement.calories = parseFloat(foodElement.calories.toFixed(1));
+          foodElement.carbs = parseFloat(foodElement.carbs.toFixed(1));
+          foodElement.protein = parseFloat(foodElement.protein.toFixed(1));
+          foodElement.fat = parseFloat(foodElement.fat.toFixed(1));
+
+        });
+
+        // Assign the totals to the allRecipes object variables
+        dayElement.caloriesRemaining = parseFloat((this.dailyCalories - totalCalsForDay).toFixed(1));
+        dayElement.carbsRemaining = parseFloat((this.dailyCarbs - totalCarbsForDay).toFixed(1));
+        dayElement.proteinRemaining = parseFloat((this.dailyProtein - totalProteinForDay).toFixed(1));
+        dayElement.fatRemaining = parseFloat((this.dailyFat - totalFatForDay).toFixed(1));
+
+        dayElement.totalCalories = parseFloat(totalCalsForDay.toFixed(1));
+        dayElement.totalCarbs = parseFloat(totalCarbsForDay.toFixed(1));
+        dayElement.totalProtein = parseFloat(totalProteinForDay.toFixed(1));
+        dayElement.totalFat = parseFloat(totalFatForDay.toFixed(1));
+
+
+      } catch (error) {
+        console.log(error);
+      }
+
     });
 
     this.arrayUpdated.emit('Array changed');
 
   }
 
-  async writeRecipeToStorage(day, recipe) {
+  writeRecipeToStorage(day, recipe) {
 
-    this.auth.writeRecipeToUserTimetable(this.accountService.getUserID(), day, recipe);
+
+
+  }
+
+  async writeFoodToStorage(day, food) {
+
+
 
   }
 
   async clearAll() {
 
     await this.auth.clearAllRecipes(this.accountService.getUserID());
+    await this.auth.clearAllFoods(this.accountService.getUserID());
     this.allRecipes = [];
     await this.checkStorage();
     this.updateWeeklyTotals();
-    this.arrayUpdated.emit('Array cleared');
 
   }
 
@@ -421,12 +576,19 @@ export class TimetableService {
       // This method checks if the recipe IDs in Firebase are the same as the ones in the localStorage for the current day
       await this.auth.checkDayMatchesBetweenStorageAndFirebase(this.accountService.getUserID(), currentDay);
 
+      // This method sets a dayIsUpToDate value on the day's storage object to true or false depending if
+      // the foods between firebase and localStorage match
+      await this.auth.checkDayMatchesBetweenStorageAndFirebaseFoods(this.accountService.getUserID(), currentDay);
+
       const dayIsUpToDate = this.storageService.checkDayIsUpToDate(currentDay);
 
       if (!dayIsUpToDate) {
 
         console.log(`${currentDay} is not up-to-date`);
+
         await this.auth.updateLocalStorageFromFirebase(this.accountService.getUserID(), currentDay); // This method fills storage
+        await this.auth.updateLocalStorageFromFirebaseFoods(this.accountService.getUserID(), currentDay); // This method fills storage
+
         this.storageService.setDayIsUpToDate(currentDay, true);
         console.log(this.storageService.getDayFromStorage(currentDay));
 
@@ -746,7 +908,7 @@ export class TimetableService {
    */
   getRecipePlanStructure(currentDay: any) {
 
-      const noOfRecipes = currentDay.edamamRecipes.length;
+      const noOfMeals = currentDay.edamamRecipes.length + currentDay.edamamFoods.length;
 
       // This reciplePlan object will be used to store the determined recipeType, caloriePercentage, fatPercentage, proteinPercentage
       // and carbsPercentage for each recipe.
@@ -760,7 +922,7 @@ export class TimetableService {
 
 
       // If there's no recipes, then the app checks how many calories are remaining and pushes recipe plans into the array
-      if (noOfRecipes === 0) {
+      if (noOfMeals === 0) {
 
         switch (true) {
 
@@ -862,7 +1024,7 @@ export class TimetableService {
 
         }
 
-      if (noOfRecipes > 0) {
+      if (noOfMeals > 0) {
 
         /* If there's one or more recipes then the application has to loop through all the recipes and check to see
          * which recipeTypes (breakfast, lunch, dinner, etc.) have already been included.

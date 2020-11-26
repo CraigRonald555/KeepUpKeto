@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { User } from 'firebase';
 import { AngularFireDatabase } from '@angular/fire/database';
 import { StorageService } from './storage.service';
-import { string } from 'mathjs';
+import { e, string } from 'mathjs';
 
 @Injectable({
   providedIn: 'root'
@@ -336,6 +336,77 @@ export class AuthService {
 
   }
 
+  async checkDayMatchesBetweenStorageAndFirebaseFoods(uid, dayName) {
+
+    // Retrieve the foods from Storage for the given dayName
+    const foodsInStorage = this.storageService.getDayFromStorage(dayName).edamamFoods;
+
+    // Retrieve the foods from Firebase for the given dayName
+    const foodsInFirebase = await this.readDataFromFirebase(`timetables/${uid}/${dayName}/edamamFoods`);
+
+    // Before we can check the length of foodsInFirebase, we should check it's not equal to null otherwise we'll get an error
+    if (foodsInFirebase !== null) {
+
+      // If the number of foods in Storage and Firebase don't match then set isUpToDate false
+      if (foodsInStorage.length !== Object.keys(foodsInFirebase).length) {
+
+        this.storageService.setDayIsUpToDate(dayName, false);
+
+        // If there are the same amount of food in each then we'll still have to check the foodIDs in localStorage match those in Firebase
+      } else {
+
+          // Loop though each food in Storage
+        for (let i = 0; i < foodsInStorage.length; i++) {
+
+          console.log(`Detected foods in Firebase for ${dayName}`);
+
+          // Store the currentFoodID we're up to in Storage food loop
+          const currentFoodIDStorage = foodsInStorage[i].foodID;
+
+          // Before we loop through the Firebase foods, set a found variable to false
+          let foundFoodIDFromStorageInFirebase = false;
+
+          // Loop through the foodIDs in Firebase
+          for (const currentFoodIDFirebase in foodsInFirebase) {
+
+            // If the current food ID in Firebase is equal to the one in Storage, set the found variable to true
+            if (currentFoodIDFirebase === currentFoodIDStorage) {
+
+              console.log(`Found the current food from Storage in Firebase - ${dayName}`);
+              foundFoodIDFromStorageInFirebase = true;
+
+            }
+
+          }
+
+          // After looping through the Firebase recipe IDs, if we didn't find the currentRecipeID from Storage in Firebase's foods
+          if (!foundFoodIDFromStorageInFirebase) {
+
+            // Then we need to set the isUpToDate value to false for the day in storage as there's a recipe we have in Storage which isn't in Firebase
+            this.storageService.setDayIsUpToDate(dayName, false);
+
+          }
+
+          console.log('Foods in Firebase from checkDayMatchesBetweenStorageAndFirebaseFoods()' + foodsInFirebase);
+
+        }
+
+      }
+
+      // If foodsInFirebase is null
+    } else {
+
+      // Check foods in storage has at least one recipe, if it does isUpToDate to false as we can't have no foods in Firebase and some in localStorage
+      if (foodsInStorage.length > 0 ) {
+
+        this.storageService.setDayIsUpToDate(dayName, false);
+
+      }
+
+    }
+
+  }
+
   async checkDayMatchesBetweenStorageAndFirebase(uid, dayName) {
 
     // Retrieve the recipes from Storage for the given dayName
@@ -454,6 +525,49 @@ export class AuthService {
 
   }
 
+  async removeMealFromUserTimetable(uid, dayName, edamamType, mealID) {
+
+    // Check user has a timetable
+    if (await this.checkReferenceExists(`timetables/${uid}`)) {
+
+      // Check timetable has the day the meal is intended to be removed from
+      if (await this.checkReferenceExists(`timetables/${uid}/${dayName}`)) {
+
+        // This is used in the firebase reference
+        const edamamTypeReference = 'recipe' === edamamType ? 'edamamRecipes' : 'edamamFoods';
+
+        // Check meal intended to be removed exists in the day
+        if (await this.checkReferenceExists(`timetables/${uid}/${dayName}/${edamamTypeReference}/${mealID}`)) {
+
+          await this.fbDB.database.ref(`timetables/${uid}/${dayName}/${edamamTypeReference}/${mealID}`).remove().catch(error => {
+
+            console.log(error);
+
+          });
+
+        } else {
+
+          // Try remove meal from storage anyway, Firebase may have updated without telling us
+          this.storageService.removeMealFromDay(dayName, edamamType, mealID);
+
+        }
+
+      } else {
+
+        // Try remove meal from storage anyway, Firebase may have updated without telling us
+        this.storageService.removeMealFromDay(dayName, edamamType, mealID);
+
+      }
+
+    } else {
+
+      // Try remove meal from storage anyway, Firebase may have updated without telling us
+      this.storageService.removeMealFromDay(dayName, edamamType, mealID);
+
+    }
+
+  }
+
   async removeRecipeFromUserTimetable(uid, dayName, recipe) {
 
     // Check user has a timetable
@@ -467,7 +581,7 @@ export class AuthService {
         console.log('User has the day which the recipe is intended for in Firebase');
 
         // Check recipe intended to be removed exists in the day
-        if (await this.checkReferenceExists(`timetables/${uid}/${dayName}/edamamRecipes/${recipe.recipeID}`) === true) {
+        if (await this.checkReferenceExists(`timetables/${uid}/${dayName}/edamamRecipes/${recipe.recipeID}`)) {
 
           console.log('Recipe to be removed exists');
 
@@ -562,7 +676,7 @@ export class AuthService {
 
       } else {
 
-        this.addDayToTimetable(uid, dayName);
+        await this.addDayToTimetable(uid, dayName);
         await this.storageService.addDayToStorage(dayName);
 
       }
@@ -570,7 +684,7 @@ export class AuthService {
     } else {
 
       // Add a new timetable for the user then call addDefaultTimetable
-      this.addDefaultTimetable(uid);
+      await this.addDefaultTimetable(uid);
       // Write the new days to localStorage if it doesn't exist there
 
     }
@@ -584,35 +698,84 @@ export class AuthService {
 
   }
 
-  async writeEdamamRecipeToDatabase(recipeID, title, imageURL) {
+  async writeFoodToUserTimetable(uid, dayName, food) {
 
-    /* uri e.g. "http://www.edamam.com/ontologies/edamam.owl#recipe_3bc88115588b85b4a4b6c717a510f9a5"
-     * The line below creates a substring from the character after _ to the end i.e. the recipeID at the end
-     */
+    let foodExistsInFirebase = false;
+    let foodExistsInStorage = false;
 
-    // Check if recipeID exists in Firebase recipes
-    await this.fbDB.database.ref('edamamRecipes/' + recipeID).once('value').then(async snapshot => {
+    // Check user has a timetable
+    if (await this.checkReferenceExists(`timetables/${uid}`)) {
 
-      // If it doesn't exist then write the recipe into recipes
-      if (!snapshot.exists()) {
+      console.log('User has a timetable in Firebase');
 
-        await this.fbDB.database.ref('edamamRecipes/' + recipeID).set({
-          isEdamam: true,
-          title: title,
-          imageURL: imageURL
+      // Check timetable has the day the food is intended for
+      if (await this.checkReferenceExists(`timetables/${uid}/${dayName}`)) {
 
-        }).catch(error => {
+        console.log('User has the day which the food is intended for in Firebase');
 
-          console.log(error);
+        // Check doesn't food doesn't exists in the day the food is intended for
+        if (await this.checkReferenceExists(`timetables/${uid}/${dayName}/edamamFoods/${food.foodID}`) === false) {
 
-        });
+          console.log('Food doesnt exist in timetable');
+
+          // add food to firebase
+          await this.fbDB.database.ref(`timetables/${uid}/${dayName}/edamamFoods/${food.foodID}`).set({
+
+            foodType: food.foodType,
+            name: food.name,
+            image: food.image,
+            measureType: food.measureType,
+            quantity: food.quantity
+
+          }).catch(error => {
+
+            console.log(error);
+
+          });
+
+          // Add food to storage as well
+          await this.storageService.addFoodToDay(dayName, food);
+
+          foodExistsInStorage = true;
+          foodExistsInFirebase = true;
+
+          // If food already exists
+        } else {
+
+          console.log('Food already exists in Firebase');
+          foodExistsInFirebase = true;
+
+          // Check if food also exists in storage, if it doesn't add it
+          if (!this.storageService.checkFoodIsInStorage(dayName, food.foodID)) {
+
+            await this.storageService.addFoodToDay(dayName, food);
+            foodExistsInStorage = true;
+
+          }
+
+        }
+
+      } else {
+
+        await this.addDayToTimetable(uid, dayName);
+        this.storageService.addDayToStorage(dayName);
 
       }
 
-    });
+    } else {
 
-    // Pushes recipe into recipes and returns the newRecipeKey
-    // const newRecipeKey = this.fbDB.database.ref().child('recipes').push().key;
+      // Add a new timetable for the user then call addDefaultTimetable
+      await this.addDefaultTimetable(uid);
+      // Write the new days to localStorage if it doesn't exist there
+
+    }
+
+    // Recursive loop if the method doesn't manage to get to the final nested if
+    // if (!(recipeExistsInFirebase && recipeExistsInStorage)) {
+
+    //   await this.writeRecipeToUserTimetable(uid, dayName, recipe);
+
+    // }
 
   }
 
@@ -630,7 +793,31 @@ export class AuthService {
 
         for (const recipeID in recipesInFirebase) {
 
-          this.fbDB.database.ref(`timetables/${uid}/${currentDay}/edamamRecipes/${recipeID}`).remove();
+          await this.fbDB.database.ref(`timetables/${uid}/${currentDay}/edamamRecipes/${recipeID}`).remove();
+
+        }
+      }
+    }
+
+    this.storageService.clearAll();
+
+  }
+
+  async clearAllFoods(uid) {
+
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+    for (let i = 0; i < days.length; i++) {
+
+      const currentDay = days[i];
+
+      if (await this.checkReferenceExists(`timetables/${uid}/${currentDay}`)) {
+
+        const foodsInFirebase = await this.readDataFromFirebase(`timetables/${uid}/${currentDay}/edamamFoods`);
+
+        for (const foodID in foodsInFirebase) {
+
+          await this.fbDB.database.ref(`timetables/${uid}/${currentDay}/edamamFoods/${foodID}`).remove();
 
         }
       }
@@ -683,4 +870,79 @@ export class AuthService {
 
   }
 
+  async updateLocalStorageFromFirebaseFoods(uid, dayName) {
+
+    // Check day exists in Firebase
+    if (await this.checkReferenceExists(`timetables/${uid}/${dayName}`)) {
+
+      console.log(`${dayName} exists in Firebase`);
+
+      // Check/Add day exists in localStorage - addDayToStorage will only add if there isn't one in there
+      this.storageService.addDayToStorage(dayName);
+
+      // Need the show and foods array from Firebase, first check foods exist
+      if (await this.checkReferenceExists(`timetables/${uid}/${dayName}/edamamFoods`)) {
+
+        console.log(`${dayName}'s foods exist in Firebase`);
+
+        // Retrieve list of Firebase foods for this currentDay
+        const foodsInFirebase = await this.readDataFromFirebase(`timetables/${uid}/${dayName}/edamamFoods`);
+
+        await this.storageService.addFoodsFromFirebase(dayName, foodsInFirebase);
+
+        await this.storageService.removeFoodsNotInFirebase(dayName, foodsInFirebase);
+
+        // No foods in currentDay in Firebase
+      } else {
+
+        console.log(`There are no foods for ${dayName} in Firebase`);
+
+        // Perhaps write noOffoods to the object stored in the localStorage for currentDay
+
+        this.storageService.removeAllFoodsFromDay(dayName);
+        console.log(`Foods should now be removed from localStorage for ${dayName}`);
+
+      }
+
+      // Day doesn't exist in Firebase
+    } else {
+
+      console.log(`${dayName} doesnt exist in Firebase`);
+
+    }
+
+  }
+
 }
+
+  // async writeEdamamRecipeToDatabase(recipeID, title, imageURL) {
+
+  //   /* uri e.g. "http://www.edamam.com/ontologies/edamam.owl#recipe_3bc88115588b85b4a4b6c717a510f9a5"
+  //    * The line below creates a substring from the character after _ to the end i.e. the recipeID at the end
+  //    */
+
+  //   // Check if recipeID exists in Firebase recipes
+  //   await this.fbDB.database.ref('edamamRecipes/' + recipeID).once('value').then(async snapshot => {
+
+  //     // If it doesn't exist then write the recipe into recipes
+  //     if (!snapshot.exists()) {
+
+  //       await this.fbDB.database.ref('edamamRecipes/' + recipeID).set({
+  //         isEdamam: true,
+  //         title: title,
+  //         imageURL: imageURL
+
+  //       }).catch(error => {
+
+  //         console.log(error);
+
+  //       });
+
+  //     }
+
+  //   });
+
+  //   // Pushes recipe into recipes and returns the newRecipeKey
+  //   // const newRecipeKey = this.fbDB.database.ref().child('recipes').push().key;
+
+  // }

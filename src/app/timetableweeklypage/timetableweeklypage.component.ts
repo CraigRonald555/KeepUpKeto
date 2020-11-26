@@ -22,20 +22,37 @@ export class TimetableweeklypageComponent implements AfterViewInit {
     fatRemaining: number,
     totalCalories: number,
     caloriesRemaining: number,
-    // isKetoFriendly: boolean, // Day is not keto friendly
-    // notKetoFriendlyReason: string, // Day is not keto friendly reason
+    noOfRecipes: number,
+    isKetoFriendly: boolean, // Day is not keto friendly
+    notKetoFriendlyReason: string, // Day is not keto friendly reason
+    edamamFoods: {
+      foodID: string,
+      foodType: string,
+      name: string,
+      image: string,
+      measureType: string,
+      quantity: number,
+      calories: number,
+      carbs: number,
+      protein: number,
+      fat: number,
+      isKetoFriendly: boolean,
+      notKetoFriendlyReason: string
+    }[],
     edamamRecipes: {
       recipeID: string,
       recipeType: string,
       name: string,
       image: string,
+      url: string,
+      uri: string,
       calories: number,
       carbs: number,
       protein: number,
       fat: number,
-      ingredients: []
-      // isKetoFriendly: boolean, // Recipe is not keto friendly
-      // notKetoFriendlyReason: string // Recipe is not keto friendly reason
+      ingredients: [],
+      isKetoFriendly: boolean, // Recipe is not keto friendly
+      notKetoFriendlyReason: string // Recipe is not keto friendly reason
     }[]
   }[];
 
@@ -110,7 +127,7 @@ export class TimetableweeklypageComponent implements AfterViewInit {
 
       const currentDayWithRecipes = this.allRecipes[i];
 
-      this.addRecipesToTodayCarousel(i, currentDayWithRecipes.edamamRecipes);
+      this.addMealsToCarousel(i, currentDayWithRecipes.edamamRecipes, currentDayWithRecipes.edamamFoods);
 
       this.progressBars[i] = {
         carbsPercentage: (currentDayWithRecipes.totalCarbs / this.timetableService.dailyCarbs) * 100,
@@ -130,23 +147,47 @@ export class TimetableweeklypageComponent implements AfterViewInit {
 
   }
 
-  addRecipesToTodayCarousel(dayIndex, recipes) {
+  async removeMealFromDay(dayName, edamamType, mealID) {
+
+    await this.timetableService.removeRecipeByMealTypeAndID(dayName, edamamType, mealID);
+
+  }
+
+  addMealsToCarousel(dayIndex, recipes, foods) {
 
     // Resets/Initialise array for this day
     this.mySlideItems[dayIndex] = [];
 
-    for (let i = 0; i < recipes.length; i++) {
+    let mergedFoodsRecipes = foods.concat(recipes);
 
-      const currentRecipe = recipes[i];
-      currentRecipe.recipeTypeHTML = currentRecipe.recipeType.toLowerCase();
+    for (let i = 0; i < mergedFoodsRecipes.length; i++) {
+
+      const currentMeal = mergedFoodsRecipes[i];
+
+      if (currentMeal.recipeType === undefined) {
+
+        console.log(`Food type: ${currentMeal.foodType}`);
+        currentMeal.mealType = currentMeal.foodType;
+        currentMeal.edamamType = 'food';
+        currentMeal.genericID = currentMeal.foodID;
+
+      } else {
+
+        console.log(`Recipe type: ${currentMeal.recipeType}`);
+        currentMeal.mealType = currentMeal.recipeType;
+        currentMeal.edamamType = 'recipe';
+        currentMeal.genericID = currentMeal.recipeID;
+
+      }
+
+      currentMeal.mealTypeHTML = currentMeal.mealType.toLowerCase();
 
       // Remove any numbers (mainly for meal plans which include 'Snack 1' & 'Snack 2') as this messes up the carousel css class which uses
       // this variable to grab the snack image
-      currentRecipe.recipeTypeHTML = currentRecipe.recipeTypeHTML.replace(/[0-9]/g, '');
-      currentRecipe.recipeTypeHTML = currentRecipe.recipeTypeHTML.trim();
+      currentMeal.mealTypeHTML = currentMeal.mealTypeHTML.replace(/[0-9]/g, '');
+      currentMeal.mealTypeHTML = currentMeal.mealTypeHTML.trim();
 
-      currentRecipe.isRecipe = true;
-      this.mySlideItems[dayIndex].push(currentRecipe);
+      this.mySlideItems[dayIndex].push(currentMeal);
 
     }
 

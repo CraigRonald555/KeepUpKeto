@@ -101,6 +101,33 @@ export class StorageService {
 
   }
 
+  checkMealIsInStorage(dayName, edamamType, mealID) {
+
+    const dayExists = this.checkDayIsInStorage(dayName);
+    let mealExists = false;
+
+    if (dayExists) {
+
+      const dayWithRecipes = this.getDayFromStorage(dayName);
+
+      if (edamamType === 'recipe') {
+
+        // A fancy way of checking if the passed recipe exists in the dayWithRecipes recipes array.
+        mealExists = dayWithRecipes.edamamRecipes.filter(recipe => recipe.recipeID === mealID).length > 0 ? true : false;
+
+      } else {
+
+        // A fancy way of checking if the passed recipe exists in the dayWithRecipes recipes array.
+        mealExists = dayWithRecipes.edamamFoods.filter(food => food.foodID === mealID).length > 0 ? true : false;
+
+      }
+
+    }
+
+    return mealExists;
+
+  }
+
   checkRecipeIsInStorage(dayName, recipeID) {
 
     const dayExists = this.checkDayIsInStorage(dayName);
@@ -119,6 +146,24 @@ export class StorageService {
 
   }
 
+  checkFoodIsInStorage(dayName, foodID) {
+
+    const dayExists = this.checkDayIsInStorage(dayName);
+    let foodExists = false;
+
+    if (dayExists) {
+
+      const dayWithFoods = this.getDayFromStorage(dayName);
+
+      // A fancy way of checking if the passed food exists in the dayWithFoods foods array.
+      foodExists = dayWithFoods.edamamFoods.filter(food => food.foodID === foodID).length > 0 ? true : false;
+
+    }
+
+    return foodExists;
+
+  }
+
   addDayToStorage(dayName) {
 
     // Assign whether the day exists in localStorage to true or false
@@ -131,13 +176,62 @@ export class StorageService {
         day: dayName,
         show: true,
         isUpToDate: false,
-        edamamRecipes: []
+        edamamRecipes: [],
+        edamamFoods: []
       };
 
       // Push day name as the key and the dayWithRecipes as the value
       window.localStorage.setItem(dayWithRecipes.day, JSON.stringify(dayWithRecipes));
 
     }
+
+  }
+
+  async removeFoodsNotInFirebase(dayName, foodsInFirebase) {
+
+    const dayExists = this.checkDayIsInStorage(dayName);
+
+    if (dayExists) {
+
+      // Get day's foods from storage
+      const foodsInStorage = this.getDayFromStorage(dayName).edamamFoods;
+
+      // Loop through each food in storage
+      for (let i = 0; i < foodsInStorage.length; i++) {
+
+        // Store storage food id
+        const currentStorageFoodID = foodsInStorage[i].foodID;
+
+        // Use this to detect whether the food in storage is also found in Firebase array
+        let foodFound = false;
+
+        // Loop through the foodIDs in the Firebase object
+        for (const currentFirebaseFoodID in foodsInFirebase) {
+
+          // If food in storage is in firebase array, set foodFound to true
+          if (currentFirebaseFoodID === currentStorageFoodID) {
+            foodFound = true;
+          }
+
+        }
+
+        // If food wasn't found during the loop above
+        if (!foodFound) {
+
+          // Remove food from storage
+          this.removeFoodFromDay(dayName, currentStorageFoodID);
+
+        }
+
+      }
+
+      // If day doesn't exist in storage
+    } else {
+
+      // Do nothing?
+
+    }
+
 
   }
 
@@ -189,7 +283,30 @@ export class StorageService {
 
   }
 
+  removeAllFoodsFromDay(dayName) {
 
+    const dayExists = this.checkDayIsInStorage(dayName);
+
+    if (dayExists) {
+
+      const emptyFoods = [];
+
+      const dayInStorage = this.getDayFromStorage(dayName);
+      const oldFoods = dayInStorage.edamamFoods;
+
+      // If foods exists in dayInStorage
+      if (!(oldFoods === undefined || oldFoods === null)) {
+
+        console.log(`There are currently foods in storage for ${dayName}`);
+
+        dayInStorage.edamamFoods = emptyFoods;
+        window.localStorage.setItem(dayName, JSON.stringify(dayInStorage));
+
+      }
+
+    }
+
+  }
 
   removeAllRecipesFromDay(dayName) {
 
@@ -216,6 +333,24 @@ export class StorageService {
 
   }
 
+  removeFoodFromDay(dayName, foodID) {
+
+    const foodExists = this.checkRecipeIsInStorage(dayName, foodID);
+
+    if (foodExists) {
+
+      console.log('Food exists in storage');
+
+      const dayInStorage = this.getDayFromStorage(dayName);
+
+      // Remove recipe from a day
+      dayInStorage.edamamFoods = dayInStorage.edamamFoods.filter(food => food.foodID !== foodID);
+      window.localStorage.setItem(dayName, JSON.stringify(dayInStorage));
+
+    }
+
+  }
+
   removeRecipeFromDay(dayName, recipeID) {
 
     const recipeExists = this.checkRecipeIsInStorage(dayName, recipeID);
@@ -234,152 +369,104 @@ export class StorageService {
 
   }
 
-  // async addRecipesFromFirebaseOld(dayName, recipesInFirebase) {
+  removeMealFromDay(dayName, edamamType, mealID) {
 
-  //   console.log(`${dayName}'s recipe IDs: `);
-  //   console.log(recipesInFirebase);
-  //   const dayExistsInLocalStorage = this.checkDayIsInStorage(dayName);
+    const mealExists = this.checkMealIsInStorage(dayName, edamamType, mealID);
 
-  //   let recipesAdded = false;
+    if (mealExists) {
 
-  //   if (dayExistsInLocalStorage) {
+      console.log('Meal exists in storage');
 
-  //     // const dayWithRecipesInStorage = JSON.parse(window.localStorage.getItem(dayName));
+      const dayInStorage = this.getDayFromStorage(dayName);
 
-  //     //Loop through the recipeIDs in the Firebase object
-  //     for (const currentRecipeID in recipesInFirebase) {
+      if (edamamType === 'recipe') {
 
-  //       // Exclude any prototype keys
-  //       if (!recipesInFirebase.hasOwnProperty(currentRecipeID)) { continue; }
+        // Remove recipe from day
+        dayInStorage.edamamRecipes = dayInStorage.edamamRecipes.filter(recipe => recipe.recipeID !== mealID);
 
-  //       // Get the curent recipe details using the current recipeID e.g. { name: ..., image: ..., ... }
-  //       const currentRecipeDetails = recipesInFirebase[currentRecipeID];
+      } else {
 
-  //       const recipeExistsInStorageDayAlready = this.checkRecipeIsInStorage(dayName, currentRecipeID);
+        // Remove food from day
+        dayInStorage.edamamFoods = dayInStorage.edamamFoods.filter(food => food.foodID !== mealID);
 
-  //       // Only make a call to Edamam if the recipe doesn't already exist in localStorage
-  //       if (!recipeExistsInStorageDayAlready) {
+      }
 
-  //         try {
+      window.localStorage.setItem(dayName, JSON.stringify(dayInStorage));
 
-  //           // Make call to edamam API to retrieve the url, uri, calories, carbs, protein etc.
-  //           const requestURL = 'https://api.edamam.com/search?app_id=4dad360d&app_key=5d6c41eeeb543f362a3b108c597193bd&r=http%3A%2F%2Fwww.edamam.com%2Fontologies%2Fedamam.owl%23recipe_' + currentRecipeID;
+    }
 
-  //           console.log('Request to Edamam for recipe details sent');
-  //           let result = await this.http.get(requestURL).toPromise();
+  }
 
-  //           result = result[0];
+  async addFoodsFromFirebase(dayName, foodsInFirebase) {
 
-  //           const servings = result['yield'];
+    console.log(`${dayName}'s recipe IDs: `);
+    console.log(foodsInFirebase);
+    const dayExistsInLocalStorage = this.checkDayIsInStorage(dayName);
 
-            // let newIngredientsArray = [];
-            // let originalIngredientArray = result['ingredientLines'];
+    let foodsAdded = false;
 
-            // for (let i = 0; i < originalIngredientArray.length; i++) {
+    if (dayExistsInLocalStorage) {
 
-            //   let ingredientLine = originalIngredientArray[i];
+      //Loop through the foodIDs in the Firebase object
+      for (const currentFoodID in foodsInFirebase) {
 
-            //   ingredientLine = this.ingredientDivider.convertAll(servings, ingredientLine);
+        // Exclude any prototype keys
+        if (!foodsInFirebase.hasOwnProperty(currentFoodID)) { continue; }
 
-            //   // ingredientLine = this.ingredientDivider.divideStringByServings(servings, ingredientLine);
-            //   // ingredientLine = this.ingredientDivider.addDecimalsToFractions(ingredientLine);
+        // Get the current basic food details using the current foodID e.g. { name: ..., image: ..., ... }
+        const currentFoodDetails = foodsInFirebase[currentFoodID];
 
-            //   newIngredientsArray.push(ingredientLine);
+        const foodExistsInStorageDayAlready = this.checkFoodIsInStorage(dayName, currentFoodID);
 
-            // }
+        // Only make a call to Edamam if the food doesn't already exist in localStorage
+        if (!foodExistsInStorageDayAlready) {
 
-            // const recipeToAdd = {
-            //   recipeID: currentRecipeID,
-            //   recipeType: currentRecipeDetails.recipeType,
-            //   name: currentRecipeDetails.name,
-            //   image: result['image'],
-            //   url: result['url'],
-            //   uri: result['uri'],
-            //   calories: result['calories'] / servings,
-            //   carbs: result['totalNutrients'].CHOCDF.quantity / servings,
-            //   protein: result['totalNutrients'].PROCNT.quantity  / servings,
-            //   fat: result['totalNutrients'].FAT.quantity / servings,
-            //   ingredients: newIngredientsArray,
-            //   isKetoFriendly: true, // Recipe is not keto friendly
-            //   notKetoFriendlyReason: '' // Recipe is not keto friendly reason
-            // };
+          try {
 
-  //           console.log('Recipe added to storage:');
-  //           console.log(recipeToAdd);
+            await this.addFoodToDay(dayName, currentFoodDetails);
 
-  //           this.addRecipeToDay(dayName, recipeToAdd);
-  //           recipesAdded = true;
+            foodsAdded = true;
 
-  //         } catch (error) {
+          } catch (error) {
 
-  //           console.log(`${error} - most likely due to Edamam having deleted the recipe`);
+            console.log(`${error} - most likely due to Edamam having deleted the food`);
 
-  //         }
-  //       }
-  //     }
+          }
+        }
+      }
 
-  //     // If day doesn't exist in localStorage
-  //   } else {
+      // If day doesn't exist in localStorage
+    } else {
 
-  //     this.addDayToStorage(dayName);
-  //     // const dayWithRecipesInStorage = JSON.parse(window.localStorage.getItem(dayName));
+      // Add day to storage
+      this.addDayToStorage(dayName);
 
-  //     // Loop through the recipeIDs in the Firebase object
-  //     for (const recipeID in recipesInFirebase) {
+      // Loop through the foodIDs in the Firebase object
+      for (const currentFoodID in foodsInFirebase) {
 
-  //       // Exclude any prototype keys
-  //       if (!recipesInFirebase.hasOwnProperty(recipeID)) { continue; }
+        // Exclude any prototype keys
+        if (!foodsInFirebase.hasOwnProperty(currentFoodID)) { continue; }
 
-  //       // Get the recipe details of the object which matches the recipeID e.g. { name: ..., image: ..., ... }
-  //       const recipeDetails = recipesInFirebase[recipeID];
+        // Get the food details of the object which matches the foodID e.g. { name: ..., image: ..., ... }
+        const currentFoodDetails = foodsInFirebase[currentFoodID];
 
-  //       // Make call to edamam API to retrieve the url, uri, calories, carbs, protein etc.
-  //       const requestURL = 'https://api.edamam.com/search?app_id=4dad360d&app_key=5d6c41eeeb543f362a3b108c597193bd&r=http%3A%2F%2Fwww.edamam.com%2Fontologies%2Fedamam.owl%23recipe_' + recipeID;
+        // No need to check if food already exists in day because the day didn't exist before reaching this else statement
+        try {
 
-  //       console.log('Request to Edamam for recipe details sent');
-  //       let result = await this.http.get(requestURL).toPromise();
+          await this.addFoodToDay(dayName, currentFoodDetails);
+          foodsAdded = true;
 
-  //       result = result[0];
+        } catch (error) {
 
-  //       const servings = result['yield'];
+          console.log(`${error} - most likely due to Edamam having deleted the food`);
 
-  //       let ingredients = [];
-  //       result['ingredientLines'].forEach(ingredientObject => {
+        }
 
-  //         ingredients.push(ingredientObject);
+      }
 
-  //       });
+    }
 
-  //       const recipeToAdd = {
-  //         recipeID: recipeID,
-  //         recipeType: recipeDetails.recipeType,
-  //         name: recipeDetails.name,
-  //         image: result['image'],
-  //         url: result['url'],
-  //         uri: result['uri'],
-  //         calories: result['calories'] / servings,
-  //         carbs: result['totalNutrients'].CHOCDF.quantity / servings,
-  //         protein: result['totalNutrients'].PROCNT.quantity  / servings,
-  //         fat: result['totalNutrients'].FAT.quantity / servings,
-  //         ingredients: ingredients,
-  //         isKetoFriendly: true, // Recipe is not keto friendly
-  //         notKetoFriendlyReason: '' // Recipe is not keto friendly reason
-  //       };
-
-  //       console.log(recipeToAdd);
-  //       this.addRecipeToDay(dayName, recipeToAdd);
-  //       // dayWithRecipesInStorage.recipes.push(recipeToAdd);
-  //       recipesAdded = true;
-
-  //     }
-
-  //   }
-
-  //   // if (!recipesAdded) {
-  //   //   await this.addRecipesFromFirebase(dayName, recipesInFirebase);
-  //   // }
-
-  // }
+  }
 
   async addRecipesFromFirebase(dayName, recipesInFirebase) {
 
@@ -453,73 +540,6 @@ export class StorageService {
 
   }
 
-  // addRecipeToDayOld(dayName, recipe) {
-
-  //   // Assign whether the day exists in localStorage to true or false
-  //   const dayExists = this.checkDayIsInStorage(dayName);
-
-  //   // If the day exists in localStorage
-  //   if (dayExists) {
-
-  //     // Assign the day's recipes from storage to recipes
-  //     const recipes: { recipeID: string, recipeType: string, name: string, image: string, calories: number, carbs: number,
-  //       protein: number, fat: number, ingredients: [], isKetoFriendly: boolean,
-  //       notKetoFriendlyReason: string }[] = JSON.parse(window.localStorage.getItem(dayName)).recipes;
-
-  //     // Check if the recipe already exists in storage <- Old way
-  //     // let recipeExists = false;
-  //     // for (let i = 0; i < recipes.length; i++) {
-  //     //   if (recipes[i].recipeID === recipe.recipeID) { recipeExists = true;  }
-  //     // }
-
-  //     // Check if the recipe already exists in storage
-  //     const recipeExists = this.checkRecipeIsInStorage(dayName, recipe.recipeID)
-
-  //     // If recipe doesn't exists
-  //     if (!recipeExists) {
-
-  //       // make a call to the edamam API using the recipeID to retrieve details about the nutrients etc. in the recipe
-  //       // add the nutrients to the recipe properties from the edamam result
-
-  //       // Get the recipe's day object from storage & add the recipe to the recipes' array
-  //       const dayWithRecipes = JSON.parse(window.localStorage.getItem(dayName));
-  //       dayWithRecipes.recipes.push(recipe);
-  //       window.localStorage.setItem(dayName, JSON.stringify(dayWithRecipes));
-
-  //       /* As this method should only really be called after a recipe is added in Firebase, localStorage should always be up-to-date
-  //       * with Firebase after the recipe is added to it - meaning there's no reason to call setIsUpToDate() after a recipe
-  //       * is added to Storage
-  //       */
-
-  //     }
-
-  //     // If day doesn't exist in localStorage
-  //   } else {
-
-  //     // Add day to storage
-  //     this.addDayToStorage(dayName);
-
-  //     // make a call to the edamam API using the recipeID to retrieve details about the nutrients etc. in the recipe
-  //     // add the nutrients to the recipe properties from the edamam result
-
-  //     // We already know the day's recipes array is empty so no need to check whether it exsits or not
-
-  //     // Get the recipe's day object from storage & add the recipe to the recipes' array
-  //     const dayWithRecipes = JSON.parse(window.localStorage.getItem(dayName));
-  //     dayWithRecipes.recipes.push(recipe);
-  //     window.localStorage.setItem(dayName, JSON.stringify(dayWithRecipes));
-
-  //     /* As this method should only really be called after a recipe is added in Firebase, localStorage should always be up-to-date
-  //     * with Firebase after the recipe is added to it - meaning there's no reason to call setIsUpToDate() after a recipe
-  //     * is added to Storage
-  //     */
-
-  //   }
-
-  // }
-
-  // Should receive a recipe directly from firebase therefore only contains basic info about recipe
-
   async addRecipeToDay(dayName, recipeID, recipeType) {
 
     // Assign whether the day exists in localStorage to true or false
@@ -581,6 +601,84 @@ export class StorageService {
 
       /* As this method should only really be called after a recipe is added in Firebase, localStorage should always be up-to-date
       * with Firebase after the recipe is added to it - meaning there's no reason to call setIsUpToDate() after a recipe
+      * is added to Storage
+      */
+
+    }
+
+  }
+
+  async addFoodToDay(dayName, food) {
+
+    // Assign whether the day exists in localStorage to true or false
+    const dayExists = this.checkDayIsInStorage(dayName);
+
+    // If the day exists in localStorage
+    if (dayExists) {
+
+      // Check if the food already exists in storage
+      const foodExists = this.checkFoodIsInStorage(dayName, food.foodID);
+
+      // If food doesn't exists
+      if (!foodExists) {
+
+        try {
+
+          // Get measureURL using food.measureType then make a call to the edamam API using the foodID, measureURL & quantity to retrieve nutritional info
+          const measureURL = this.edamamService.getMeasureURL(food.measureType);
+          const nutritionalInfo = await this.edamamService.getFoodNutrients(food.foodID, measureURL, food.quantity);
+
+          const foodToAdd = { foodID: food.foodID, foodType: food.foodType, name: food.name, image: food.image, contents: food.contents,
+            measureType: food.measureType, quantity: food.quantity, calories: nutritionalInfo.calories,
+            carbs: nutritionalInfo.carbs, protein: nutritionalInfo.protein, fat: nutritionalInfo.fat };
+
+          // Get the food's day object from storage & add the food to the foods' array
+          const dayWithRecipes = JSON.parse(window.localStorage.getItem(dayName));
+          dayWithRecipes.edamamFoods.push(foodToAdd);
+          window.localStorage.setItem(dayName, JSON.stringify(dayWithRecipes));
+
+        } catch (error) {
+
+          console.log(`${error} - most likely due to Edamam having deleted the food`);
+
+        }
+
+        /* As this method should only really be called after a food is added in Firebase, localStorage should always be up-to-date
+        * with Firebase after the food is added to it - meaning there's no reason to call setIsUpToDate() after a food
+        * is added to Storage
+        */
+
+      }
+
+      // If day doesn't exist in localStorage
+    } else {
+
+      // Add day to storage
+      this.addDayToStorage(dayName);
+
+      try {
+
+        // Get measureURL using food.measureType then make a call to the edamam API using the foodID, measureURL & quantity to retrieve nutritional info
+        const measureURL = this.edamamService.getMeasureURL(food.measureType);
+        const nutritionalInfo = await this.edamamService.getFoodNutrients(food.foodID, measureURL, food.quantity);
+
+        const foodToAdd = { foodID: food.foodID, foodType: food.foodType, name: food.name, image: food.image, contents: food.contents,
+          measureType: food.measureType, quantity: food.quantity, calories: nutritionalInfo.calories,
+          carbs: nutritionalInfo.carbs, protein: nutritionalInfo.protein, fat: nutritionalInfo.fat };
+
+        // Get the food's day object from storage & add the food to the foods' array
+        const dayWithRecipes = JSON.parse(window.localStorage.getItem(dayName));
+        dayWithRecipes.edamamFoods.push(foodToAdd);
+        window.localStorage.setItem(dayName, JSON.stringify(dayWithRecipes));
+
+      } catch (error) {
+
+        console.log(`${error} - most likely due to Edamam having deleted the food`);
+
+      }
+
+      /* As this method should only really be called after a food is added in Firebase, localStorage should always be up-to-date
+      * with Firebase after the food is added to it - meaning there's no reason to call setIsUpToDate() after a food
       * is added to Storage
       */
 
