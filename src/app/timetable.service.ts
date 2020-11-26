@@ -128,52 +128,6 @@ export class TimetableService {
 
     let todayRecipes;
 
-    // let todayRecipes: {
-    //   day: string,
-    //   show: boolean,
-    //   totalCarbs: number,
-    //   carbsRemaining: number,
-    //   totalProtein: number,
-    //   proteinRemaining: number,
-    //   totalFat: number,
-    //   fatRemaining: number,
-    //   totalCalories: number,
-    //   caloriesRemaining: number,
-    //   noOfRecipes: number,
-    //   isKetoFriendly: boolean, // Day is not keto friendly
-    //   notKetoFriendlyReason: string, // Day is not keto friendly reason
-    //   edamamFoods: {
-    //     foodID: string,
-    //     foodType: string,
-    //     name: string,
-    //     image: string,
-    //     contents: [],
-    //     measureType: string,
-    //     quantity: number,
-    //     calories: number,
-    //     carbs: number,
-    //     protein: number,
-    //     fat: number,
-    //     isKetoFriendly: boolean,
-    //     notKetoFriendlyReason: string
-    //   }[],
-    //   edamamRecipes: {
-    //     recipeID: string,
-    //     recipeType: string,
-    //     name: string,
-    //     image: string,
-    //     url: string,
-    //     uri: string,
-    //     calories: number,
-    //     carbs: number,
-    //     protein: number,
-    //     fat: number,
-    //     ingredients: [],
-    //     isKetoFriendly: boolean, // Recipe is not keto friendly
-    //     notKetoFriendlyReason: string // Recipe is not keto friendly reason
-    //   }[]
-    // };
-
     // Find today in the allRecipes array and save to todayRecipes
     this.allRecipes.forEach(element => {
 
