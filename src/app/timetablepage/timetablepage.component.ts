@@ -189,6 +189,8 @@ export class TimetablepageComponent implements AfterViewInit {
 
     for (let i = 0; i < recipes.length; i++) {
 
+      console.log('Reached recipes loop');
+
       const currentRecipe = recipes[i];
 
       const mealToAdd: {
@@ -236,6 +238,8 @@ export class TimetablepageComponent implements AfterViewInit {
     }
 
     for (let i = 0; i < foods.length; i++) {
+
+      console.log('Reached foods loop');
 
       const currentFood = foods[i];
 
@@ -292,20 +296,6 @@ export class TimetablepageComponent implements AfterViewInit {
     for (let i = 0; i < mergedFoodsRecipes.length; i++) {
 
       const currentMeal = mergedFoodsRecipes[i];
-
-      // if (currentMeal.recipeType === undefined) {
-
-      //   currentMeal.mealType = currentMeal.foodType;
-      //   currentMeal.edamamType = 'food';
-      //   currentMeal.genericID = currentMeal.foodID;
-
-      // } else {
-
-      //   currentMeal.mealType = currentMeal.recipeType;
-      //   currentMeal.edamamType = 'recipe';
-      //   currentMeal.genericID = currentMeal.recipeID;
-
-      // }
 
       currentMeal.mealTypeHTML = currentMeal.mealType.toLowerCase();
 
@@ -649,6 +639,8 @@ export class TimetablepageComponent implements AfterViewInit {
 
     this.addMealsToTodayCarousel(this.todayRecipes.edamamRecipes, this.todayRecipes.edamamFoods);
 
+    console.log('Made it past addMealsToTodayCarousel');
+
     // console.log(`Daily Carbs: ${this.timetableService.dailyCarbs}`);
     // console.log(`Used Carbs ${this.todayRecipes.totalCarbs}`);
     // console.log(`Daily Protein: ${this.timetableService.dailyProtein}`);
@@ -668,6 +660,8 @@ export class TimetablepageComponent implements AfterViewInit {
       caloriesPercentage: (this.todayRecipes.totalCalories / this.timetableService.dailyCalories) * 100,
       caloriesRemaining: Math.floor(this.todayRecipes.caloriesRemaining)
     };
+
+    console.log('Made is passed assigning progress bars')
 
     // console.log('Progress');
     // console.log(this.progressBars);

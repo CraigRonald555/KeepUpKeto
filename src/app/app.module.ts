@@ -41,9 +41,9 @@ const appRoutes = [
 
   {path: '', redirectTo: 'home', pathMatch: 'full'},
   { path: '', component: MainComponent, children: [
-    { path: 'home', component: HomepageComponent},
-    { path: 'timetable', component: TimetablepageComponent},
-    { path: 'timetable/weekly', component: TimetableweeklypageComponent},
+    { path: 'home', component: TimetablepageComponent},
+    // { path: 'timetable', component: TimetablepageComponent},
+    { path: 'plan', component: TimetableweeklypageComponent},
     { path: 'recipes', component: RecipeComponent},
     { path: 'foods', component: FoodComponent},
     { path: 'instructions', component: InstructionsComponent },
