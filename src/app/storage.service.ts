@@ -399,7 +399,7 @@ export class StorageService {
 
   async addFoodsFromFirebase(dayName, foodsInFirebase) {
 
-    console.log(`${dayName}'s recipe IDs: `);
+    console.log(`${dayName}'s food IDs: `);
     console.log(foodsInFirebase);
     const dayExistsInLocalStorage = this.checkDayIsInStorage(dayName);
 
@@ -423,7 +423,7 @@ export class StorageService {
 
           try {
 
-            await this.addFoodToDay(dayName, currentFoodDetails);
+            await this.addFoodToDay(dayName, currentFoodID, currentFoodDetails);
 
             foodsAdded = true;
 
@@ -453,7 +453,7 @@ export class StorageService {
         // No need to check if food already exists in day because the day didn't exist before reaching this else statement
         try {
 
-          await this.addFoodToDay(dayName, currentFoodDetails);
+          await this.addFoodToDay(dayName, currentFoodID, currentFoodDetails);
           foodsAdded = true;
 
         } catch (error) {
@@ -608,7 +608,7 @@ export class StorageService {
 
   }
 
-  async addFoodToDay(dayName, food) {
+  async addFoodToDay(dayName, foodID, food) {
 
     // Assign whether the day exists in localStorage to true or false
     const dayExists = this.checkDayIsInStorage(dayName);
@@ -626,7 +626,8 @@ export class StorageService {
 
           // Get measureURL using food.measureType then make a call to the edamam API using the foodID, measureURL & quantity to retrieve nutritional info
           const measureURL = this.edamamService.getMeasureURL(food.measureType);
-          const nutritionalInfo = await this.edamamService.getFoodNutrients(food.foodID, measureURL, food.quantity);
+          const nutritionalInfo = await this.edamamService.getFoodNutrients(foodID, measureURL, food.quantity);
+
 
           const foodToAdd = { foodID: food.foodID, foodType: food.foodType, name: food.name, image: food.image, contents: food.contents,
             measureType: food.measureType, quantity: food.quantity, calories: nutritionalInfo.calories,
@@ -660,7 +661,7 @@ export class StorageService {
 
         // Get measureURL using food.measureType then make a call to the edamam API using the foodID, measureURL & quantity to retrieve nutritional info
         const measureURL = this.edamamService.getMeasureURL(food.measureType);
-        const nutritionalInfo = await this.edamamService.getFoodNutrients(food.foodID, measureURL, food.quantity);
+        const nutritionalInfo = await this.edamamService.getFoodNutrients(foodID, measureURL, food.quantity);
 
         const foodToAdd = { foodID: food.foodID, foodType: food.foodType, name: food.name, image: food.image, contents: food.contents,
           measureType: food.measureType, quantity: food.quantity, calories: nutritionalInfo.calories,

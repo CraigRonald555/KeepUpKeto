@@ -189,8 +189,6 @@ export class TimetablepageComponent implements AfterViewInit {
 
     for (let i = 0; i < recipes.length; i++) {
 
-      console.log('Reached recipes loop');
-
       const currentRecipe = recipes[i];
 
       const mealToAdd: {
@@ -629,13 +627,7 @@ export class TimetablepageComponent implements AfterViewInit {
 
     this.allRecipes = this.timetableService.getAllRecipes();
     this.todayRecipes = this.timetableService.getTodayRecipes();
-    console.log('Got past getTodayRecipes()');
-    try {
-      this.updateProgress();
-    } catch(error) {
-      console.log(error);
-    }
-    console.log('Got past updateProgress()');
+    this.updateProgress();
 
     this.changeDetector.detectChanges();
 
@@ -644,8 +636,6 @@ export class TimetablepageComponent implements AfterViewInit {
   updateProgress() {
 
     this.addMealsToTodayCarousel(this.todayRecipes.edamamRecipes, this.todayRecipes.edamamFoods);
-
-    console.log('Made it past addMealsToTodayCarousel');
 
     // console.log(`Daily Carbs: ${this.timetableService.dailyCarbs}`);
     // console.log(`Used Carbs ${this.todayRecipes.totalCarbs}`);
@@ -666,8 +656,6 @@ export class TimetablepageComponent implements AfterViewInit {
       caloriesPercentage: (this.todayRecipes.totalCalories / this.timetableService.dailyCalories) * 100,
       caloriesRemaining: Math.floor(this.todayRecipes.caloriesRemaining)
     };
-
-    console.log('Made is passed assigning progress bars')
 
     // console.log('Progress');
     // console.log(this.progressBars);

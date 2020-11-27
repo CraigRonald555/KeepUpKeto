@@ -725,7 +725,8 @@ export class AuthService {
             name: food.name,
             image: food.image,
             measureType: food.measureType,
-            quantity: food.quantity
+            quantity: food.quantity,
+            contents: food.contents
 
           }).catch(error => {
 
@@ -734,7 +735,7 @@ export class AuthService {
           });
 
           // Add food to storage as well
-          await this.storageService.addFoodToDay(dayName, food);
+          await this.storageService.addFoodToDay(dayName, food.foodID, food);
 
           foodExistsInStorage = true;
           foodExistsInFirebase = true;
@@ -748,7 +749,7 @@ export class AuthService {
           // Check if food also exists in storage, if it doesn't add it
           if (!this.storageService.checkFoodIsInStorage(dayName, food.foodID)) {
 
-            await this.storageService.addFoodToDay(dayName, food);
+            await this.storageService.addFoodToDay(dayName, food.foodID, food);
             foodExistsInStorage = true;
 
           }
