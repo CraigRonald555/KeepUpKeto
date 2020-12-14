@@ -1,4 +1,12 @@
-<div class="container" style="background: white">
+<div class="container">
+
+  <div class="col-12 d-flex justify-content-center">
+
+    <div class="notification" *ngIf="showMealAddedNotification === true">
+      <span class='material-icons' style="vertical-align: middle;">check_circle_outline</span> Meal successfully added!
+    </div>
+
+  </div>
 
   <div class="row">
 
@@ -15,8 +23,6 @@
     </div>
 
     <div class="col-6 col-sm-6 text-center">
-
-      <!-- <img src="assets/img/calory_circle.png" width=230 height=230> -->
 
     </div>
 
@@ -60,24 +66,21 @@
 
 </div>
 
-<div class="container">
+<!-- <div class="container">
   <div class="row">
     <div class="dropdown">
       <div class="mt-5"></div>
       <div class="text-center">More info</div>
     </div>
   </div>
-</div>
+</div> -->
 
-<div class="container" style="background: #f3f5f9; padding-bottom: 100px;">
+<div class="container" style="padding-bottom: 100px;">
 
   <div class="row">
 
     <div class="col-6 col-sm-6">
       <h3>{{this.timetableService.getTodayName()}}</h3>
-      <div class="clickable" data-toggle="modal" data-target="#mainModal" (click)='selectedDayIndex = this.timetableService.getDayIndexByName(this.timetableService.getTodayName())'>
-        Add recipe to today
-      </div>
     </div>
 
     <div class="col-6 col-sm-6 text-right">
@@ -90,13 +93,13 @@
 
   <div class="mb-5"></div>
 
-  <owl-carousel [options]="mySlideOptions" [items]="myCarouselItems" [carouselClasses]="['owl-carousel', 'owl-theme']" #owlElement>
+  <owl-carousel *ngIf="timetableLoading === false" [options]="mySlideOptions" [items]="myCarouselItems" [carouselClasses]="['owl-carousel', 'owl-theme']" #owlElement>
     <div class="item" *ngFor="let item of mySlideItems;let i = index">
       <div [class]="item.mealTypeHTML" (dblclick)="navigateToMeal(item.genericID, item.edamamType)">
         <div class="row">
             <div class="col-12">
-
-              <div class="clickable" style='position: fixed; right: 20px; ' (click)="this.removeMealFromDay(this.todayRecipes.day, item.edamamType, item.genericID);">
+              <!-- (click)="this.removeMealFromDay(this.todayRecipes.day, item.edamamType, item.genericID);" -->
+              <div class="clickable" style='position: fixed; right: 20px; ' data-toggle="modal" data-target="#removeMeal" (click)="selectMeal(todayRecipes.day, item)">
                 <i class="material-icons" style="color: white">close</i>
               </div>
               <img src="./assets/img/{{item.mealTypeHTML}}_main.png" alt="" class="inner_img">
@@ -113,9 +116,16 @@
     </div>
    </owl-carousel>
 
+   <div class="row" *ngIf="timetableLoading === true">
+      <div class="col-12 d-flex justify-content-center">
+        <p><mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+        Loading meal plan...</p>
+      </div>
+   </div>
+
 </div>
 
-<!-- Modal boxes start here (isn't visible until triggered by a button click event above) -->
+<!-- Modal boxes start here (these aren't visible until triggered by a button click event above) -->
 
 <!-- Opened when adding new meal -->
 <div class="modal fade" id="mainModal" tabindex="-1" role="dialog" aria-labelledby="mainModal" aria-hidden="true">
@@ -304,7 +314,7 @@
             <hr>
             <h4>Results</h4>
 
-            <div class="card" *ngFor="let result of recipeSearchResults[pageNumber-1]; let j = index;">
+            <div class="card" *ngFor="let result of recipeSearchResults[recipePageNumber-1]; let j = index;">
 
               <div class="card-body">
                 <h6 class="card-title">
@@ -313,59 +323,79 @@
               </div>
 
               <div class="card-footer">
-                Calories: {{result.calories}} | Carbs: {{result.carbs}} | Protein: {{result.protein}} | Fat: {{result.fat}} <br/>
-                <a (click)='addRecipeFromSearch(pageNumber-1, j)'>Add</a>
-              </div>
 
+                <div class="row">
+
+                  <div class="col-3">
+
+                    <img src="{{result.image}}" height=100 width=100 />
+
+                  </div>
+
+                  <div class="col-9">
+
+                    <div id="addFood" style="padding-left: 10px">
+
+                      <p>Calories: {{ result.calories }} | Carbs: {{ result.carbs }}g | Fat: {{ result.fat }}g | Protein: {{ result.protein }}g</p>
+
+                      <div class="mb-3"></div>
+
+                      <button class="btn btn-success btn-round pull-right" (click)="addRecipeFromSearch(recipePageNumber-1, j)">
+                        Add
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <nav aria-label="...">
               <ul class="pagination justify-content-center">
 
                 <!-- Only show when pageNumber is not equal to 1 -->
-                <li class="page-item" *ngIf='pageNumber !== 1'>
-                  <a class="page-link" (click)='pageNumber = pageNumber - 1'>Previous</a>
+                <li class="page-item" *ngIf='recipePageNumber !== 1'>
+                  <a class="page-link" (click)='recipePageNumber = recipePageNumber - 1'>Previous</a>
                 </li>
 
-                <!-- Only show when pageNumber is equal to maxPage number i.e. when you're on the last page
+                <!-- Only show when recipePageNumber is equal to maxPage number i.e. when you're on the last page
                       Don't show when there's maxPage number is greater than two otherwise we'll be showing -1 and 0 for when maxPage is 1 and 2 respectively-->
-                <li class="page-item" *ngIf='pageNumber === maxPage && maxPage > 2'>
-                  <a class="page-link" (click)='pageNumber = pageNumber - 2'>
-                    {{pageNumber - 2}}
+                <li class="page-item" *ngIf='recipePageNumber === maxPage && maxPage > 2'>
+                  <a class="page-link" (click)='recipePageNumber = recipePageNumber - 2'>
+                    {{recipePageNumber - 2}}
                   </a>
                 </li>
 
-                <!-- Don't show page number if pageNumber is 1 -->
-                <li class="page-item" *ngIf='pageNumber !== 1'>
-                  <a class="page-link" (click)='pageNumber = pageNumber - 1'>{{pageNumber - 1}}</a>
+                <!-- Don't show page number if recipePageNumber is 1 -->
+                <li class="page-item" *ngIf='recipePageNumber !== 1'>
+                  <a class="page-link" (click)='recipePageNumber = recipePageNumber - 1'>{{recipePageNumber - 1}}</a>
                 </li>
 
-                <!-- Current pageNumber -->
+                <!-- Current recipePageNumber -->
                 <li class="page-item active">
                   <span class="page-link">
-                    {{pageNumber}}
+                    {{recipePageNumber}}
                     <span class="sr-only">(current)</span>
                   </span>
                 </li>
 
-                <!-- Don't show if pageNumber is equal to the maxPage -->
-                <li class="page-item" *ngIf='pageNumber !== maxPage'>
-                  <a class="page-link" (click)='pageNumber = pageNumber + 1'>
-                    {{pageNumber + 1}}
+                <!-- Don't show if recipePageNumber is equal to the maxPage -->
+                <li class="page-item" *ngIf='recipePageNumber !== maxPage'>
+                  <a class="page-link" (click)='recipePageNumber = recipePageNumber + 1'>
+                    {{recipePageNumber + 1}}
                   </a>
                 </li>
 
-                <!-- Only show when pageNumber is equal to one i.e. when you're on the first page
+                <!-- Only show when recipePageNumber is equal to one i.e. when you're on the first page
                       Don't show when there's maxPage number is greater than two otherwise we'll be showing pages with no results-->
-                <li class="page-item" *ngIf='pageNumber === 1 && maxPage > 2'>
-                  <a class="page-link" (click)='pageNumber = pageNumber + 2'>
-                    {{pageNumber + 2}}
+                <li class="page-item" *ngIf='recipePageNumber === 1 && maxPage > 2'>
+                  <a class="page-link" (click)='recipePageNumber = recipePageNumber + 2'>
+                    {{recipePageNumber + 2}}
                   </a>
                 </li>
 
-                <!-- Only show when pageNumber is not equal to maxPage number -->
-                <li class="page-item" *ngIf="pageNumber !== maxPage">
-                  <a class="page-link" (click)='pageNumber = pageNumber + 1'>Next</a>
+                <!-- Only show when recipePageNumber is not equal to maxPage number -->
+                <li class="page-item" *ngIf="recipePageNumber !== maxPage">
+                  <a class="page-link" (click)='recipePageNumber = recipePageNumber + 1'>Next</a>
                 </li>
 
               </ul>
@@ -438,19 +468,68 @@
 
                       <div class="mb-3"></div>
 
-                      <button class="btn btn-default btn-round pull-right" (click)="formStep = 4.1 ;selectFood(pageNumber-1, j)">
+                      <button class="btn btn-default btn-round pull-right" (click)="formStep = 4.1 ;selectFood(foodPageNumber-1, j)">
                         Set quantity
                       </button>
-
-                      <!-- <button rel="tooltip" class="btn btn-default btn-round pull-right" data-toggle="modal" data-target="#setNutrients" (click)="selectFood(pageNumber-1, j)">
-                        Set quantity
-                      </button> -->
 
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+
+            <nav aria-label="...">
+              <ul class="pagination justify-content-center">
+
+                <!-- Only show when foodPageNumber is not equal to 1 -->
+                <li class="page-item" *ngIf='foodPageNumber !== 1'>
+                  <a class="page-link" (click)='foodPageNumber = foodPageNumber - 1'>Previous</a>
+                </li>
+
+                <!-- Only show when foodPageNumber is equal to maxPage number i.e. when you're on the last page
+                      Don't show when there's maxPage number is greater than two otherwise we'll be showing -1 and 0 for when maxPage is 1 and 2 respectively-->
+                <li class="page-item" *ngIf='foodPageNumber === maxPage && maxPage > 2'>
+                  <a class="page-link" (click)='foodPageNumber = foodPageNumber - 2'>
+                    {{foodPageNumber - 2}}
+                  </a>
+                </li>
+
+                <!-- Don't show page number if foodPageNumber is 1 -->
+                <li class="page-item" *ngIf='foodPageNumber !== 1'>
+                  <a class="page-link" (click)='foodPageNumber = foodPageNumber - 1'>{{foodPageNumber - 1}}</a>
+                </li>
+
+                <!-- Current foodPageNumber -->
+                <li class="page-item active">
+                  <span class="page-link">
+                    {{foodPageNumber}}
+                    <span class="sr-only">(current)</span>
+                  </span>
+                </li>
+
+                <!-- Don't show if foodPageNumber is equal to the maxPage -->
+                <li class="page-item" *ngIf='foodPageNumber !== maxPage'>
+                  <a class="page-link" (click)='foodPageNumber = foodPageNumber + 1'>
+                    {{foodPageNumber + 1}}
+                  </a>
+                </li>
+
+                <!-- Only show when foodPageNumber is equal to one i.e. when you're on the first page
+                      Don't show when there's maxPage number is greater than two otherwise we'll be showing pages with no results-->
+                <li class="page-item" *ngIf='foodPageNumber === 1 && maxPage > 2'>
+                  <a class="page-link" (click)='foodPageNumber = foodPageNumber + 2'>
+                    {{foodPageNumber + 2}}
+                  </a>
+                </li>
+
+                <!-- Only show when foodPageNumber is not equal to maxPage number -->
+                <li class="page-item" *ngIf="foodPageNumber !== maxPage">
+                  <a class="page-link" (click)='foodPageNumber = foodPageNumber + 1'>Next</a>
+                </li>
+
+              </ul>
+            </nav>
+
           </div>
 
         </ng-container>
@@ -541,3 +620,58 @@
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="removeMeal" tabindex="-1" role="dialog" aria-labelledby="removeMeal" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="removeMealLabel">Are you sure you want to remove this meal?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-2"></div>
+        <div class="title" style="margin: 1px">{{this.selectedMeal.mealType}}</div>
+        <div class="title" style="margin: 1px">{{this.selectedMeal.mealName}}</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="removeMealFromDay(selectedMeal.dayName, selectedMeal.edamamType, selectedMeal.mealID)">Yes</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="col-2 col-sm-2 f-box">
+    <a routerLink="/home">
+      <span class="box_img home d-block"></span>
+      <span class="d-block content">Home</span>
+    </a>
+  </div>
+  <div class="col-2 col-sm-2 f-box">
+    <a routerLink="/plan">
+      <span class="box_img plan d-block"></span>
+      <span class="d-block content">Plan</span>
+    </a>
+  </div>
+  <div class="col-2 col-sm-2 f-box" data-toggle="modal" data-target="#mainModal">
+      <div class="box_pattern">
+        <span class="plus_btn clickable" data-toggle="modal" data-target="#exampleModal"><img src="assets/img/footer_plus.png"></span>
+      </div>
+  </div>
+  <div class="col-2 col-sm-2 f-box">
+    <a routerLink="/progress">
+        <span class="box_img progress d-block"></span>
+        <span class="d-block content">Progress</span>
+    </a>
+  </div>
+
+  <div class="col-2 col-sm-2 f-box">
+    <a routerLink="/settings">
+      <span class="box_img settings d-block"></span>
+      <span class="d-block content">Settings</span>
+    </a>
+  </div>
+</footer>

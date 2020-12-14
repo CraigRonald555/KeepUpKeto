@@ -1,5 +1,6 @@
 import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, Injectable, ChangeDetectorRef  } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 
 declare var paypal: any;
@@ -44,6 +45,9 @@ export class LandingpageComponent implements AfterViewInit {
   goals: number = undefined; // -1 = lose 1kg, 0 = maintain, 1 = gain 1kg
 
   @ViewChild('signUpForm') signUpForm;
+  @ViewChild('closeLoginModal') closeLoginModal;
+  @ViewChild('loginModal') loginModal;
+
   @ViewChild('metricsForm') userMetricsForm;
   today = new Date();
   loginStatus: string;
@@ -54,7 +58,7 @@ export class LandingpageComponent implements AfterViewInit {
   planID = "P-1BH46091SU0529455L2YMZFY";
   subcripId: any;
 
-  constructor(private auth: AuthService, private changeDetector: ChangeDetectorRef) {
+  constructor(private auth: AuthService, private changeDetector: ChangeDetectorRef, private router: Router) {
   }
 
   ngAfterViewInit() {
@@ -112,9 +116,9 @@ export class LandingpageComponent implements AfterViewInit {
       },
 
       onApprove: (data, actions) => {
-        console.log(data + ' transaction approved');
-        this.submitSignUpDetails();
-        console.log(data.subscriptionID);
+        console.log(data);
+        this.submitSignUpDetails(data.subscriptionID);
+        console.log('Subscription ID: ' + data.subscriptionID);
         //this.getSubcriptionDetails(data.subscriptionID);
         // use auth login method and redirect to /home
       },
@@ -175,19 +179,17 @@ export class LandingpageComponent implements AfterViewInit {
 
   }
 
-  async submitSignUpDetails() {
+
+  async submitSignUpDetails(subscriptionID) {
 
     this.name = this.signUpForm.value.name;
 
-    const uid = await (this.auth.signUp(this.signUpForm.value.email, this.signUpForm.value.password));
-    await this.auth.addMetrics(uid, this.name, this.ingredients, this.goalsText, this.sexText, this.heightCM, this.weightKG, this.dateOfBirth, this.age);
+    const uid = await this.auth.signUp(this.signUpForm.value.email, this.signUpForm.value.password);
+    await this.auth.addMetrics(uid, subscriptionID, this.name, this.ingredients, this.goalsText, this.sexText, this.heightCM, this.weightKG, this.dateOfBirth, this.age);
     await this.auth.addDefaultTimetable(uid);
+    // await this.auth.add
 
-    /* Write the values from the metricsForm and ingredients to the database
-     *
-     * We already have a default table which stores the user's primary details (user id, email, last login, sign up date)
-     *
-     */
+    setTimeout(() => this.router.navigate(['/home']), 3000);
 
   }
 
@@ -208,6 +210,12 @@ export class LandingpageComponent implements AfterViewInit {
       case response === 'successful':   break;
 
     }
+
+    this.closeLoginModal.nativeElement.click();
+
+    setTimeout(() => this.router.navigate(['/home']), 1000);
+
+    console.log(response);
 
   }
 

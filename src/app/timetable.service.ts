@@ -60,6 +60,7 @@ export class TimetableService {
   currentDayIndex = this.currentDate.getDay(); // with Index on the end because it returns an ID not the actual name
   arrayUpdated = new EventEmitter<string>();
   dataLoaded = false;
+  loading = new EventEmitter<boolean>();
 
   // Get user's daily calorie and macro requirements from accountDetails service
   dailyCalories;
@@ -584,6 +585,8 @@ export class TimetableService {
 
   async generate() {
 
+    this.loading.emit(true);
+
     let totalCallsToAPI = 0;
 
     // a string which will be used to store the request url to the edamam API
@@ -695,6 +698,7 @@ export class TimetableService {
 
     }
 
+    this.loading.emit(false);
     console.log(window.localStorage);
     console.log(`Total calls: ${totalCallsToAPI}`);
 

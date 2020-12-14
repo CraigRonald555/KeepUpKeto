@@ -1,31 +1,56 @@
 import { ActivatedRouteSnapshot, RouterStateSnapshot, CanActivate, Router, CanActivateChild } from "@angular/router";
-import { Observable } from "rxjs";
+import { Observable, TimeoutError } from "rxjs";
 import { Injectable } from "@angular/core";
 import { AuthService } from "./auth.service";
+import { AngularFireAuth } from '@angular/fire/auth';
 
 @Injectable()
 export class AuthGuard implements CanActivate, CanActivateChild {
 
-  constructor(private authService: AuthService, private router: Router) {
+  constructor(private authService: AuthService, private router: Router, private afAuth: AngularFireAuth) {
 
 
   }
 
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
 
-    return this.authService.isAuthenticated()
-      .then((authenticated: boolean) => {
+    // console.log('afAuth.authState value:');
+    // console.log(this.afAuth.authState);
 
-        if (authenticated) {
-          return true;
-        }
-        else {
-          this.router.navigate(['/']);
-        }
+    // let status = false;
 
-      });
+    // if (this.afAuth.currentUser) {
 
+    //   status = true;
+    //   console.log(this.afAuth.currentUser);
+
+    // } else {
+
+    //   status = false;
+    //   console.log(this.afAuth.currentUser);
+    //   this.router.navigate(['/landing']);
+
+    // }
+
+    return this.afAuth.authState.toPromise().then(user => {
+
+      if (user) {
+
+        console.log("AuthGuard - User is logged in");
+        console.log(user);
+        return true;
+
+      } else {
+
+        console.log("AuthGuard - User is null");
+        console.log(user);
+        this.router.navigate(['/landing']);
+        return false;
+
+      }
+
+    });
 
   }
 

@@ -36,19 +36,22 @@ import { ProgressComponent } from './progress/progress.component';
 import { TimetableweeklypageComponent } from './timetableweeklypage/timetableweeklypage.component';
 import { ShoppinglistpageComponent } from './shoppinglistpage/shoppinglistpage.component';
 import { FoodComponent } from './food/food.component';
+import { SettingsComponent } from './settings/settings.component';
+import { AuthGuard } from './auth-guard.service';
+import { AuthService } from './auth.service';
 
 const appRoutes = [
 
   {path: '', redirectTo: 'home', pathMatch: 'full'},
   { path: '', component: MainComponent, children: [
-    { path: 'home', component: TimetablepageComponent},
+    { path: 'home', canActivate: [AuthGuard], component: TimetablepageComponent},
     // { path: 'timetable', component: TimetablepageComponent},
     { path: 'plan', component: TimetableweeklypageComponent},
     { path: 'recipes', component: RecipeComponent},
     { path: 'foods', component: FoodComponent},
     { path: 'instructions', component: InstructionsComponent },
     { path: 'progress', component: ProgressComponent},
-    { path: 'shopping-list', component: ShoppinglistpageComponent}
+    { path: 'settings', component: SettingsComponent}
   ]},
   { path: 'landing', component: LandingpageComponent}
 
@@ -71,7 +74,8 @@ const appRoutes = [
     ProgressComponent,
     TimetableweeklypageComponent,
     ShoppinglistpageComponent,
-    FoodComponent
+    FoodComponent,
+    SettingsComponent
   ],
   imports: [
     BrowserModule,
@@ -85,7 +89,7 @@ const appRoutes = [
     GoogleChartsModule,
     ChartsModule
   ],
-  providers: [TimetableService, AccountService, EdamamService, StorageService, IngredientDivider],
+  providers: [TimetableService, AuthService, AuthGuard, AccountService, EdamamService, StorageService, IngredientDivider],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

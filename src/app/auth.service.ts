@@ -1,4 +1,4 @@
-import { Injectable, EventEmitter } from '@angular/core';
+import { Injectable, EventEmitter, NgZone } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -13,6 +13,7 @@ import { e, string } from 'mathjs';
 export class AuthService {
 
   signedIn = new EventEmitter<User>();
+  signedInStatus = false;
   mondayChanged = new EventEmitter<unknown>();
   tuesdayChanged = new EventEmitter<unknown>();
   wednesdayChanged = new EventEmitter<unknown>();
@@ -22,18 +23,22 @@ export class AuthService {
   sundayChanged = new EventEmitter<unknown>();
 
   constructor(private afAuth: AngularFireAuth, private router: Router, private fbDB: AngularFireDatabase,
-              private storageService: StorageService) {
+              private storageService: StorageService, private ngZone: NgZone) {
 
     this.afAuth.onAuthStateChanged(user => {
 
       if (user) {
 
         this.signedIn.emit(user);
+        this.signedInStatus = true;
+
 
       } else {
 
         // Don't just clear the localStorage, make sure to only remove the Days as it may break Firebase and PayPal API
         window.localStorage.clear();
+        this.signedInStatus = false;
+
         console.log('Currently logged out');
 
         /* Calling the navigate inside a subscribe block causes an ngZone error which
@@ -119,7 +124,6 @@ export class AuthService {
 
     });
 
-    this.router.navigate(['/home']);
     return finalResponse;
 
   }
@@ -132,7 +136,6 @@ export class AuthService {
     await this.afAuth.signInWithEmailAndPassword(email, password)
       .then(response => {
 
-         this.router.navigate(['/home']);
          console.log(response);
          finalResponse = 'successful';
 
@@ -163,6 +166,8 @@ export class AuthService {
 
     });
 
+    this.router.navigate(['/landing']);
+
   }
 
   async resetPassword(email: string) {
@@ -186,7 +191,7 @@ export class AuthService {
   }
 
   // Add the initial details the user signs up with
-  async addMetrics(uid, name, ingredients, goals, sex, height, weight, dob, age) {
+  async addMetrics(uid, subscriptionID, name, ingredients, goals, sex, height, weight, dob, age) {
 
     await this.fbDB.database.ref('userData/' + uid).set({
       name: name,
@@ -196,16 +201,14 @@ export class AuthService {
       heightCM : height,
       weightKG: weight,
       dateOfBirth: dob,
-      age: age
+      age: age,
+      initialSubscriptionID: subscriptionID
 
     }).catch(error => {
 
       console.log(error);
 
     });
-
-    // Add the weight initially entered by user into the user's progress table with today's date
-    let progress: {date: string, weight: number};
 
     const today = new Date();
     const dd = String(today.getDate()).padStart(2, '0');
@@ -214,7 +217,7 @@ export class AuthService {
 
     const date = yyyy + '-' + mm + '-' + dd;
 
-    this.addWeightToUserProgress(uid, date, weight);
+    await this.addWeightToUserProgress(uid, date, weight);
 
   }
 

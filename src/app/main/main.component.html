@@ -1,14 +1,15 @@
-<nav class="navbar" id="sectionsNav" style="background-color:crimson">
+<nav class="navbar navbar-light bg-light">
   <div class="container">
-      <div class="navbar-translate">
-          <a class="navbar-brand" routerLink="/landing" ><strong>{{title}}</strong></a>
-      </div>
+    <a routerLink="/landing">
+      <img src="assets/img/KeepUpKeto.png"/>
+    </a>
+    <p class='clickableText' (click)="this.authService.signOut()"><a style='color: #0079bf; font-family: arial; font-size: 12px'>Logout</a></p>
   </div>
 </nav>
 
 <router-outlet></router-outlet>
 
-<footer>
+<!-- <footer>
   <div class="col-2 col-sm-2 f-box">
     <a routerLink="/home">
       <span class="box_img diary d-block"></span>
@@ -41,4 +42,4 @@
       <span class="d-block content">Settings</span>
     </a>
   </div>
-</footer>
+</footer> -->

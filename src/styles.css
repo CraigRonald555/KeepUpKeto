@@ -179,8 +179,8 @@ footer {
   z-index: 1;
 }
 footer .f-box{
-flex: 20%;
-  max-width: 20%;
+flex: 30%;
+  max-width: 30%;
 }
 a .box_img {
   width: 25px;
@@ -195,30 +195,30 @@ a .box_img {
   -ms-transition: all 0.3s;
   -o-transition: all 0.3s;
 }
-a:hover .box_img.diary{
-background-position: -1px -43px;
+a:hover .box_img.home{
+background-position: -1px -44px;
 transition: all 0.3s;
   -webkit-transition: all 0.3s;
   -moz-transition: all 0.3s;
   -ms-transition: all 0.3s;
   -o-transition: all 0.3s;
 }
-a .box_img.friend{
-background-position: -1px -87px;
+a .box_img.plan{
+background-position: -1px -88px;
 }
-a:hover .box_img.friend{
-background-position: -1px -130px;
+a:hover .box_img.plan{
+background-position: -1px -137px;
 }
-a .box_img.plans{
-background-position: -1px -177px;
+a .box_img.progress{
+background-position: -1px -181px;
 }
-a:hover .box_img.plans{
+a:hover .box_img.progress{
 background-position: -1px -227px;
 }
-a .box_img.recipes{
+a .box_img.settings{
 background-position: -1px -277px;
 }
-a:hover .box_img.recipes{
+a:hover .box_img.settings{
 background-position: -1px -330px;
 }
 footer a:hover .content{

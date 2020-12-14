@@ -102,6 +102,9 @@ export class TimetablepageComponent implements AfterViewInit {
     }[]
   };
 
+  timetableLoading = false;
+
+  showMealAddedNotification = false;
   selectedDayIndex = -1;
 
   // Determines what is being shown in the Modal Box
@@ -139,9 +142,18 @@ export class TimetablepageComponent implements AfterViewInit {
   searchFormError = false;
   recipeResultsReturned = -1; // -1 = false, 0 = searching, 1 = returned
   recipeSearchResults = [];
-  pageNumber = 1;
+  recipePageNumber = 1;
   maxResults = 50;
   maxPage = Math.floor(this.maxResults / 10);
+
+  // Used to remove food
+  selectedMeal: {
+    dayName: string,
+    edamamType: string,
+    mealID: string,
+    mealName: string,
+    mealType: string
+  } = { dayName: 'Default', edamamType: 'Default', mealID: "Default", mealName: "Default", mealType: "Default"};
 
   progressBars = {
     carbsPercentage: 0,
@@ -387,6 +399,17 @@ export class TimetablepageComponent implements AfterViewInit {
 
     });
 
+    timetableService.loading.subscribe(status => {
+
+      if (status === true) {
+        this.timetableLoading = true;
+      } else {
+        this.timetableLoading = false;
+        this.updateProgress();
+      }
+
+    });
+
   }
 
   async removeMealFromDay(dayName, edamamType, mealID) {
@@ -495,6 +518,23 @@ export class TimetablepageComponent implements AfterViewInit {
 
   }
 
+  async selectMeal(dayName, meal) {
+
+    console.log(dayName);
+
+    this.selectedMeal.dayName = dayName;
+    this.selectedMeal.edamamType = meal.edamamType;
+    this.selectedMeal.mealID = meal.genericID;
+    this.selectedMeal.mealName = meal.name;
+    this.selectedMeal.mealType = meal.mealType;
+
+    this.changeDetector.detectChanges();
+    // this.timetableService.removeRecipeByMealTypeAndID()
+
+  }
+
+
+
   async selectFood(foodRecipesi, foodRecipesj) {
 
     // this.closeMainModalButton.nativeElement.click();
@@ -524,6 +564,9 @@ export class TimetablepageComponent implements AfterViewInit {
 
     // If every form input is valid
     if (this.searchForFoodsForm.valid) {
+
+      // Reset pageNumber back to 1
+      this.foodPageNumber = 1;
 
       this.foodResultsReturned = 0;
       this.foodSearchResults = await this.edamamService.searchForFoods(this.searchForFoodsForm.value.food);
@@ -563,7 +606,7 @@ export class TimetablepageComponent implements AfterViewInit {
       this.searchFormError = false;
 
       // Reset pageNumber back to 1
-      this.pageNumber = 1;
+      this.recipePageNumber = 1;
 
       const recipeDetails = {
         calories: this.searchForRecipesForm.value.calories,
@@ -596,6 +639,11 @@ export class TimetablepageComponent implements AfterViewInit {
     console.log(recipeToAdd);
     console.log(this.selectedDayIndex);
     this.timetableService.addRecipeToDay(this.selectedDayIndex, recipeToAdd);
+    this.closeMainModalButton.nativeElement.click();
+
+    // Trigger notification
+    this.showMealAddedNotification = true;
+    setTimeout(() => this.showMealAddedNotification = false, 2000);
 
   }
 
@@ -618,6 +666,11 @@ export class TimetablepageComponent implements AfterViewInit {
     console.log(foodToAdd);
     console.log(this.selectedDayIndex);
     await this.timetableService.addFoodToDay(this.selectedDayIndex, foodToAdd);
+    this.closeMainModalButton.nativeElement.click();
+
+    // Trigger notification
+    this.showMealAddedNotification = true;
+    setTimeout(() => this.showMealAddedNotification = false, 2000);
 
   }
 

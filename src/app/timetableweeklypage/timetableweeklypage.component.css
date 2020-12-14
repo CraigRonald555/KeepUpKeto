@@ -1,0 +1,44 @@
+.addFoodBlock {
+
+  display:block;
+  min-width:100%
+
+}
+
+.modal {
+  overflow-y:auto;
+}
+
+.btn-align {
+  padding: 6px 12px;
+  line-height: 1.42857143;
+  vertical-align: middle;
+
+}
+
+.notification {
+  font-size: 18px;
+  /* font-weight: bold; */
+  background-color: rgb(7, 206, 96);
+  color: white;
+  z-index: 1000;
+  padding: 10px;
+  animation: fadeOut 1s forwards;
+  animation-delay: 1s;
+  width: 300px;
+  height: 50px;
+  position: fixed;
+  border-radius: 5px;
+  margin-top: 100px;
+}
+
+@keyframes fadeOut {
+  from {opacity: 1;}
+  to {opacity: 0;}
+}
+
+.help-block {
+
+  color: red;
+
+}

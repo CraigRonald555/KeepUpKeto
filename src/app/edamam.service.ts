@@ -122,12 +122,24 @@ export class EdamamService {
 
         currentMeasures.unshift(gramMeasure);
 
+        let contents;
+        try {
+          contents = currentFoodDetails['foodContentsLabel'].split('; ');
+        } catch (error) { contents = ''; console.log(contents); }
+
+        let image;
+        if (currentFoodDetails['image'] === undefined) {
+          image = '/assets/img/default-food.png';
+        } else {
+          image = currentFoodDetails['image'];
+        }
+
         foodToBePushedToReturnFoods = {
 
           foodId: currentFoodDetails['foodId'],
           name: currentFoodDetails['label'],
-          image: currentFoodDetails['image'],
-          contents: currentFoodDetails['foodContentsLabel'].split('; '),
+          image: image,
+          contents: contents,
           calories: Math.round(currentFoodDetails['nutrients']['ENERC_KCAL'] * 10) / 10,
           carbs: Math.round(currentFoodDetails['nutrients']['CHOCDF'] * 10) / 10,
           fat: Math.round(currentFoodDetails['nutrients']['FAT'] * 10) / 10,
