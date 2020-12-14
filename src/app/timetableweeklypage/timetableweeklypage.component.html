@@ -37,7 +37,7 @@
           <h3>{{dayWithRecipes.day}}</h3>
         </div>
 
-        <div class="col-6 col-sm-6 text-right">
+        <div class="col-6 col-sm-6 text-right" *ngIf="dayWithRecipes.edamamRecipes.length + dayWithRecipes.edamamFoods.length > 0">
           <h3 (click)="this.addDayToShoppingList(i)" class="clickable"><small>Add to basket <span class="material-icons" style="vertical-align: baseline;">shopping_basket</span></small></h3>
         </div>
 
@@ -45,7 +45,7 @@
 
       <div class="mb-3"></div>
 
-      <div class="row" *ngIf="dayWithRecipes.edamamRecipes.length === 0">
+      <div class="row" *ngIf="dayWithRecipes.edamamRecipes.length + dayWithRecipes.edamamFoods.length === 0">
 
         <div class="col-12">
           <h5 class="text-center">No recipes - Fill now by selecting '+' button below</h5>
@@ -53,7 +53,7 @@
 
       </div>
 
-      <owl-carousel [options]="mySlideOptions" [items]="myCarouselItems" [carouselClasses]="['owl-carousel', 'owl-theme']" #owlElement *ngIf="dayWithRecipes.edamamRecipes.length > 0">
+      <owl-carousel [options]="mySlideOptions" [items]="myCarouselItems" [carouselClasses]="['owl-carousel', 'owl-theme']" #owlElement *ngIf="dayWithRecipes.edamamRecipes.length + dayWithRecipes.edamamFoods.length > 0">
         <div class="item" *ngFor="let item of mySlideItems[i]; let j = index">
 
           <div [class]="item.mealTypeHTML" (dblclick)="navigateToRecipe(item.genericID, i, item.edamamType)">

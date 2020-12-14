@@ -513,15 +513,28 @@ export class TimetableService {
 
   async clearAll() {
 
+    this.loading.emit(true);
+    this.staticLoadingStatus = true;
+
+    console.log("loading set to true in timetable service");
+
     await this.auth.clearAllRecipes(this.accountService.getUserID());
     await this.auth.clearAllFoods(this.accountService.getUserID());
     this.allRecipes = [];
     await this.checkStorage();
     this.updateWeeklyTotals();
 
+    this.loading.emit(false);
+    this.staticLoadingStatus = false;
+
+    console.log("loading set to false in timetable service");
+
   }
 
   async checkStorage() {
+
+    // this.loading.emit(true);
+    // this.staticLoadingStatus = true;
 
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -558,6 +571,9 @@ export class TimetableService {
     console.log(window.localStorage);
 
     this.arrayUpdated.emit('Array changed');
+
+    // this.loading.emit(false);
+    // this.staticLoadingStatus = false;
 
     //console.log(this.allRecipes);
 

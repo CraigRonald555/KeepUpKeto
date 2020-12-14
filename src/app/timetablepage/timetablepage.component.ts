@@ -170,7 +170,28 @@ export class TimetablepageComponent implements AfterViewInit {
   @ViewChild('owlElement') owlElement: OwlCarousel;
   myCarouselItems = [];
 
-  mySlideOptions = {margin: 5, dots: false, nav: false};
+  // mySlideOptions = {margin: 5, dots: false, nav: false};
+
+  mySlideOptions = {margin: 5, dots: false, nav: false, responsive: {
+    0: {
+      items: 1,
+      autoplay: false,
+    },
+      361: {
+      items: 2,
+      autoplay: false,
+    },
+    600: {
+      items: 2,
+      autoplay: false,
+    },
+    680: {
+      items: 3,
+      autoplay: false,
+    },
+
+  }};
+
   // myCarouselOptions = {items: 3, dots: false, nav: true};
 
   addMealsToTodayCarousel(recipes, foods) {
