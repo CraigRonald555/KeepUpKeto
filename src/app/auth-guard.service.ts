@@ -3,6 +3,7 @@ import { Observable, TimeoutError } from "rxjs";
 import { Injectable } from "@angular/core";
 import { AuthService } from "./auth.service";
 import { AngularFireAuth } from '@angular/fire/auth';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class AuthGuard implements CanActivate, CanActivateChild {
@@ -13,27 +14,9 @@ export class AuthGuard implements CanActivate, CanActivateChild {
   }
 
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
 
-    // console.log('afAuth.authState value:');
-    // console.log(this.afAuth.authState);
-
-    // let status = false;
-
-    // if (this.afAuth.currentUser) {
-
-    //   status = true;
-    //   console.log(this.afAuth.currentUser);
-
-    // } else {
-
-    //   status = false;
-    //   console.log(this.afAuth.currentUser);
-    //   this.router.navigate(['/landing']);
-
-    // }
-
-    return this.afAuth.currentUser.then(user => {
+    return this.afAuth.authState.pipe(map(user => {
 
       if (user) {
 
@@ -50,7 +33,27 @@ export class AuthGuard implements CanActivate, CanActivateChild {
 
       }
 
-    });
+
+    }));
+
+    // return this.afAuth.currentUser.then(user => {
+
+    //   if (user) {
+
+    //     console.log("AuthGuard - User is logged in");
+    //     console.log(user);
+    //     return true;
+
+    //   } else {
+
+    //     console.log("AuthGuard - User is null");
+    //     console.log(user);
+    //     this.router.navigate(['/landing']);
+    //     return false;
+
+    //   }
+
+    // });
 
   }
 
