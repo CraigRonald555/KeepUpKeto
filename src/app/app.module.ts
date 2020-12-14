@@ -46,12 +46,12 @@ const appRoutes = [
   { path: '', component: MainComponent, children: [
     { path: 'home', canActivate: [AuthGuard], component: TimetablepageComponent},
     // { path: 'timetable', component: TimetablepageComponent},
-    { path: 'plan', component: TimetableweeklypageComponent},
-    { path: 'recipes', component: RecipeComponent},
-    { path: 'foods', component: FoodComponent},
-    { path: 'instructions', component: InstructionsComponent },
-    { path: 'progress', component: ProgressComponent},
-    { path: 'settings', component: SettingsComponent}
+    { path: 'plan', canActivate: [AuthGuard], component: TimetableweeklypageComponent},
+    { path: 'recipes', canActivate: [AuthGuard], component: RecipeComponent},
+    { path: 'foods', canActivate: [AuthGuard], component: FoodComponent},
+    { path: 'instructions', canActivate: [AuthGuard], component: InstructionsComponent },
+    { path: 'progress', canActivate: [AuthGuard], component: ProgressComponent},
+    { path: 'settings', canActivate: [AuthGuard], component: SettingsComponent}
   ]},
   { path: 'landing', component: LandingpageComponent}
 

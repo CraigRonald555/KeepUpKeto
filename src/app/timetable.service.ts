@@ -61,6 +61,7 @@ export class TimetableService {
   arrayUpdated = new EventEmitter<string>();
   dataLoaded = false;
   loading = new EventEmitter<boolean>();
+  staticLoadingStatus = false;
 
   // Get user's daily calorie and macro requirements from accountDetails service
   dailyCalories;
@@ -586,6 +587,7 @@ export class TimetableService {
   async generate() {
 
     this.loading.emit(true);
+    this.staticLoadingStatus = true;
 
     let totalCallsToAPI = 0;
 
@@ -677,7 +679,7 @@ export class TimetableService {
 
             // Make sure an actual recipe returned before adding it to day
             if (recipeForMealType !== undefined) {
-              this.addRecipeToDay(i, recipeForMealType);
+              await this.addRecipeToDay(i, recipeForMealType);
             }
 
             totalCallsToAPI++;
@@ -699,6 +701,8 @@ export class TimetableService {
     }
 
     this.loading.emit(false);
+    this.staticLoadingStatus = false;
+
     console.log(window.localStorage);
     console.log(`Total calls: ${totalCallsToAPI}`);
 

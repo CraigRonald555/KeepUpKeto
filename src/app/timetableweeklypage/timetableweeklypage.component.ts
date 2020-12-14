@@ -149,6 +149,9 @@ export class TimetableweeklypageComponent implements AfterViewInit {
 
   constructor(public timetableService: TimetableService, private edamamService: EdamamService, private router: Router, private changeDetector: ChangeDetectorRef, private ngZone: NgZone ) {
 
+    // Check loading status incase the eventemitter fired before the component loaded
+    this.timetableLoading = this.timetableService.staticLoadingStatus;
+
     // Initialise whisk
     whisk = whisk || {};
     whisk.queue = whisk.queue || [];
@@ -527,6 +530,8 @@ export class TimetableweeklypageComponent implements AfterViewInit {
 
     }
 
+    this.closeMainModalButton.nativeElement.click();
+
 
   }
 
@@ -653,7 +658,7 @@ export class TimetableweeklypageComponent implements AfterViewInit {
     recipeToAdd.recipeType = this.selectedMealType;
     console.log(recipeToAdd);
     console.log(this.selectedDayIndex);
-    this.timetableService.addRecipeToDay(this.selectedDayIndex, recipeToAdd);
+    await this.timetableService.addRecipeToDay(this.selectedDayIndex, recipeToAdd);
     this.closeMainModalButton.nativeElement.click();
 
     // Trigger notification

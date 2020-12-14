@@ -279,20 +279,6 @@ export class EdamamService {
 
     let recipeForDay;
 
-  //   let recipeForDay: {
-  //     recipeID: string,
-  //     recipeType: string,
-  //     name: string,
-  //     image: string,
-  //     url: string,
-  //     uri: string,
-  //     calories: number,
-  //     carbs: number,
-  //     protein: number,
-  //     fat: number,
-  //     ingredients:
-  // };
-
     console.log('Reached searchForRecipes');
 
     //
@@ -333,45 +319,49 @@ export class EdamamService {
           console.log(`${randomRecipeNo} after change`);
         }
 
-        returnRecipe = recipes[randomRecipeNo]['recipe'];
+        try {
 
-        //Use this to get the servings
-        const servings = returnRecipe['yield'];
+          returnRecipe = recipes[randomRecipeNo]['recipe'];
 
-        let newIngredientsArray = [];
-        let originalIngredientArray = returnRecipe['ingredientLines'];
+          //Use this to get the servings
+          const servings = returnRecipe['yield'];
 
-        for (let i = 0; i < originalIngredientArray.length; i++) {
+          let newIngredientsArray = [];
+          let originalIngredientArray = returnRecipe['ingredientLines'];
 
-          let ingredientLine = originalIngredientArray[i];
+          for (let i = 0; i < originalIngredientArray.length; i++) {
 
-          ingredientLine = this.ingredientDivider.convertAll(servings, ingredientLine);
+            let ingredientLine = originalIngredientArray[i];
 
-          newIngredientsArray.push(ingredientLine);
+            ingredientLine = this.ingredientDivider.convertAll(servings, ingredientLine);
 
-        }
+            newIngredientsArray.push(ingredientLine);
 
-        recipeForDay = {
-          recipeID: returnRecipe.uri.substring(returnRecipe.uri.indexOf('_') + 1, returnRecipe.uri.length),
-          recipeType: recipeDetails.recipeType,
-          name: returnRecipe.label,
-          url: returnRecipe.url,
-          uri: returnRecipe.uri,
-          carbs: returnRecipe['totalNutrients'].CHOCDF.quantity / servings,
-          protein: returnRecipe['totalNutrients'].PROCNT.quantity  / servings,
-          fat: returnRecipe['totalNutrients'].FAT.quantity / servings,
-          calories: returnRecipe.calories / servings,
-          image: returnRecipe.image,
-          ingredients: newIngredientsArray
-        };
+          }
 
-        console.log(`New recipe added`);
-        console.log(`Name: ${returnRecipe.label}`);
-        console.log(`Image: ${returnRecipe.image}`);
-        console.log(`Calories: ${returnRecipe.calories / servings}`);
-        console.log(`Carbs: ${returnRecipe['totalNutrients'].CHOCDF.quantity / servings}`);
-        console.log(`Protein: ${returnRecipe['totalNutrients'].PROCNT.quantity / servings}`);
-        console.log(`Fat: ${returnRecipe['totalNutrients'].FAT.quantity / servings}`);
+          recipeForDay = {
+            recipeID: returnRecipe.uri.substring(returnRecipe.uri.indexOf('_') + 1, returnRecipe.uri.length),
+            recipeType: recipeDetails.recipeType,
+            name: returnRecipe.label,
+            url: returnRecipe.url,
+            uri: returnRecipe.uri,
+            carbs: returnRecipe['totalNutrients'].CHOCDF.quantity / servings,
+            protein: returnRecipe['totalNutrients'].PROCNT.quantity  / servings,
+            fat: returnRecipe['totalNutrients'].FAT.quantity / servings,
+            calories: returnRecipe.calories / servings,
+            image: returnRecipe.image,
+            ingredients: newIngredientsArray
+          };
+
+          console.log(`New recipe added`);
+          console.log(`Name: ${returnRecipe.label}`);
+          console.log(`Image: ${returnRecipe.image}`);
+          console.log(`Calories: ${returnRecipe.calories / servings}`);
+          console.log(`Carbs: ${returnRecipe['totalNutrients'].CHOCDF.quantity / servings}`);
+          console.log(`Protein: ${returnRecipe['totalNutrients'].PROCNT.quantity / servings}`);
+          console.log(`Fat: ${returnRecipe['totalNutrients'].FAT.quantity / servings}`);
+
+        } catch (error) { console.log(error); }
 
       }
     });

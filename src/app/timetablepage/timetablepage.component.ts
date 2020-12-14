@@ -384,6 +384,9 @@ export class TimetablepageComponent implements AfterViewInit {
 
     // window.localStorage.clear();
 
+    // Check loading status incase the eventemitter fired before the component loaded
+    this.timetableLoading = this.timetableService.staticLoadingStatus;
+
     timetableService.arrayUpdated.subscribe(status => {
 
       this.allRecipes = timetableService.getAllRecipes();
