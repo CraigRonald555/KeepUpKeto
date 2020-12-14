@@ -33,7 +33,7 @@ export class AuthGuard implements CanActivate, CanActivateChild {
 
     // }
 
-    return this.afAuth.authState.toPromise().then(user => {
+    return this.afAuth.currentUser.then(user => {
 
       if (user) {
 
