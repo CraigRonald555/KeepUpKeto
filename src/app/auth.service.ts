@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { User } from 'firebase';
 import { AngularFireDatabase } from '@angular/fire/database';
+import { AngularFireStorage, AngularFireUploadTask } from '@angular/fire/storage';
 import { StorageService } from './storage.service';
 import { e, string } from 'mathjs';
 
@@ -13,31 +14,25 @@ import { e, string } from 'mathjs';
 export class AuthService {
 
   signedIn = new EventEmitter<User>();
-  signedInStatus = false;
-  mondayChanged = new EventEmitter<unknown>();
-  tuesdayChanged = new EventEmitter<unknown>();
-  wednesdayChanged = new EventEmitter<unknown>();
-  thursdayChanged = new EventEmitter<unknown>();
-  fridayChanged = new EventEmitter<unknown>();
-  saturdayChanged = new EventEmitter<unknown>();
-  sundayChanged = new EventEmitter<unknown>();
 
-  constructor(private afAuth: AngularFireAuth, private router: Router, private fbDB: AngularFireDatabase,
+  isUploading = false;
+  isUploadingEmitter = new EventEmitter<Boolean>();
+
+  constructor(private afAuth: AngularFireAuth, private router: Router, private fbDB: AngularFireDatabase, private fbStorage: AngularFireStorage,
               private storageService: StorageService, private ngZone: NgZone) {
 
     this.afAuth.onAuthStateChanged(user => {
 
       if (user) {
 
+        console.log('Currently logged in');
         this.signedIn.emit(user);
-        this.signedInStatus = true;
 
 
       } else {
 
         // Don't just clear the localStorage, make sure to only remove the Days as it may break Firebase and PayPal API
         window.localStorage.clear();
-        this.signedInStatus = false;
 
         console.log('Currently logged out');
 
@@ -54,56 +49,57 @@ export class AuthService {
 
   }
 
-  listenToTimetableChanges(uid) {
+  async getProfileImage (uid) {
 
-    const mondayListener = this.fbDB.database.ref(`timetables/${uid}/Monday`);
-    mondayListener.on('value', snapshot => {
+    let returnUrl = "";
+    let imagePath = await this.readDataFromFirebase(`userData/${uid}/currentProfileImage`);
+    // imagePath = imagePath + ".png";
 
-      this.mondayChanged.emit(snapshot.val());
+    console.log(imagePath);
 
-    });
+    const userStorageRef = await this.fbStorage.storage.ref().child(imagePath);
 
-    const tuesdayListener = this.fbDB.database.ref(`timetables/${uid}/Tuesday`);
-    tuesdayListener.on('value', snapshot => {
+    console.log(userStorageRef.fullPath);
 
-      this.tuesdayChanged.emit(snapshot.val());
+    await userStorageRef.getDownloadURL().then(url => {
+      returnUrl = url
+    }).catch(error => {
 
-    });
-
-    const wednesdayListener = this.fbDB.database.ref(`timetables/${uid}/Wednesday`);
-    wednesdayListener.on('value', snapshot => {
-
-      this.wednesdayChanged.emit(snapshot.val());
+      console.log(error);
 
     });
 
-    const thursdayListener = this.fbDB.database.ref(`timetables/${uid}/Thursday`);
-    thursdayListener.on('value', snapshot => {
+    console.log(returnUrl);
 
-      this.thursdayChanged.emit(snapshot.val());
+    return returnUrl;
+
+  }
+
+  async uploadImage(uid, image: File) {
+
+    // const ref = this.fbStorage.ref('test');
+
+    this.isUploading = true;
+    this.isUploadingEmitter.emit(true);
+
+    const dateNow = Date.now();
+
+    await this.fbStorage.upload(`userData/${uid}/gallery/${dateNow}`, image);
+
+    await this.fbDB.database.ref(`userData`).child(`${uid}`).update({
+
+      'currentProfileImage': `userData/${uid}/gallery/${dateNow}`
+
+    }).catch(error => {
+
+      console.log(error);
 
     });
 
-    const fridayListener = this.fbDB.database.ref(`timetables/${uid}/Friday`);
-    fridayListener.on('value', snapshot => {
+    console.log('Upload complete');
 
-      this.fridayChanged.emit(snapshot.val());
-
-    });
-
-    const saturdayListener = this.fbDB.database.ref(`timetables/${uid}/Saturday`);
-    saturdayListener.on('value', snapshot => {
-
-      this.saturdayChanged.emit(snapshot.val());
-
-    });
-
-    const sundayListener = this.fbDB.database.ref(`timetables/${uid}/Sunday`);
-    sundayListener.on('value', snapshot => {
-
-      this.sundayChanged.emit(snapshot.val());
-
-    });
+    this.isUploading = false;
+    this.isUploadingEmitter.emit(false);
 
   }
 

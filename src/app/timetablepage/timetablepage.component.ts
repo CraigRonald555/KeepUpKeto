@@ -5,6 +5,8 @@ import { NgForm } from '@angular/forms';
 import { OwlCarousel } from 'ngx-owl-carousel';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { NavigationExtras, Router } from '@angular/router';
+import { AuthService } from '../auth.service';
+import { AccountService } from '../account.service';
 
 // declare var whisk: any;
 
@@ -17,6 +19,8 @@ export class TimetablepageComponent implements AfterViewInit {
 
   showDaily = true;
   monShow = true;
+
+  profilePic = "";
 
   // An array of all the recipes in the timetable
   allRecipes: {
@@ -103,6 +107,7 @@ export class TimetablepageComponent implements AfterViewInit {
   };
 
   timetableLoading = false;
+  isUploading = false;
 
   showMealAddedNotification = false;
   selectedDayIndex = -1;
@@ -343,10 +348,12 @@ export class TimetablepageComponent implements AfterViewInit {
 
     }
 
-    // Renitialise the owlElement
-    this.owlElement.reInit();
+    try {
+      // Renitialise the owlElement
+      this.owlElement.reInit();
+    } catch (error) { console.log(error); }
 
-    console.log(this.owlElement);
+    // console.log(this.owlElement);
 
   }
 
@@ -401,12 +408,15 @@ export class TimetablepageComponent implements AfterViewInit {
 
   }
 
-  constructor(public timetableService: TimetableService, private edamamService: EdamamService, private router: Router, private changeDetector: ChangeDetectorRef, private ngZone: NgZone ) {
+  constructor(public timetableService: TimetableService, private edamamService: EdamamService, private router: Router,
+    private changeDetector: ChangeDetectorRef, private ngZone: NgZone, private auth: AuthService, private accountService: AccountService ) {
 
     // window.localStorage.clear();
 
     // Check loading status incase the eventemitter fired before the component loaded
     this.timetableLoading = this.timetableService.staticLoadingStatus;
+    this.isUploading = this.auth.isUploading;
+    this.retrieveImage();
 
     timetableService.arrayUpdated.subscribe(status => {
 
@@ -427,12 +437,28 @@ export class TimetablepageComponent implements AfterViewInit {
 
       if (status === true) {
         this.timetableLoading = true;
+        this.changeDetector.detectChanges();
+        console.log('Timetable is loading');
       } else {
         this.timetableLoading = false;
+        console.log('Timetable is not loading');
         this.updateProgress();
+        this.changeDetector.detectChanges();
       }
 
     });
+
+    auth.isUploadingEmitter.subscribe(status => {
+
+      if (status === true) {
+        this.isUploading = true;
+        this.changeDetector.detectChanges();
+      } else {
+        this.isUploading = false;
+        this.changeDetector.detectChanges();
+      }
+
+    })
 
   }
 
@@ -750,6 +776,22 @@ export class TimetablepageComponent implements AfterViewInit {
     console.log("Started generating");
 
     this.timetableService.generate();
+
+  }
+
+  async uploadImage(images: FileList) {
+
+    const image = images.item(0);
+
+    await this.auth.uploadImage(this.accountService.getUserID(), image);
+
+    this.profilePic = await this.auth.getProfileImage(this.accountService.getUserID());
+
+  }
+
+  async retrieveImage() {
+
+    this.profilePic = await this.auth.getProfileImage(this.accountService.getUserID());
 
   }
 

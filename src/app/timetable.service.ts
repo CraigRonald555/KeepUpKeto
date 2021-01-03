@@ -85,7 +85,11 @@ export class TimetableService {
 
     this.accountService.accountDetailsUpdated.subscribe(async status => {
 
-      console.log(window.localStorage);
+      this.loading.emit(true);
+      this.staticLoadingStatus = true;
+
+
+      this.allRecipes = [];
 
       this.dailyCalories = this.accountService.accountDetails.dailyCalories;
       this.dailyCarbs = this.accountService.accountDetails.macros.carbs;
@@ -93,11 +97,14 @@ export class TimetableService {
       this.dailyFat = this.accountService.accountDetails.macros.fat;
       this.userIngredients = this.accountService.accountDetails.ingredientPreferences;
 
-      this.auth.listenToTimetableChanges(this.accountService.getUserID());
       await this.checkStorage();
+      this.checkOrder();
       this.updateWeeklyTotals();
 
       this.dataLoaded = true;
+
+      this.loading.emit(false);
+      this.staticLoadingStatus = false;
 
       console.log('Updated account details in timetable service');
 
@@ -499,15 +506,15 @@ export class TimetableService {
 
   }
 
-  writeRecipeToStorage(day, recipe) {
+  checkOrder() {
+
+    for (let i = 0; i < this.allRecipes.length; i++) {
+
+      const dayName = this.allRecipes[i].day;
 
 
 
-  }
-
-  async writeFoodToStorage(day, food) {
-
-
+    }
 
   }
 

@@ -1,5 +1,6 @@
 import { ChangeDetectorRef, Component, NgZone } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Location } from '@angular/common';
 import { EdamamService } from '../edamam.service';
 import { TimetableService } from '../timetable.service';
 
@@ -29,7 +30,8 @@ export class RecipeComponent {
     caloriesDaily: 0
   };
 
-  constructor(private timetableService: TimetableService, private router: Router, private route: ActivatedRoute, private ngZone: NgZone ,private changeDetector: ChangeDetectorRef) {
+  constructor(private timetableService: TimetableService, private router: Router, private route: ActivatedRoute,
+    private changeDetector: ChangeDetectorRef, private location: Location) {
 
     if (this.timetableService.dataLoaded) {
 
@@ -120,6 +122,12 @@ export class RecipeComponent {
     }
 
     return foundRecipe;
+
+  }
+
+  goBackToPreviousRoute() {
+
+    this.location.back();
 
   }
 

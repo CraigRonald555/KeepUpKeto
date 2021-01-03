@@ -26,7 +26,8 @@
 
   </div>
 
-  <ng-container *ngIf="timetableLoading === false">
+  <!-- <ng-container *ngIf="timetableLoading === false"> -->
+  <div [hidden]="timetableLoading === true">
 
     <!-- 'i' represents the index of the day in allRecipes, 'j' represents the index of the recipe in the day's recipes array -->
     <ng-container *ngFor="let dayWithRecipes of allRecipes; let i = index">
@@ -121,9 +122,11 @@
 
     </ng-container>
 
-  </ng-container>
+  <!-- </ng-container> -->
+  </div>
 
-  <div class="row" *ngIf="timetableLoading === true">
+  <!-- <div class="row" *ngIf="timetableLoading === true"> -->
+  <div class="row" [hidden]="timetableLoading === false">
     <div class="col-12 d-flex justify-content-center">
       <p><mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
       Loading meal plan...</p>
@@ -638,7 +641,7 @@
   </div>
   <div class="col-2 col-sm-2 f-box">
     <a routerLink="/progress">
-        <span class="box_img progress d-block"></span>
+        <span class="box_img prog d-block"></span>
         <span class="d-block content">Progress</span>
     </a>
   </div>
@@ -646,7 +649,7 @@
   <div class="col-2 col-sm-2 f-box">
     <a routerLink="/settings">
       <span class="box_img settings d-block"></span>
-      <span class="d-block content">Settings</span>
+      <span class="d-block content">Help</span>
     </a>
   </div>
 </footer>

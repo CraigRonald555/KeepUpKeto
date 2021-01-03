@@ -1,5 +1,6 @@
 import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
+import {Location} from '@angular/common';
 import { TimetableService } from '../timetable.service';
 
 @Component({
@@ -27,7 +28,8 @@ export class FoodComponent {
     caloriesDaily: 0
   };
 
-  constructor(private timetableService: TimetableService, private router: Router, private route: ActivatedRoute, private ngZone: NgZone ,private changeDetector: ChangeDetectorRef) {
+  constructor(private timetableService: TimetableService, private router: Router, private route: ActivatedRoute,
+    private changeDetector: ChangeDetectorRef, private location: Location) {
 
     if (this.timetableService.dataLoaded) {
 
@@ -112,6 +114,12 @@ export class FoodComponent {
     }
 
     return foundFood;
+
+  }
+
+  goBackToPreviousRoute() {
+
+    this.location.back();
 
   }
 

@@ -32,8 +32,7 @@ export class IngredientDivider {
 
   convertAll(servings, stringWithIngredients) {
 
-    // console.log(`Initial ingredient: ${stringWithIngredients}`);
-    // console.log(`Servings: ${servings}`);
+    // IMPORTANT: The order of these functions is very important, do NOT change it!
 
     stringWithIngredients = this.divideStringByServings(servings, stringWithIngredients);
     // console.log(`After dividing by servings: ${stringWithIngredients}`);

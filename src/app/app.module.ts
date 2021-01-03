@@ -11,10 +11,7 @@ import { GoogleChartsModule } from 'angular-google-charts';
 import { ChartsModule } from 'ng2-charts';
 
 import { AppComponent } from './app.component';
-import { HomepageComponent } from './homepage/homepage.component';
 import { TimetablepageComponent } from './timetablepage/timetablepage.component';
-import { WelcomeComponent } from './homepage/welcome/welcome.component';
-import { TodaytableComponent } from './homepage/todaytable/todaytable.component';
 import { AddMealComponent } from './add-meal/add-meal.component';
 import { TimetableService } from './timetable.service';
 import { AccountService } from './account.service';
@@ -60,10 +57,7 @@ const appRoutes = [
 @NgModule({
   declarations: [
     AppComponent,
-    HomepageComponent,
     TimetablepageComponent,
-    WelcomeComponent,
-    TodaytableComponent,
     AddMealComponent,
     LandingpageComponent,
     MainComponent,

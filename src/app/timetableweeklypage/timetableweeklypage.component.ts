@@ -162,8 +162,6 @@ export class TimetableweeklypageComponent implements AfterViewInit {
 
     timetableService.arrayUpdated.subscribe(status => {
 
-      this.allRecipes = timetableService.getAllRecipes();
-
       this.updateProgress();
       console.log(this.owlElements);
 
@@ -175,9 +173,12 @@ export class TimetableweeklypageComponent implements AfterViewInit {
 
       if (status === true) {
         this.timetableLoading = true;
+        this.changeDetector.detectChanges();
       } else {
         this.timetableLoading = false;
+
         this.updateProgress();
+        this.changeDetector.detectChanges();
       }
 
     });
@@ -197,6 +198,8 @@ export class TimetableweeklypageComponent implements AfterViewInit {
   }
 
   updateProgress() {
+
+    this.allRecipes = this.timetableService.getAllRecipes();
 
     for (let i = 0; i < this.allRecipes.length; i++) {
 
@@ -219,6 +222,7 @@ export class TimetableweeklypageComponent implements AfterViewInit {
 
     console.log('Progress');
     console.log(this.progressBars);
+    console.log(window.localStorage);
 
   }
 
@@ -726,7 +730,6 @@ export class TimetableweeklypageComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
 
-    this.allRecipes = this.timetableService.getAllRecipes();
     this.updateProgress();
 
     this.changeDetector.detectChanges();

@@ -14,12 +14,6 @@
 
       <h2>Home</h2>
 
-      <div class="row">
-
-        <div class="profilepic" style="height: 150px"></div>
-
-      </div>
-
     </div>
 
     <div class="col-6 col-sm-6 text-center">
@@ -27,6 +21,35 @@
     </div>
 
   </div>
+
+  <div class="row" [hidden]="isUploading === true">
+
+    <div class="col-6">
+
+      <img [src]="this.profilePic" alt="Circle Image" class="img-raised rounded-circle img-fluid" style="max-height: 200px;">
+
+    </div>
+
+    <div class="col-6 text-center" style="margin-top: auto; margin-bottom: auto">
+
+      <div class="form-group">
+        <label for="file" class="btn btn-success" style="display:block; min-width:100%">Upload new pic</label>
+        <input type="file"
+               id="file"
+               (change)="uploadImage($event.target.files)">
+      </div>
+      <button class="btn btn-default" style="display:block; min-width:100%">View Gallery</button>
+
+    </div>
+
+  </div>
+
+  <div class="row" *ngIf="isUploading === true">
+    <div class="col-12 d-flex justify-content-center">
+      <p><mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+      Uploading image...</p>
+    </div>
+ </div>
 
 </div>
 
@@ -57,7 +80,8 @@
 
   <div class="mb-5"></div>
 
-  <owl-carousel *ngIf="timetableLoading === false" [options]="mySlideOptions" [items]="myCarouselItems" [carouselClasses]="['owl-carousel', 'owl-theme']" #owlElement>
+  <!-- <owl-carousel *ngIf="timetableLoading === false" [options]="mySlideOptions" [items]="myCarouselItems" [carouselClasses]="['owl-carousel', 'owl-theme']" #owlElement> -->
+  <owl-carousel [hidden]="timetableLoading === true" [options]="mySlideOptions" [items]="myCarouselItems" [carouselClasses]="['owl-carousel', 'owl-theme']" #owlElement>
     <div class="item" *ngFor="let item of mySlideItems;let i = index">
       <div [class]="item.mealTypeHTML" (dblclick)="navigateToMeal(item.genericID, item.edamamType)">
         <div class="row">
@@ -80,7 +104,8 @@
     </div>
    </owl-carousel>
 
-  <div class="row" *ngIf="timetableLoading === false">
+  <!-- <div class="row" *ngIf="timetableLoading === false"> -->
+  <div class="row" [hidden]="timetableLoading === true">
 
     <div class="col-3 col-sm-3">
       <h6>Carbs</h6>
@@ -663,7 +688,7 @@
   </div>
   <div class="col-2 col-sm-2 f-box">
     <a routerLink="/progress">
-        <span class="box_img progress d-block"></span>
+        <span class="box_img prog d-block"></span>
         <span class="d-block content">Progress</span>
     </a>
   </div>
@@ -671,7 +696,7 @@
   <div class="col-2 col-sm-2 f-box">
     <a routerLink="/settings">
       <span class="box_img settings d-block"></span>
-      <span class="d-block content">Settings</span>
+      <span class="d-block content">Help</span>
     </a>
   </div>
 </footer>
