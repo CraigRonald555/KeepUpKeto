@@ -174,11 +174,8 @@
 
   <div class="row">
 
-    <div class="col-6 text-center" style="margin-top: auto; margin-bottom: auto;">
-      <img src="assets/img/landing-guarentee.png" />
-    </div>
 
-    <div class="col-6" style="margin-top: auto; margin-bottom: auto;">
+    <div class="col-12" style="margin-top: auto; margin-bottom: auto;">
       <div class="landing-header">
         Risk free. No Questions Asked.
       </div>
@@ -305,7 +302,7 @@
         <h5 class="modal-title" id="step1label" *ngIf='signUpStep===0'>Help us find recipes for you by selecting your preferred ingredients</h5>
         <h5 class="modal-title" id="step2label" *ngIf='signUpStep===1'>To help us calculate your required nutrients please enter in your details</h5>
         <h5 class="modal-title" id="step3label" *ngIf='signUpStep===2'>These details are required to log in</h5>
-        <button type="button" class="close" data-dismiss="modal" (click)='signUpStep=0' aria-label="Close">
+        <button #closeSignUpForm type="button" class="close" data-dismiss="modal" (click)='signUpStep=0' aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>

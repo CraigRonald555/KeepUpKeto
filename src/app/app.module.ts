@@ -12,7 +12,6 @@ import { ChartsModule } from 'ng2-charts';
 
 import { AppComponent } from './app.component';
 import { TimetablepageComponent } from './timetablepage/timetablepage.component';
-import { AddMealComponent } from './add-meal/add-meal.component';
 import { TimetableService } from './timetable.service';
 import { AccountService } from './account.service';
 import { IngredientDivider } from './ingredientDivider.service';
@@ -58,7 +57,6 @@ const appRoutes = [
   declarations: [
     AppComponent,
     TimetablepageComponent,
-    AddMealComponent,
     LandingpageComponent,
     MainComponent,
     LoginpageComponent,

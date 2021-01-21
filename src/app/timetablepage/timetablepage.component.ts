@@ -740,15 +740,6 @@ export class TimetablepageComponent implements AfterViewInit {
 
     this.addMealsToTodayCarousel(this.todayRecipes.edamamRecipes, this.todayRecipes.edamamFoods);
 
-    // console.log(`Daily Carbs: ${this.timetableService.dailyCarbs}`);
-    // console.log(`Used Carbs ${this.todayRecipes.totalCarbs}`);
-    // console.log(`Daily Protein: ${this.timetableService.dailyProtein}`);
-    // console.log(`Used Protein ${this.todayRecipes.totalProtein}`);
-    // console.log(`Daily Fat: ${this.timetableService.dailyFat}`);
-    // console.log(`Used Fat ${this.todayRecipes.totalFat}`);
-    // console.log(`Daily Calories: ${this.timetableService.dailyCalories}`);
-    // console.log(`Used Calories: ${this.todayRecipes.totalCalories}`);
-
     this.progressBars = {
       carbsPercentage: (this.todayRecipes.totalCarbs / this.timetableService.dailyCarbs) * 100,
       carbsRemaining: Math.floor(this.todayRecipes.carbsRemaining),
@@ -759,9 +750,6 @@ export class TimetablepageComponent implements AfterViewInit {
       caloriesPercentage: (this.todayRecipes.totalCalories / this.timetableService.dailyCalories) * 100,
       caloriesRemaining: Math.floor(this.todayRecipes.caloriesRemaining)
     };
-
-    // console.log('Progress');
-    // console.log(this.progressBars);
 
   }
 
@@ -791,7 +779,11 @@ export class TimetablepageComponent implements AfterViewInit {
 
   async retrieveImage() {
 
-    this.profilePic = await this.auth.getProfileImage(this.accountService.getUserID());
+    try {
+      this.profilePic = await this.auth.getProfileImage(this.accountService.getUserID());
+    } catch (error) {
+      this.profilePic = 'assets/img/default-photo.jpg'
+    }
 
   }
 

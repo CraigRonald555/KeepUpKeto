@@ -30,21 +30,25 @@ export class LandingpageComponent implements AfterViewInit {
   age;
   name;
 
+  centimeters = true;
+  lbs = true;
+  male: boolean = undefined;
+  goals: number = undefined; // -1 = lose 1kg, 0 = maintain, 1 = gain 1kg
+
+  // Track step of each form step
   signUpStep = 0;
-  progress = 0;
   loginStep = 0;
+
+  progress = 0; // For progress bar
 
   resetPasswordError = false;
   resetPasswordSuccess = false;
 
   loginAttemptFailed = false;
 
-  centimeters = true;
-  lbs = true;
-  male: boolean = undefined;
-  goals: number = undefined; // -1 = lose 1kg, 0 = maintain, 1 = gain 1kg
-
   @ViewChild('signUpForm') signUpForm;
+  @ViewChild('closeSignUpForm') closeSignUpForm;
+
   @ViewChild('closeLoginModal') closeLoginModal;
   @ViewChild('loginModal') loginModal;
 
@@ -187,9 +191,11 @@ export class LandingpageComponent implements AfterViewInit {
     const uid = await this.auth.signUp(this.signUpForm.value.email, this.signUpForm.value.password);
     await this.auth.addMetrics(uid, subscriptionID, this.name, this.ingredients, this.goalsText, this.sexText, this.heightCM, this.weightKG, this.dateOfBirth, this.age);
     await this.auth.addDefaultTimetable(uid);
-    // await this.auth.add
 
-    setTimeout(() => this.router.navigate(['/home']), 3000);
+    this.closeSignUpForm.nativeElement.click();
+
+    // Temporary page crash fix caused by modal box, wait a second for the modal box to close before navigating away
+    setTimeout(() => this.router.navigate(['/home']), 1000);
 
   }
 
@@ -211,9 +217,11 @@ export class LandingpageComponent implements AfterViewInit {
 
     }
 
-    this.closeLoginModal.nativeElement.click();
-
-    setTimeout(() => this.router.navigate(['/home']), 1000);
+    if (response === 'successful') {
+      this.closeLoginModal.nativeElement.click();
+      // Temporary page crash fix caused by modal box, wait a second for the modal box to close before navigating away
+      setTimeout(() => this.router.navigate(['/home']), 1000);
+    }
 
     console.log(response);
 
