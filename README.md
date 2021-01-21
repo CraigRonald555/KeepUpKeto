@@ -1,5 +1,5 @@
 # KeepUpKeto
 
-## GitHub Pages Link
+## Website
 
-https://craigronald555.github.io/KeepUpKeto
+https://KeepUpKeto.com
