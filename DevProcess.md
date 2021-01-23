@@ -2,7 +2,7 @@
 
 ## Introduction 
 
-During my time studying an Angular udemy course, I took on a personal project found here at KeepUpKeto.com. 
+During my time studying an Angular udemy course, I took on a personal project found here at [KeepUpKeto.com](https://keepupketo.com). 
 
 The website aims to give keto dieters the resources to discover new recipes for a fairly restricted diet; and offers them the ability to track their daily nutritional requirements throughout the week. 
 
