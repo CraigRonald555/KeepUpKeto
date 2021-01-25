@@ -37,7 +37,7 @@ export class EdamamService {
       ]
     };
 
-    const postURL = `https://api.edamam.com/api/food-database/v2/nutrients?app_id=196941c8&app_key=1cd2c180f1873ed2d3388d3df478d174`;
+    const postURL = `https://api.edamam.com/api/food-database/v2/nutrients?app_id=`;
 
     try {
 
@@ -91,7 +91,7 @@ export class EdamamService {
     const returnFoods = [];
     let foodToBePushedToReturnFoods;
 
-    const requestURL = `https://api.edamam.com/api/food-database/v2/parser?ingr=${food}&app_id=196941c8&app_key=1cd2c180f1873ed2d3388d3df478d174`;
+    const requestURL = `https://api.edamam.com/api/food-database/v2/parser?ingr=${food}&app_id=`;
 
     await this.http.get(requestURL).toPromise().then(async result => {
 
@@ -199,7 +199,7 @@ export class EdamamService {
     const minCalories = (recipeDetails.calories - 35 <= 0) ? 0 : recipeDetails.calories - 35;
     const maxCalories = (recipeDetails.calories < 0) ? 35 : recipeDetails.calories + 35;
 
-    const requestURL = `https://api.edamam.com/search?q=${ingredient}&app_id=4dad360d&app_key=5d6c41eeeb543f362a3b108c597193bd&from=0&to=${maxResults}&calories=${minCalories}-${maxCalories}&nutrients%5BFAT%5D=${minFat}-${maxFat}&nutrients%5BCHOCDF%5D=${minCarbs}-${maxCarbs}&nutrients%5BPROCNT%5D=${minProtein}-${maxProtein}`;
+    const requestURL = `https://api.edamam.com/search?q=${ingredient}&app_id=
 
 
     await this.http.get(requestURL).toPromise().then(async result => {
@@ -295,7 +295,7 @@ export class EdamamService {
     const maxCalories = (recipeDetails.calories < 0) ? 35 : recipeDetails.calories + 35;
 
     // TEMPORARILY JUST USE BASIC PARAMETERS UNTIL MEMBERSHIP UPGRADED
-    const requestURL = `https://api.edamam.com/search?q=${ingredient}&app_id=4dad360d&app_key=5d6c41eeeb543f362a3b108c597193bd&from=${from}&to=${to}&calories=${minCalories}-${maxCalories}&nutrients%5BFAT%5D=${minFat}-${maxFat}&nutrients%5BCHOCDF%5D=${minCarbs}-${maxCarbs}&nutrients%5BPROCNT%5D=${minProtein}-${maxProtein}`;
+    const requestURL = `https://api.edamam.com/search?q=${ingredient}&app_id=;
     console.log(requestURL);
 
     await this.http.get(requestURL).toPromise().then(async result => {
@@ -373,7 +373,7 @@ export class EdamamService {
   async getRecipeByEdamamID(edamamRecipeID, recipeType) {
 
     // Make call to edamam API to retrieve the url, uri, calories, carbs, protein etc.
-    const requestURL = 'https://api.edamam.com/search?app_id=4dad360d&app_key=5d6c41eeeb543f362a3b108c597193bd&r=http%3A%2F%2Fwww.edamam.com%2Fontologies%2Fedamam.owl%23recipe_' + edamamRecipeID;
+    const requestURL = 'https://api.edamam.com/search?app_id=
 
     console.log('Request to Edamam for recipe details sent');
 
