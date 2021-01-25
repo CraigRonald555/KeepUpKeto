@@ -8,7 +8,7 @@ The website essentially allows users to manage their ketogenic diet by offering 
 
 I managed to create multiple complex systems and combine them into a working system. My proudest achievement was reducing data bandwidth by caching user data within their browser and designing the system so it remains reliable and up-to-date across every device.
   
-Test Login Details  
+Login Details  
 Username: craigronald517@gmail.com  
 Password: NewPass123  
 
