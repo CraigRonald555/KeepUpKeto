@@ -19,7 +19,7 @@ Password: NewPass123
 * Calculate nutritional requirements to achieve ketosis based on a user's weight, height, sex and target weight
 * Automatically break a user's day into a structure which can then be automatically filled with recipes based on pre-selected ingredient preferences
 * Search for recipes manually based on what ingredient the user types in and return up to 50 recipes
-* Alternatively, search for a food directly e.g. eggs
+* Alternatively, search for a foods directly e.g. eggs
 * Mix and match between manually selected favourite recipes/foods, and automatic selection to fill remaining required nutrients 
 * Visualisation of user progress with Chart.js
 * A caching system which keeps user data stored in their browser, reducing the amount of calls to recipe API and backend cloud database
@@ -27,7 +27,7 @@ Password: NewPass123
 
 ## Support
 
-If you are interested in this repository, please feel free to contact me to discuss potentially implementing it for your business. All code here is protected by Intellectual Property legislation and commercial usage is prohibited without permission by myself.
+If you are interested in this repository, please feel free to contact me to discuss implementing it for your business. All code here is protected by Intellectual Property legislation and commercial usage is prohibited without permission from myself.
 
 ## Development Process
 
