@@ -18,7 +18,7 @@ Password: NewPass123
 * PayPal payment system
 * Calculate nutritional requirements to achieve ketosis based on a user's weight, height, sex and target weight
 * Automatically break a user's day into a structure which can then be automatically filled with recipes based on pre-selected ingredient preferences
-* Search for recipes manually based on what ingredient the user types in and return up to 50 recipes
+* Search for recipes manually based on what ingredient the user types in and return up to 50 recipes to select for their meal plan
 * Alternatively, search for a foods directly e.g. eggs
 * Mix and match between manually selected favourite recipes/foods, and automatic selection to fill remaining required nutrients 
 * Visualisation of user progress with Chart.js
